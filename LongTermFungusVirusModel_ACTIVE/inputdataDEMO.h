@@ -167,7 +167,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 	while (fscanf(ftp_data,"%d %lf %lf %lf %lf %lf %lf %lf \n",&Ddata2[i],&Rain[i],&MaxT[i],&MinT[i],&AveT[i],&MaxRH[i],&MinRH[i],&AveRH[i])!= EOF)			{
 		//printf("inside while statement...\n");getc(stdin);
 
-        //JL: Read in DEMOweather1, Rain/2 from DEMOweather2
+        //JL: Read in DEMOweather1, Rain/2 from DEMOweather2 //SH Might need to *100 for RH
 		Params->WDATA[j][i][0]=Ddata2[i]; Params->WDATA[j][i][1]=Rain[i]/2; Params->WDATA[j][i][2]=MaxT[i]; Params->WDATA[j][i][3]=MinT[i]; //TEMP
 		Params->WDATA[j][i][4]=AveT[i]; Params->WDATA[j][i][5]=MaxRH[i]; Params->WDATA[j][i][6]=MinRH[i]; Params->WDATA[j][i][7]=AveRH[i]; //TEMP
 
@@ -236,7 +236,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 		//if(i==367920){ weeks=0;	i=0;	FlagF=0; q++;}
 		if(i==days[q]){ weeks=0;	i=0;	FlagF=0; q++;}         //JL: Update to the next year
 
-		Params->CCDATA[q][i][0]=rain; Params->CCDATA[q][i][1]=minRH; Params->CCDATA[q][i][2]=maxT; Params->CCDATA[q][i][3]=aveT; //TEMP
+		Params->CCDATA[q][i][0]=rain; Params->CCDATA[q][i][1]=minRH*100; Params->CCDATA[q][i][2]=maxT; Params->CCDATA[q][i][3]=aveT; //TEMP //SH changed to *100 for RH
 
 		//printf("WEATHER: rain:%lf\t  minRH:%lf\t maxT:%lf\t aveT:%lf\n",Params->Rain[i],Params->MinRH[i],Params->MaxT[i],Params->AveT[i]);getc(stdin);
 		//printf("WEATHER: q=%d\t i=%d\t rain:%lf\t  minRH:%lf\t maxT:%lf\t aveT:%lf\n",q,i,Params->CCDATA[q][i][0],Params->CCDATA[q][i][1],Params->CCDATA[q][i][2], Params->CCDATA[q][i][3]); //getc(stdin);

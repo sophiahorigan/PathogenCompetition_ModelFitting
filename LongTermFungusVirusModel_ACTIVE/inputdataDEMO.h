@@ -31,8 +31,8 @@ double minRH;
 int FlagF;
 
 char *file;
-char *file_name="Obs_JHN"; // SH modified for one observational site
-char *file_name2="KBS1_dailyweather";  //CK// name for inputing the experimental data
+char *file_name="JHN_NoCo"; // SH modified for one observational site
+char *file_name2="KBS1_dailyweather";  //SH weather data for one site
 // char *file_name3="DEMOweather";  //CK// name for inputing the rain data
 // char *file_name4="CDO_Roscommon_APT_long";  //CK// name for inputing the rain data
 // char *fakeweather="fakeweather";

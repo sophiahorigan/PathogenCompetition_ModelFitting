@@ -186,12 +186,18 @@ double vdensity;
 int bbf;
 for (bbf=0;bbf<15;bbf++){
 //VFPass=VFtime;
+// SH need to set initial conditions
 VFSus=VFSusF[bbf];
 sdensity=initialS[0];
 fdensity=0;
 vdensity=initialV;
 
-for (year=0;year<47;year++){
+// brings initial values into structure
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+/* for (year=0;year<47;year++){
      //printf("year: %d\n",year);
     //printf("%lf %lf %lf %lf %lf %lf %lf %lf\n",initialS[0],initialS[1],initialS[2],initialS[3],initialS[4],initialS[5],initialS[6],initialS[7]);
     //getc(stdin);
@@ -206,13 +212,13 @@ for (year=0;year<47;year++){
 	Params.PARS[30+pop]=sdensity;  //CK//  I think these should just be initialS[pop], not initialS[pop-1].  Keep everything where pop starts at 1
 	//Params.PARS[40+pop]=initial_T[pop-1];  //CK// Needs to be [pop-1].  initialS is where the conditions are read in, so it starts at 0 and needs to be adjusted for
 
-	VPass=vdensity;
+	
 
     if (year<16){
         Params.PARS[50+pop] = 0;
     }
     else{
-    Params.PARS[50+pop] = fdensity;
+    
     }
     //printf("%d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",year,Params.PARS[30+pop],Params.PARS[50+pop],VPass,InfFungusEnd,InfVirusEnd,InfFungusAdj,InfVirusAdj);
 	//MAXT3=(Params.EXPDATA[pop][Params.MAXT2[pop2]][2]+1)*7;
@@ -357,7 +363,7 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 */
 
 	for(j=0; j<reps; j++){
-		DDEVF(&Params,r_seed,dim,pop,MAXT3,S_start,year);
+		DDEVF(&Params,r_seed,dim,pop,MAXT3,S_start,year); // SH change S_start to 0 and MAXT3 (length of epizootic) to final number
 	}
 
 

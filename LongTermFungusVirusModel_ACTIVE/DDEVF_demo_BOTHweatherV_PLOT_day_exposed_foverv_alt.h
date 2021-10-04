@@ -1,5 +1,5 @@
 //double DDEVF(void *Paramstuff,double *RandNumsPass,size_t dim,int pop,int maxy_t,double (*sim_results)[7])
-double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q)
+double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q) //SH year is q
 //double DDEVF2(struct STRUCTURE *Params,int pop,double sim_results[1+Params->MAXT[pop]/7][5])
 {
 // DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
@@ -230,7 +230,7 @@ test_day = line_ticker;
 
 while(DD10 <= DDstart){
 
-	DDtemp_now = Params->CCDATA[q][test_day][3]-10.0;  //CK// begin calculation of accumulated Degree Days
+	DDtemp_now = Params->WDATA[0][test_day][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 	if(DDtemp_now<0.0){DDtemp_now=0.0;}
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 	R_start++;
@@ -247,7 +247,7 @@ test_day = line_ticker;
 
 while(DD10 <= DDstop){
 
-	DDtemp_now = Params->CCDATA[q][test_day][3]-10.0;  //CK// begin calculation of accumulated Degree Days
+	DDtemp_now = Params->WDATA[0][test_day][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 	if(DDtemp_now<0.0){DDtemp_now=0.0;}
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 	R_end++;
@@ -302,7 +302,7 @@ if(R_start<1.0){
 	//printf("stochasticity: %f\t initR: %f\n", rand_nuF[0], initR);
 
 	for (rain_day= (line_ticker - beta - theta - 1);rain_day <= line_ticker - theta -1;rain_day++){
-		total_rainfall = Params->CCDATA[q][rain_day][0]+total_rainfall;
+		total_rainfall = Params->WDATA[0][rain_day][0][0]+total_rainfall;
 	//printf("line: %d\t accumulating rain: %lf\n", rain_day, total_rainfall);		getc(stdin);
 	}
 
@@ -343,7 +343,7 @@ if(R_start<1.0){
 //printf("Pop:%d\t Day:%d\t Week:%d\t Rain1: %f\t Stoch1: %f\t Spores1: %f\n", pop, day, week, total_rainfall, exp(rand_nuF[0]), initR);
 
 	for (rain_day= (line_ticker2 - beta - theta - 1);rain_day <= line_ticker2 - theta -1;rain_day++){
-		total_rainfall = Params->CCDATA[q][rain_day][0]+total_rainfall;
+		total_rainfall = Params->WDATA[0][rain_day][0][0]+total_rainfall;
 	//printf("line: %d\t accumulating rain: %lf\n", rain_day, total_rainfall);		getc(stdin);
 	}
 
@@ -589,7 +589,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		Params->nuV = Params->PARS[2];
 		//Params->muF = specific_muF;
 
-		DDtemp_now = Params->CCDATA[q][line_ticker - 1][3]-10.0;  //CK// begin calculation of accumulated Degree Days
+		DDtemp_now = Params->WDATA[0][line_ticker - 1][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 		if(DDtemp_now<0.0){DDtemp_now=0.0;}
 		DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 
@@ -608,14 +608,14 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//nuF2 = specific_nuF*exp(RH_P*Params->WDATA[pop2][line_ticker - 1][6] + rand_nuF[(int)t]);
 		//nuF2 = specific_nuF*exp(RH_P*Params->WDATA[pop2][line_ticker - 1][6] * exp(rand_nuF[(int)t]));  //JL: Make it the same as DDEVF for MCMC?
 		//if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
-		nuF2 = specific_nuF*exp(RH_P*Params->CCDATA[q][line_ticker - 1][1]) * exp(rand_nuF[(int)t]);    //JL: Make it the same as DDEVF for MCMC
+		nuF2 = specific_nuF*exp(RH_P*Params->WDATA[0][line_ticker - 1][1][0]) * exp(rand_nuF[(int)t]);    //JL: Make it the same as DDEVF for MCMC
 		if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
         //printf("%e\t %e\t %e\n",specific_nuF,RH_P,rand_nuF[(int)t]);
 		Params->nuF = (DD10/fourth_size)*nuF2;
         //printf("%e\t %e\n",DD10,fourth_size);
 
 
-		temp_now = Params->CCDATA[q][line_ticker - 1][2];  //CK// putting max temp in smaller object
+		temp_now = Params->WDATA[0][line_ticker - 1][2][0];  //CK// putting max temp in smaller object
 		//printf("DDtemp_now=%e, temp_now=%e\n",DDtemp_now,temp_now);
 
 		//Params->muF = specific_muF;	//CK// Conidia Decay Response #2.2  BEST SO FAR!!
@@ -641,7 +641,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
                 total_rainfall=0;
             }
             else{
-                    total_rainfall = Params->CCDATA[q][rain_day][0]+total_rainfall;
+                    total_rainfall = Params->WDATA[0][rain_day][0][0]+total_rainfall;
             }
 			//printf("line: %d\t accumulating rain: %lf\n", rain_day, total_rainfall);
 		}
@@ -901,6 +901,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
         //printf("muF=%e\n",Params->muF);
         //printf("Vcadaver=%e\n", Vcadaver);
+		//SH below line prints daily output
         //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R

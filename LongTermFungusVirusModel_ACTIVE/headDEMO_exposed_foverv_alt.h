@@ -125,7 +125,7 @@ typedef struct
 	int ***EXPDATA;				    // 3-dimensional array that holds all the EXPERIMENTAL data
 	//int ***WDATA;				    // 3-dimensional array that holds all the WEATHER data
 	double ***CCDATA;
-	double WDATA[DATA_SETS+1][999][8];
+	double WDATA[DATA_SETS+1][999][8][100]; //SH Change last value to determine the number of years
 	double test_data[1000][36];
 
 	double AcceptedVect[NUM_PARS];

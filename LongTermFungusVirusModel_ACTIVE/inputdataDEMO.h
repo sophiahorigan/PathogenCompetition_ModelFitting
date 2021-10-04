@@ -7,7 +7,7 @@ int inputdata(void *Paramstuff)
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 // loads the data into a matrix and finds the number of weeks in the data set
-int Sdata[MAX_WEEKS]; int Vdata[MAX_WEEKS]; int Fdata[MAX_WEEKS]; int Ddata[MAX_WEEKS]; int Cdata[MAX_WEEKS]; int D2data[MAX_WEEKS];
+int Sdata[MAX_WEEKS]; int Vdata[MAX_WEEKS]; int Fdata[MAX_WEEKS]; int FVdata[MAX_WEEKS]; int Ddata[MAX_WEEKS]; int Cdata[MAX_WEEKS]; int D2data[MAX_WEEKS];
 int Ddata2[MAX_WEEKS2]; double Rain[MAX_WEEKS2]; double MaxT[MAX_WEEKS2]; double MinT[MAX_WEEKS2]; double AveT[MAX_WEEKS2]; double MaxRH[MAX_WEEKS2]; double MinRH[MAX_WEEKS2]; double AveRH[MAX_WEEKS2];
 double fakeday[SIMU]; double fakerain[SIMU]; double fakemaxt[SIMU]; double fakeavet[SIMU]; double fakerh[SIMU];
 int weeks;	int i; int j; int q;
@@ -31,11 +31,11 @@ double minRH;
 int FlagF;
 
 char *file;
-char *file_name="data";
-char *file_name2="expdata";  //CK// name for inputing the experimental data
-char *file_name3="DEMOweather";  //CK// name for inputing the rain data
-char *file_name4="CDO_Roscommon_APT_long";  //CK// name for inputing the rain data
-char *fakeweather="fakeweather";
+char *file_name="Obs_JHN"; // SH modified for one observational site
+char *file_name2="KBS1_dailyweather";  //CK// name for inputing the experimental data
+// char *file_name3="DEMOweather";  //CK// name for inputing the rain data
+// char *file_name4="CDO_Roscommon_APT_long";  //CK// name for inputing the rain data
+// char *fakeweather="fakeweather";
 char *file_type=".txt";
 
 char *code;
@@ -43,6 +43,7 @@ char *code_name="ftp";
 
 char numbs[5];
 /*------------------------------- Data Sets ---------------------------------*/
+/* -------- SH Observational Data ------- */
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
 	FILE *ftp_data;
@@ -50,7 +51,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 //printf("just before numbs...\n");
 	sprintf(numbs,"%d",j);
 
-	file = (char*)calloc((strlen(file_name)+strlen(file_type)+strlen(numbs)+1),sizeof(char));
+	file = (char*)calloc((strlen(file_name)+strlen(file_type)+strlen(numbs)+1),sizeof(char)); //SH name multiple weather files in incrementing order
 	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
 
 	strcat(file,file_name);
@@ -66,8 +67,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
 
-	while (fscanf(ftp_data,"%d %d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i],&Ddata[i],&D2data[i])!= EOF)			{
-		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=Ddata[i]; Params->DATA[j][i][4]=D2data[i];
+	while (fscanf(ftp_data,"%d %d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &Ddata[i],&D2data[i])!= EOF)			{
+		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][4]=Ddata[i]; Params->DATA[j][i][5]=D2data[i];
 		//printf("FERALS: i=%d\t pop:%d\t healthy:%d\t viral:%d\t fungal:%d\t week:%d\t week2:%d\n",i,j,Params->DATA[j][i][0],Params->DATA[j][i][1],Params->DATA[j][i][2], Params->DATA[j][i][3], Params->DATA[j][i][4]);
 		//if ((Fdata[i]>0) && (FlagF<1))	{
 		//	FlagF=2;
@@ -91,6 +92,74 @@ for (j=1;j<=DATA_SETS;j++)	{
 //getc(stdin);
 
 //printf("just before Experimental Data...\n");getc(stdin);
+
+/*-------------------------------Weather Data Sets ---------------------------------*/
+/* -------- SH Weather Data ------- */
+for (j=1;j<=DATA_SETS;j++)	{
+	weeks=0;	i=0;	FlagF=0;
+	FILE *ftp_data;
+
+	sprintf(numbs,"%d",j);
+
+	file = (char*)calloc((strlen(file_name2)+strlen(file_type)+strlen(numbs)+1),sizeof(char));
+	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
+
+	strcat(file,file_name2);
+	strcat(file,numbs);
+	strcat(file,file_type);
+
+	strcat(code,code_name);
+	strcat(code,numbs);
+//printf("within weather data sets \n");
+
+	ftp_data=fopen(file,"r");
+	//ftp_data = fopen("weather1.txt","r");
+	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
+	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
+
+	//printf("just before while statement...\n");
+	while (fscanf(ftp_data,"%d %lf %lf %lf %lf %lf %lf %lf \n",&Ddata2[i],&Rain[i],&MaxT[i],&MinT[i],&AveT[i],&MaxRH[i],&MinRH[i],&AveRH[i])!= EOF)			{
+		//printf("inside while statement...\n");getc(stdin);
+
+        //JL: Read in DEMOweather1, Rain/2 from DEMOweather2 //SH Might need to *100 for RH
+		// j = site (loop) i = row column 1,2,3 
+		Params->WDATA[j][i][0][0]=Ddata2[i]; Params->WDATA[j][i][1][0]=Rain[i]; Params->WDATA[j][i][2][0]=MaxT[i]; Params->WDATA[j][i][3][0]=MinT[i]; //TEMP
+		Params->WDATA[j][i][4][0]=AveT[i]; Params->WDATA[j][i][5][0]=MaxRH[i]; Params->WDATA[j][i][6][0]=MinRH[i]; Params->WDATA[j][i][7][0]=AveRH[i]; //TEMP //SH added column to indicate year
+
+        //JL: Read in DEMOweather8, Temp-5, RH+20 from DEMOweather2
+		//Params->WDATA[j][i][0]=Ddata2[i]; Params->WDATA[j][i][1]=Rain[i]; Params->WDATA[j][i][2]=MaxT[i]-5; Params->WDATA[j][i][3]=MinT[i]-5; //TEMP
+		//Params->WDATA[j][i][4]=AveT[i]-5; Params->WDATA[j][i][5]=MaxRH[i]+20; Params->WDATA[j][i][6]=MinRH[i]+20; Params->WDATA[j][i][7]=AveRH[i]+20; //TEMP
+		//if (Params->WDATA[j][i][5]>100){
+        //   Params->WDATA[j][i][5] = 100;
+		//}
+		//if (Params->WDATA[j][i][6]>100){
+        //    Params->WDATA[j][i][6] = 100;
+		//}
+		//if (Params->WDATA[j][i][7]>100){
+        //    Params->WDATA[j][i][7] = 100;
+		//}
+
+		//printf("WEATHER: i=%d\t wk_number:%d\t day:%d\t rain:%lf\t maxT:%lf\t minT:%lf\t aveT:%lf\t maxRH:%lf\t minRH:%lf\t aveRH:%lf\n",i,weeks,Ddata2[i],Params->WDATA[j][i][1],MaxT[i],MinT[i],AveT[i],MaxRH[i],MinRH[i],AveRH[i]);
+//getc(stdin);
+		//if ((Fdata[i]>0) && (FlagF<1))	{
+		//	FlagF=2;
+		//	Params->DAY_F[j]=7*i;
+		//}
+		weeks++; i++;
+		//printf("weeks: %d i:%d \n",weeks,i);
+	}
+	fclose(ftp_data);
+
+	//Params->MAXT3[j]=weeks-1;				// number of days
+	//total_days += Params->MAXT3[j];    //don't think weather data should count for miser...
+	//printf("data set %d has %d days\t total=%d\n",j,Params->MAXT2[j],total_days);getc(stdin);
+	num_weeks3[j]=i;
+
+	//getc(stdin);
+
+	//if (FlagF==0)	Params->DAY_F[j]=Params->MAXT2[j];
+}
+//ALL BELOW IS COLINS OLD STUFF
 
 /*-------------------------------Experimental Data Sets ---------------------------------*/
 for (j=1;j<=DATA_SETS;j++)	{
@@ -140,70 +209,6 @@ for (j=1;j<=DATA_SETS;j++)	{
 
 //printf("just before Weater Data...\n");
 
-/*-------------------------------Weather Data Sets ---------------------------------*/
-for (j=1;j<=DATA_SETS;j++)	{
-	weeks=0;	i=0;	FlagF=0;
-	FILE *ftp_data;
-
-	sprintf(numbs,"%d",j);
-
-	file = (char*)calloc((strlen(file_name3)+strlen(file_type)+strlen(numbs)+1),sizeof(char));
-	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
-
-	strcat(file,file_name3);
-	strcat(file,numbs);
-	strcat(file,file_type);
-
-	strcat(code,code_name);
-	strcat(code,numbs);
-//printf("within weather data sets \n");
-
-	ftp_data=fopen(file,"r");
-	//ftp_data = fopen("weather1.txt","r");
-	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
-	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
-
-	//printf("just before while statement...\n");
-	while (fscanf(ftp_data,"%d %lf %lf %lf %lf %lf %lf %lf \n",&Ddata2[i],&Rain[i],&MaxT[i],&MinT[i],&AveT[i],&MaxRH[i],&MinRH[i],&AveRH[i])!= EOF)			{
-		//printf("inside while statement...\n");getc(stdin);
-
-        //JL: Read in DEMOweather1, Rain/2 from DEMOweather2 //SH Might need to *100 for RH
-		Params->WDATA[j][i][0]=Ddata2[i]; Params->WDATA[j][i][1]=Rain[i]/2; Params->WDATA[j][i][2]=MaxT[i]; Params->WDATA[j][i][3]=MinT[i]; //TEMP
-		Params->WDATA[j][i][4]=AveT[i]; Params->WDATA[j][i][5]=MaxRH[i]; Params->WDATA[j][i][6]=MinRH[i]; Params->WDATA[j][i][7]=AveRH[i]; //TEMP
-
-        //JL: Read in DEMOweather8, Temp-5, RH+20 from DEMOweather2
-		//Params->WDATA[j][i][0]=Ddata2[i]; Params->WDATA[j][i][1]=Rain[i]; Params->WDATA[j][i][2]=MaxT[i]-5; Params->WDATA[j][i][3]=MinT[i]-5; //TEMP
-		//Params->WDATA[j][i][4]=AveT[i]-5; Params->WDATA[j][i][5]=MaxRH[i]+20; Params->WDATA[j][i][6]=MinRH[i]+20; Params->WDATA[j][i][7]=AveRH[i]+20; //TEMP
-		//if (Params->WDATA[j][i][5]>100){
-        //   Params->WDATA[j][i][5] = 100;
-		//}
-		//if (Params->WDATA[j][i][6]>100){
-        //    Params->WDATA[j][i][6] = 100;
-		//}
-		//if (Params->WDATA[j][i][7]>100){
-        //    Params->WDATA[j][i][7] = 100;
-		//}
-
-		//printf("WEATHER: i=%d\t wk_number:%d\t day:%d\t rain:%lf\t maxT:%lf\t minT:%lf\t aveT:%lf\t maxRH:%lf\t minRH:%lf\t aveRH:%lf\n",i,weeks,Ddata2[i],Params->WDATA[j][i][1],MaxT[i],MinT[i],AveT[i],MaxRH[i],MinRH[i],AveRH[i]);
-//getc(stdin);
-		//if ((Fdata[i]>0) && (FlagF<1))	{
-		//	FlagF=2;
-		//	Params->DAY_F[j]=7*i;
-		//}
-		weeks++; i++;
-		//printf("weeks: %d i:%d \n",weeks,i);
-	}
-	fclose(ftp_data);
-
-	//Params->MAXT3[j]=weeks-1;				// number of days
-	//total_days += Params->MAXT3[j];    //don't think weather data should count for miser...
-	//printf("data set %d has %d days\t total=%d\n",j,Params->MAXT2[j],total_days);getc(stdin);
-	num_weeks3[j]=i;
-
-	//getc(stdin);
-
-	//if (FlagF==0)	Params->DAY_F[j]=Params->MAXT2[j];
-}
 
 /*-------------------------------Realistic Weather Data Sets ---------------------------------*/
 for (j=1;j<=DATA_SETS;j++)	{
@@ -267,7 +272,7 @@ for (j=1;j<=DATA_SETS;j++)	{
   
 
 /*----------------------------end of data sets------------------------------*/
-FILE *fp_weeks;
+/* FILE *fp_weeks;
 fp_weeks=fopen("weeks.dat","w");
 
 for (j=1;j<=DATA_SETS;j++)	{
@@ -277,6 +282,7 @@ fclose(fp_weeks);
 
 return 0;
 }
+*/
 
 
 /*

@@ -161,7 +161,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 }
 //SH ALL BELOW IS COLINS OLD STUFF
 
-/*-------------------------------Experimental Data Sets ---------------------------------*/
+/*-------------------------------Experimental Data Sets ---------------------------------
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
 	FILE *ftp_data;
@@ -204,12 +204,12 @@ for (j=1;j<=DATA_SETS;j++)	{
 
 	//if (FlagF==0)	Params->DAY_F[j]=Params->MAXT2[j];
 }
-
+*/
 //getc(stdin);
 
 //printf("just before Weater Data...\n");
 
-/*-------------------------------Realistic Weather Data Sets ---------------------------------*/
+/*-------------------------------Realistic Weather Data Sets ---------------------------------
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0; 	q=0;
 	FILE *ftp_data;

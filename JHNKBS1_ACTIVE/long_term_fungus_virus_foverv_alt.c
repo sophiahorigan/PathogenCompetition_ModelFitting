@@ -372,7 +372,7 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
     //sprintf(name,"pred_row_%d_col_%d.txt",row,col);
     // sprintf(name,"typethree_Vall_Cthreeweek_fut_immi_VFSus_alt_%lf_1.txt",VFSusF[bbf]);
     //sprintf(name,"fv_bf_%f_row_%d_col_%d.txt",bfungus[bbf],row,col);
-	sprintf(name, "JHN_KBS1daily_test1", row, col); //SH attempt at naming output based on above lines
+	sprintf(name, "JHN_KBS1daily_test1"); //SH attempt at naming output based on above lines
 
     fp=fopen(name,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
 
@@ -399,17 +399,17 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
     //initial_nuF[0]=phifungus*
     //fdensity=InfFungusEnd;
     //vdensity=InfVirusEnd;
-    if (year>15){
-    fdensity=phifungus*InfFungusNext+gammafungus*fdensity;
+    // if (year>15){
+    // fdensity=phifungus*InfFungusNext+gammafungus*fdensity;
     //fdensity=phifungus*tempor/(1+psifungus*fdensity);
     //fdensity=phifungus*InfFungusAdj+gammafungus*fdensity;
-    }
-    vdensity=eta*(phivirus/eta*InfVirusNext+gammavirus*vdensity/eta);
+   // }
+    // vdensity=eta*(phivirus/eta*InfVirusNext+gammavirus*vdensity/eta);
     //vdensity=eta*(phivirus/eta*InfVirusAdj+gammavirus*vdensity/eta);
-    fclose(fp);
-    }
-    }
-}
+    // fclose(fp);
+    //}
+    // }
+
 
 /*				// ----------------------- loop over patch numbers -------------------------------------------- //
 				for (Params.pop=1;Params.pop<=DATA_SETS;Params.pop++)	{
@@ -478,8 +478,8 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 //}   //end of the infinite while loop
 
 free_i3tensor(Params.DATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
-free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
-free_d3tensor(Params.CCDATA,0,100,0,MAX_WEEKS2,0,4);
+// free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
+free_d3tensor(Params.WDATA,0,100,0,MAX_WEEKS2,0,4);
 //free_i3tensor(Params.WDATA,0,0,0,MAX_WEEKS2,0,2);
 //free(Params.Rain);
 //free(Params.MaxT);
@@ -487,4 +487,4 @@ free_d3tensor(Params.CCDATA,0,100,0,MAX_WEEKS2,0,4);
 //printf("DONE!!!\n");
 
 return 0;
-}
+// }

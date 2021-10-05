@@ -486,5 +486,5 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 //free(Params.MinRH);
 //printf("DONE!!!\n");
 
-// return 0;
+return 0;
 }

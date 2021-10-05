@@ -4,10 +4,8 @@ double bound(int i,int j)				// bounds on parameters for parhood line search
 double low;
 double high;
 
-//if (i==2)		{	low = -6.1;			high = .1;	}		//nuBAR	(log10)
 if (i==2)		{	low = -4.0;			high = -0.5;	}		//nuV	(log10)
 else if (i==3)	{	low = -7.50;			high = -3.50;	}		//nuF
-//else if (i==4)	{	low = 0.001;			high = 3.0;	}		//k
 else if (i==4)	{	low = 0.1;			high = 4.0;	}		//k
 else if (i==5)	{	low = -1.0;			high = 0.2;}		//muV	(log10)
 else if (i==6)	{	low = -6.50;			high = -3.00;}		//muF	(log10)
@@ -17,43 +15,30 @@ else if (i==7)	{	low = 1.01;			high = 9.01;}		//CK//  beta = the size of accumul
 else if (i==8)	{	low = 5;			high = 50;	}		//gam_stepsV
 else if (i==9)	{	low = 10;			high = 200;	}		//gam_stepsF
 else if (i==10)	{	low = -4.0;			high = -1.0;}		//ratio	(log10)
-//else if (i==11)	{	low = -4.0;			high = -0.300;	}		//sdr
-//else if (i==12)	{	low = -4.0;			high = -0.500;	}		//sdf
 else if (i==11)	{	low = 0.000001;			high = 0.600;	}		//sdr
 else if (i==12)	{	low = 0.000001;			high = 0.300;	}		//sdC
 
 else if (i==13)	{	low = -4.0;			high = 1.00;	}		//gamma
-//else if (i==13)	{	low = -4.0;			high = 0.5;	}		//CK// Average R(0) for all populations
-//else if (i==13)	{	low = .50;			high = 3.5;	}		//CK// cover_C
-//else if (i==13)	{	low = .50;			high = 4.5;	}		//CK// Now it is the COVERED CAGE scaling parameter 
+
 												//CK// theta = delay for when to start accumulating rainfall
 
 else if (i==14)	{	low = -4.0;			high = 1.00;	}		//gamma
 
 else if (i==15)	{	low = 1.0;			high = 14.1;}		//neonates_v
-//else if (i==16)	{	low = 0.51;			high = 5.1;	}		//r_time
-//else if (i==16)	{	low = 38.0;			high = 52.0;	}		//CK// STOP1
 else if (i==16)	{	low = 350.0;			high = 650.0;	}		//CK// C end	
 //CK//  I'm changing param 16 from influencing when spores start blooming to when spores stop blooming 
-//else if (i==17)	{	low = .005;			high = 3.0;	}		//lambdaV
 else if (i==17)	{	low = 4.0;			high = 17.0;	}		//Covered_C
 else if (i==18)	{	low = .066667;			high = 0.25;	}		//lambdaF
 
-//else if (i==19)	{	low = -2.0;			high = -0.4;	}		//CK// 
 else if (i==19)	{	low = 160.0;			high = 500.0;	}		//CK// stop2 R_end.  time when resting spores stop blooming
 
 else if (i==20)	{	low = 4.0;			high = 20.50;	}		//CK// Covered_R
-//else if (i==20)	{	low = 0.5;			high = 4.50;	}		//CK// CAGE scaling parameter
-//else if (i==20)	{	low = 1E-5;			high = 0.1;	}		//CK// rain scaling parameter
 
-//else if (i==21)	{	low = 0.01;			high = 20.0;	}		//CK// Rain scaling parameter func 3 and 4
 else if (i==21)	{	low = -2.0;			high = 1.50;	}		//CK// Rain scaling parameter func 2
-//else if (i==21)	{	low = 0.0000001;			high = 0.2;	}		//CK// temp scaling parameter
 
 else if (i==22)	{	low = -1.75;			high = -0.70;	}		//CK// RH scaling parameter
 
 else if (i==23)	{	low = -0.600;			high = -0.10;	}		//CK// temp scaling parameter for muF
-//else if (i==23)	{	low = 0.0001;			high = 0.2;	}		//CK// stop2 R_end.  time when resting spores stop blooming
 
 else if (i==24)	{	low = 2.50;			high = 18.00;	}		//CK// open_C
 
@@ -62,11 +47,7 @@ else if (i==25)	{	low = 4.1;			high = 18.50;	}		//CK// open_R
 else if (i==26)	{	low = -0.750;			high = 3.50;	}		// rain_P2
 
 else if (i==27)	{	low = 60.0;			high = 130.0;	}		//CK// R_start.  time when resting spores start blooming
-//else if (i==27)	{	low = -4.0;			high = -0.7;	}		//CK// stop2 R_end.  time when resting spores stop blooming
-//else if (i==26)	{	low = 1E-4;			high = 0.1;	}		//CK// scaler for TEMP affect of muF func 2
-//else if (i==26)	{	low = 0.001;			high = 4.0;	}		//CK// scaler for TEMP affect of muF func 3 and 4
 
-//else if (i==28)	{	low = 0.015;			high = 0.07;	}		//CK// size_S. effect of size on susceptibility.
 else if (i==28)	{	low = 230.0;			high = 370.0;	}		//CK// size_S. effect of size on susceptibility.
 
 else if (i==29)	{	low = -2.50;			high = 0.50;	}		//CK// rain_P3
@@ -136,15 +117,13 @@ else if (i==13)	{	low = 0.01;			high = 4.01;	}		//CK// theta = delay for when to
 
 else if (i==14)	{	low = 1.9;			high = 3.5;	}		//gamma
 else if (i==15)	{	low = 1;			high = 14;	}		//neonates_v
-//else if (i==16)	{	low = 0;			high = 10;	}		//r_time
-else if (i==16)	{	low = 0.1;			high = 20.0;	}		//r_time  //CK// changed!		//CK// to change!
+else if (i==16)	{	low = 0.1;			high = 20.0;	}		//r_time  
 else if (i==17)	{	low = .1;			high = 9.0;	}		//lambdaV
 else if (i==18)	{	low = .1;			high = 9.0;	}		//lambdaF
 
 else if (i==19)	{	low = .01;			high = 0.4;	}		//CK// dummy param for testing!!!
 
 else if (i==20)	{	low = 0.1;			high = 5.4;	}		//CK// covered cage scaling parameter
-//else if (i==20)	{	low = 0.00001;			high = 0.4;	}		//CK// rain scaling parameter
 
 else if (i==21)	{	low = 0.00001;			high = 0.4;	}		//CK// temp scaling parameter
 
@@ -156,7 +135,6 @@ else if (i==24)	{	low = 0.1;			high = 3.5;	}		//CK// open_R
 
 else if (i==25)	{	low = 0.5;			high = 4.5;	}		//CK// cover_R
 
-//else if (i==26)	{	low = 1E-6;			high = 0.5;	}		//CK// scaler for TEMP affect of muF func 2
 else if (i==26)	{	low = 0.01;			high = 20.0;	}		//CK// scaler for TEMP affect of muF func 3 and 4
 else if (i==27)	{	low = 1E-6;			high = 0.5;	}		//CK// scaler for TEMP affect of muF func 2
 
@@ -209,8 +187,6 @@ double mean=0, sdev=0;
 double Slow=0, Shigh=0;
 double Rmean=0,Rsdev=0;
 
-//ulow=0;	uhigh=0;	mean=0;	sdev=0;	Slow=0;	Shigh=0; Rmean=0; Rsdev=0;
-
 if (i==2)		{	ulow =.001;	uhigh=.3;	}
 else if (i==4)	{	mean=.13;	sdev =.4;	}
 else if (i==5)	{	ulow=.1;	uhigh=1;	}
@@ -260,16 +236,8 @@ else {printf("PROBLEM WITH MEAN or SDEV in GAUSSIAN PARAMETERES!!\n");	return 0;
 double r_end(int i)
 {
 double r_day=31+20;
-//r_day=32+30+55;
 double end_day;
 
-//Lat and long for all 6 sites in current order (KF, RC1, UM1, RC2, RC3, CCR)
-//42.363523, -85.348499
-//44.463390, -84.604086
-//45.483875, -84.680951
-//44.465764, -84.595857
-//44.465764, -84.595857
-//45.188782, -84.22861
 
 if      (i==0)      end_day = 0;
 else if (i==1)		end_day = 20;
@@ -288,7 +256,6 @@ else if (i==13)		end_day = 25;
 else if (i==14)		end_day = 12;
 else if (i==15)		end_day = 12;
 else if (i==16)		end_day = 12;
-//R_end[17]=R_final-21;	R_end[18]=R_final-21;	R_end[19]=R_final-21;
 
 else {
 	printf("ERROR IN R END DATE!!!!\n");
@@ -435,18 +402,12 @@ STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
 Params->PARS[1] = 1;											// dummy parm to differentiate between profile hood and maxhood
-//Params->PARS[3] = 1;											// scaled nuV and nuR
-//Params->PARS[7] = 3.0;											//CK//  beta = the size of accumulated rainfall window
 Params->PARS[9] = 50.0;											//CK//  beta = the size of accumulated rainfall window
 
 
 Params->PARS[10] = 0.002;		//ck// ratio for virus infection.  Trying to set it and see what happens
 
-// mu_R (wont matter)
 Params->PARS[8] = 5;			Params->PARS[9] = 5;			// gamma steps
-//Params->PARS[11]= 0;			Params->PARS[12]= 0;			// noise variance
-//Params->PARS[13]= 1.01;											// delta (fixed)
-//Params->PARS[24]=1293.3/30;		Params->PARS[27]=35148/30;		// constant S(0)
 
 }
 // ---------------------------------------------------------------------------------------------------------------- //
@@ -466,26 +427,17 @@ if (num_adj_pars>0)	{
 		if (i==2||i==3||i==4||i==5||i==6||i==9||i==10||i==11||i==12||i==13||i==14||i==15||i==16||i==17||i==18||i==19||i==20||i==21||i==22||i==23||i==24||i==25||i==26||i==27||i==28||i==29)	{
 			Params->parm_step[i]=(Params->parm_high[i]-Params->parm_low[i])/parm_inc;
 		}
-		//if (i==14)	{
-		//	Params->parm_step[i]=(Params->parm_high[i]-Params->parm_low[i])/(parm_inc/2);
-		//}
-		//printf("parm:%d\t low=%f high=%f step=%f\n",i,Params->parm_low[i],Params->parm_high[i],Params->parm_step[i]);	
-	}	//getc(stdin);
+	}	
 }
 
 // ----------------------------- host/initR increments and end of spore germination -------------------------------- //
 for (i=0;i<=DATA_SETS;i++){
-	//Params->parm_low[30+i]  = patch_bound(i,1);		Params->parm_high[30+i]= patch_bound(i,2);	// S(0)
 	Params->parm_low[40+i]  = patch_bound(i,1);		Params->parm_high[40+i]= patch_bound(i,2);	//CK// Site-Specific muF
 	Params->parm_low[50+i]  = patch_bound(i,3);		Params->parm_high[50+i]= patch_bound(i,4);	// R(0)
-	//Params->parm_step[30+i] = (Params->parm_high[30+i]-Params->parm_low[30+i])/host_inc;
 	Params->parm_step[40+i] = (Params->parm_high[40+i]-Params->parm_low[40+i])/host_inc;   //CK// muF
 	Params->parm_step[50+i] = (Params->parm_high[50+i]-Params->parm_low[50+i])/initR_inc;
 	Params->R_END[i]	= r_end(i);	                                                // fungus stops blooming
 }
-// -------------------------------------- fixed parameter values -------------------------------------------------- //
-//Params->parm_step[30+4]=1.8;	Params->parm_step[30+7]= 1.9;
-//Params->parm_step[50+3]=1.8;	Params->parm_step[50+14]=1.8;    Params->parm_step[50+15]=1.8;	Params->parm_step[50+16]=1.8;
 
 }
 
@@ -505,7 +457,6 @@ for (i=1;i<=num_adj_pars;i++)	{
 			Params->PARS[i] = gsl_ran_flat(r_seed,Params->parm_low[i],Params->parm_high[i]);
 		}
 		else if (i==11||i==12)						{	// start with very low amounts of stochasticity
-		//else if (i==12)						{	// start with very low amounts of stochasticity
 			Params->PARS[i] = .01;
 		}
 		else if (i==9)						{	// start with very low amounts of stochasticity
@@ -513,13 +464,8 @@ for (i=1;i<=num_adj_pars;i++)	{
 		}
 		else if (i==7)						{	// start with very low amounts of stochasticity
 			Params->PARS[i] = 10.0;
-			//Params->PARS[i] = 5.0;
-			//Params->PARS[i] = 3.0;
 
 		}
-		//else if (i==10)						{	//CK// Set ratio to experimentall measured value
-		//	Params->PARS[i] = 0.002;
-		//}
 		else if (i==2||i==4||i==5||i==8||i==10||i==15)	{	//CK// set virus parameters to 0. NO VIRUS
 			Params->PARS[i] = 0.0;
 		}
@@ -529,7 +475,6 @@ for (i=1;i<=num_adj_pars;i++)	{
 		if (pro==1)		{	printf("initial parm(%d)=%e\n",i,Params->PARS[i]);	}
 	}
 	Params->MLE[i] = Params->PARS[i];
-	//printf("init parm(%d)=%f\n",i,Params->PARS[i]);
 }
 
 }

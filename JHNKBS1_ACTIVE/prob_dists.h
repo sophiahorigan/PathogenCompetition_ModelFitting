@@ -35,12 +35,10 @@ double prob=0;
 double mean[19];
 double stdev[19];
 
-mean[5]=-.42;	stdev[5]=.08;		//mean[5]=.38;	stdev[5]=.675;
-mean[6]=-.545;	stdev[6]=.12;		//mean[6]=.285;	stdev[6]=.0725;
+mean[5]=-.42;	stdev[5]=.08;		
+mean[6]=-.545;	stdev[6]=.12;	
 
 prob=gsl_ran_gaussian_pdf(value-mean[i],stdev[i]);
-
-//printf("%d: log10value=%f\t prior=%f\n",i,value,prob);	//getc(stdin);
 
 return prob;
 }
@@ -59,34 +57,19 @@ double prob_prior[NUM_PARS];
 for (i=1;i<=50+DATA_SETS;i++)	{
 	if (i==2||i==3||i==4||i==5||i==6||i==10||i==11||i==12||i==14||i==15||i==16||i==17||i==18||i==19)	{	// continuous uniform for prior
 		if (i==5||i==6)	{
-			//printf("value=%e log_value=%e\n",Params->PARS[i],log10(Params->PARS[i]));
 			prob_prior[i]=prior_dist(i,log10(Params->PARS[i]));
-			//printf("prior[%d]=%f\n",i,prob_prior[i]);
 		}
 		else	{		
-			prob_prior[i]		= 1;	//gsl_ran_flat_pdf(PARAMS[0].PARS[i],prior_low[i],prior_high[i]);
-			//printf("prior[%d]=%f\n",i,prob_prior[i]);
+			prob_prior[i]		= 1;	
 		}
-		/*
-		else if (i>20 && i<=30+DATA_SETS)	{	// S(0) uniform proposal/prior
-			prob_prior[i]		= .1;	//gsl_ran_flat_pdf(PARAMS[0].PARS[i],prior_low[i],prior_high[i]);
-		}
-		else if (i>50 && i<=50+DATA_SETS)	{	// R(0) gaussian proposal/uniform prior
-			prob_prior[i]		 = .1;	//gsl_ran_flat_pdf(PARAMS[0].PARS[i],prior_low[i],prior_high[i]);
-		}
-		else {
-			prob_prior[i] = 1;
-		}
-		*/
+	
 		if (prob_prior[i]<delta)	{
 			printf("ZERO PROBABILITY for PRIOR!! i=%d\t prob_prior=%e\n",i,prob_prior[i]);	getc(stdin);
 		}
 		log_prob_prior += log(prob_prior[i]);
-		//printf("parm:%d\t value=%f\t prob_prior=%f\t log_prob=%f\t sum_log_prob=%f\n",
-		//	i,Params->PARS[i],prob_prior[i],log(prob_prior[i]),log_prob_prior);
-	}//getc(stdin);
+		
+	}
 }
-//printf("prior=%f\n",log_prob_prior);
 return log_prob_prior;
 }
 // ---------------------------------------------------------------------------------------------------- //
@@ -96,18 +79,14 @@ STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
 int i,j;
-//printf(" PARMS:\t");
 for (i=0;i<=(size_parm_index-1);i++)			{								// intrinsic parameters
 	j=parm_index[i];
 	Params->PARS[j]=pc_parms[i];
-	//printf("translate::%d or %d=%4.3e\n",j,i,pc_parms[i]);
-	//printf("Params->PARS[%d]=%4.3e\n",j,pc_parms[i]);
 }
 
 for (i=0;i<=(size_parm_index-1);i++)			{								// intrinsic parameters
 	j=parm_index[i];
-	//printf("Params->PARS[%d]=%4.3e\n",j,Params->PARS[j]);
-}//getc(stdin);
+}
 
 }
 // ---------------------------------------------------------------------------------------------------- //
@@ -117,25 +96,18 @@ STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
 int i,j;
-//printf(" PARMS:\t");
 for (i=0;i<=(size_parm_index-1);i++)			{								// intrinsic parameters
 	j=parm_index[i];
 	Params->PARS[j]=pc_parms[i];
-	//printf("%d=%4.3e ",j,pc_parms[i]);
 }
-//printf("\n S(0):\t");
 for (i=size_parm_index;i<=(size_parm_index+size_S0_index-1);i++)	{							// S(0)
 	j=S0_index[i-size_parm_index];
 	Params->PARS[j]=pc_parms[i];
-	//printf("%d=%3.2e ",j-20,pc_parms[i]);
 }
-//printf("\n R(0):\t");
 for (i=size_parm_index+size_S0_index;i<=(size_parm_index+size_S0_index+size_r0_index-1);i++){	// R(0)
 	j=r0_index[i-(size_parm_index+size_S0_index)];
 	Params->PARS[j]=pc_parms[i];
-	//printf("%d=%3.2e ",j-50,pc_parms[i]);
 	}
-//printf("\n");	getc(stdin);
 }
 // ---------------------------------------------------------------------------------------------------- //
 void testing_parms(void *Paramstuff)
@@ -159,18 +131,5 @@ j=16;	Params->PARS[16]=1.1e+00;	Params->MLE[j] = Params->PARS[j];	printf("Parm[%
 j=17;	Params->PARS[17]=5.250000e-02;	Params->MLE[j] = Params->PARS[j];	printf("Parm[%d]=%4.3e\n",j,Params->PARS[j]);
 j=18;	Params->PARS[18]=2.400000e-01;	Params->MLE[j] = Params->PARS[j];	printf("Parm[%d]=%4.3e\n",j,Params->PARS[j]);
 j=19;	Params->PARS[18]=2.400000e-01;	Params->MLE[j] = Params->PARS[j];	printf("Parm[%d]=%4.3e\n",j,Params->PARS[j]);
-
-//getc(stdin);
-
-// Params->PARS[11]=3.333333e-02;
-
-/*
-for (i=0;i<=(size_parm_index-1);i++)			{								// intrinsic parameters
-	j=parm_index[i];
-	printf("testing:Params->PARS[%d]=%4.3e\n",j,Params->PARS[j]);
-	Params->MLE[j] = Params->PARS[j];				// necessary if called by parhood
-}
-*/
-
 
 }

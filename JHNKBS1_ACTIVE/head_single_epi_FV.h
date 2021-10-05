@@ -33,36 +33,24 @@ char *strFileNameDate;
 const double h = 0.01;		        // time step
 
 double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
-//double exposetime = 12.0;
-//double lambdaV	= 1/12.0;
-
-//double rsquareCVV=1/1.5;
 double squareCVV=0.86*0.86;
 
 double exposetime = 16;
-//double VFtime[7]={4,5,6,7,8,9,10};
 double VFtime=10;
 double VFPass;
 
 //JL: Long-term survival rates for the pathogens and fecundity
-//double phivirus=15;          //from Fuller et al. 2012
 double phivirus=40;
 double gammavirus=0.01;
 double phifungus=0.25;
 double gammafungus=0.95;
 double psifungus=0.95;
 double eta=100;
-//double fecundity=5.5;         //from Fuller et al. 2012, for host-pathogen only model
 double fecundity=74.6;
-//JL: Predation parameters
-//double preda=0;
-//double predb=0;
 double preda=0.967;           //Predation parameters, for host-pathogen-predator model
 double predb=0.14*0.39/0.64;
 double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
-//double VFSusF[15]={150,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500};
 double VFSus;
-//JL: Recording the status at the end of an epizootic
 double SusEnd;
 double InfFungusEnd=0;
 double InfVirusEnd=0;
@@ -87,8 +75,6 @@ double VPass;          //variable to pass the value of initialV in each generati
 
 
 double FakeWDATA[SIMU][5];
-//int days[20]={365, 366, 365, 365, 365, 366, 365, 365, 364, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365}; //1991-2010
-//int days[30]={365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 364, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 364, 364, 365, 366, 365, 365};  //1989-2018
 int days[47]={365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 366, 365, 365, 364}; //1973-2019
 //CK Structure for experimental data!!!
 
@@ -141,38 +127,21 @@ typedef struct
 	double MLE[NUM_PARS];
 	double MLE_host[DATA_SETS+1];
 	double MLE_initR[DATA_SETS+1];
-	//double MLE_gamma[DATA_SETS+1];
-
-	//double gamma_hood[DATA_SETS+1][100];	// 100 needs to be bigger than parm_inc (hood for each gamma value)
-	//double best_gamma[DATA_SETS+1][100];
 	double best_initS[DATA_SETS+1];
 	double best_initR[DATA_SETS+1];
 
 	int parm_inc;
 
-	//size_t dim;
-	//int calls;
 	double sim_results[55][4];		// 1st entry larger than the number of weeks in any data set
 	int th_id;
 	int pop;
 }STRUCTURE;
 
 
-#include "inputdataDEMO.h"
-#include "random_setup2.h"
-#include "filenames4.h"
-//#include "bounds_stochWEATHER_dd5.h"
-#include "bounds_RAIN+TEMP+RH8.h"
+#include "inputdata.h"
+#include "random_setup.h"
+#include "filenames.h"
+#include "par_bounds.h"
 #include "prob_dists.h"
-#include "fast_odev_exposed_foverv_alt.h"
-//#include "DDEVF_DEMO_disease1.h"
-//#include "DDEVF_DEMO_window_logistic3.h"
-//#include "DDEVF_demo_onlyW_R+T_PLOT.h"
-//#include "DDEVF_storm_wR+T_MvsV2.h"
-//#include "DDEVF_storm_BOTHweather_PLOT_window_logistic3.h"
-#include "DDEVF_demo_BOTHweatherV_PLOT_day_exposed_foverv_alt.h"
-//#include "hood_popsBASICnew3.h"
-
-//#include "experiments.h"
-//#include "hood.h"
-//#include "uniroot_burnout_solver.h"
+#include "ODE_single_epi_FV.h"
+#include "DDEVF_single_epi_FV.h"

@@ -158,7 +158,9 @@ for (j=1;j<=DATA_SETS;j++)	{
 	//getc(stdin);
 
 	//if (FlagF==0)	Params->DAY_F[j]=Params->MAXT2[j];
+	}
 }
+
 //SH ALL BELOW IS COLINS OLD STUFF
 
 /*-------------------------------Experimental Data Sets ---------------------------------

@@ -1,79 +1,78 @@
+//SH 
+// DDEVF is a the main function which calls in the parameter values, initial populations, year, etc
+
+
 double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q) //SH year is q
 {
-// DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
 
-STRUCTURE* Params;
-Params = (STRUCTURE*) Paramstuff;
-		//declarations of stuff for plotting
-double PLOT=1.0;
+	STRUCTURE* Params; //Params is a structure which bundles and carries parameters across code files
+	Params = (STRUCTURE*) Paramstuff; // saying that Params is what goes into DDEVF as Paramstuff
+	// The parameters in Params
+	double PLOT=1.0;
+	double Fprob;
+	double p1,p2,p3;	        // simulation results (p_i is the probability of being in each of the three classes)
+	double Cpar, Cprob, Cprob2, Cprob3;					//CK//
+	double Opar, Oprob, Oprob2, Oprob3;					//CK//
+	double r1, r2, r3, c1, c2;	            //CK// simulation results (r1 is resting spore density, c1 is condidia density)
+	r1 = 0.0; r2=0.0; c1= 0.0; c2=0.0;
 
-double Fprob;
-double p1,p2,p3;	        // simulation results (p_i is the probability of being in each of the three classes)
-double Cpar, Cprob, Cprob2, Cprob3;					//CK//
-double Opar, Oprob, Oprob2, Oprob3;					//CK//
-double r1, r2, r3, c1, c2;	            //CK// simulation results (r1 is resting spore density, c1 is condidia density)
-r1 = 0.0; r2=0.0; c1= 0.0; c2=0.0;
+	double cover_C = Params->PARS[17];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+	double cover_R = Params->PARS[20];
+	double open_C = Params->PARS[24];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+	double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
 
-double cover_C = Params->PARS[17];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
-double cover_R = Params->PARS[20];
-double open_C = Params->PARS[24];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
-double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+	int FlagDay=0;
+	int MAXT3=maxy_t; // length of epizootic
+	int m = Params->PARS[9];
+	int n = Params->PARS[8];
+	int DIM = m+n+4+2+1;
+	int n1=(VFPass/exposetime)*Params->PARS[8];    //The number of the first group of exposed classes to virus
+	int n2=n-n1;                  //The number of the first group of exposed classes to virus
 
-int FlagDay=0;
+	double t=h;		double t_next=h;	double t_0=h;	int i;				// time loop and index
+	double epsilon = pow(10,-6);
+	double y_ode[DIM];
+	double rand_nuR[MAXT3];
+	double rand_nuF[MAXT3];
 
+	double ave_R = Params->PARS[50+pop];
+	double specific_muF = Params->PARS[6];   //general intercept for MAX TEMP decay function for conidia
+	double specific_nuF = Params->PARS[3];   //Site-specific infection rate for conidia
+	double rain_P = Params->PARS[21];  //fit param used to scale accumulating rain.
+	double rain_P2 = Params->PARS[26];  //fit param used to scale accumulating rain.
+	double rain_P3 = Params->PARS[29];  //fit param used to scale accumulating rain.
+	double RH_P = Params->PARS[22];   //CK//  Parameter for RH data
+	double temp_P = Params->PARS[23];   //CK//  Parameter for temperature data
+	double fourth_size=Params->PARS[28];	//CK// degree day when the bugs reach 4th instar
 
-int MAXT3=maxy_t;
+	double DDstart	= Params->PARS[27];  //CK// param used for starting date
+	double DDstop	= Params->PARS[19];  //CK// param used for starting date
 
-int m = Params->PARS[9];
-int n = Params->PARS[8];
-int DIM = m+n+4+2+1;
+	Params->size_C = 1.0;
+	Params->indexR = 0.0;
+	Params->indexV = 0.0;
 
-int n1=(VFPass/exposetime)*Params->PARS[8];    //The number of the first group of exposed classes to virus
-int n2=n-n1;                  //The number of the first group of exposed classes to virus
+	double C_end=Params->PARS[16];	  //CK// fit param that turns off new conidia production once a specific size has been reached
 
-double t=h;		double t_next=h;	double t_0=h;	int i;				// time loop and index
-double epsilon = pow(10,-6);
-double y_ode[DIM];
-double rand_nuR[MAXT3];
-double rand_nuF[MAXT3];
+	double temp_now;  //CIK// used simplify decay functions
+	double total_rainfall=0.0;  //used to sum up rainfall
+	int rain_day;  //used to sum up rainfall
+	int beta;		//used to dictate how many days to go back when accumulating rain
+	int theta;    //used to determine lag period before calculating accumulated rainfall
+	beta=Params->PARS[7];
+	theta=1;
 
-double ave_R = Params->PARS[50+pop];
-double specific_muF = Params->PARS[6];   //general intercept for MAX TEMP decay function for conidia
-double specific_nuF = Params->PARS[3];   //Site-specific infection rate for conidia
-double rain_P = Params->PARS[21];  //fit param used to scale accumulating rain.
-double rain_P2 = Params->PARS[26];  //fit param used to scale accumulating rain.
-double rain_P3 = Params->PARS[29];  //fit param used to scale accumulating rain.
-double RH_P = Params->PARS[22];   //CK//  Parameter for RH data
-double temp_P = Params->PARS[23];   //CK//  Parameter for temperature data
-double fourth_size=Params->PARS[28];	//CK// degree day when the bugs reach 4th instar
+	double DDtemp_now;  //CIK// used simplify decay functions
 
-double DDstart	= Params->PARS[27];  //CK// param used for starting date
-double DDstop	= Params->PARS[19];  //CK// param used for starting date
+	double nuF2;
+	double nuR2;
 
-Params->size_C = 1.0;
-Params->indexR = 0.0;
-Params->indexV = 0.0;
-double C_end=Params->PARS[16];	  //CK// fit param that turns off new conidia production once a specific size has been reached
+	double FIO_Cc;
+	double FIO_Cr;
+	double FIO_Oc;
+	double FIO_Or;
 
-double temp_now;  //CIK// used simplify decay functions
-double total_rainfall=0.0;  //used to sum up rainfall
-int rain_day;  //used to sum up rainfall
-int beta;		//used to dictate how many days to go back when accumulating rain
-int theta;    //used to determine lag period before calculating accumulated rainfall
-beta=Params->PARS[7];
-theta=1;
-
-double DDtemp_now;  //CIK// used simplify decay functions
-
-double nuF2;
-double nuR2;
-
-double FIO_Cc;
-double FIO_Cr;
-double FIO_Oc;
-double FIO_Or;
-
-double DD10=0;    //accumulated degree days about 10 degrees C
+	double DD10=0;    //accumulated degree days about 10 degrees C
 
 
 // ----------------------------------- Generate Random Numbers -------------------------------------------- //
@@ -292,15 +291,12 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		y_ode[m+n+3]=Vcadaver;
 
 		for (i=1;i<=gstepsF;i++)	{
-			//y_ode[1+i]=E_V[i];
 			y_ode[i]=E_F[i];
 		}
 		for (i=1;i<=n1;i++)	{
-			//y_ode[1+i]=E_V[i];
 			y_ode[gstepsF+i]=E_VF[i];
 		}
 		for (i=1;i<=n2;i++)	{
-			//y_ode[1+i]=E_V[i];
 			y_ode[gstepsF+n1+i]=E_V[i];
 		}
 		y_ode[m+n+2]=FRnext;

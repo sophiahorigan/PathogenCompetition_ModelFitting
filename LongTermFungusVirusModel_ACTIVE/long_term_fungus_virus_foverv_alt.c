@@ -183,16 +183,16 @@ double sdensity;
 double fdensity;
 double vdensity;
 
-int bbf;
-for (bbf=0;bbf<15;bbf++){
+//int bbf;
+//for (bbf=0;bbf<15;bbf++){ //SH removed for now, just set VfSus to something
 //VFPass=VFtime;
 // SH need to set initial conditions
-VFSus=VFSusF[bbf];
-sdensity=initialS[0];
-fdensity=0;
-vdensity=initialV;
+VFSus=50; //SH random pick 
+sdensity=1000; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.2; //SH guesstimate
 
-// brings initial values into structure
+//SH KEEP brings initial values into structure
 Params.PARS[30+pop]=sdensity; 
 VPass=vdensity;
 Params.PARS[50+pop]=fdensity;
@@ -362,16 +362,17 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 		}
 */
 
-	for(j=0; j<reps; j++){
-		DDEVF(&Params,r_seed,dim,pop,MAXT3,S_start,year); // SH change S_start to 0 and MAXT3 (length of epizootic) to final number
-	}
+	//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
+		DDEVF(&Params,r_seed,dim,pop,48,0,year); // SH change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
+	//}
 
 
     FILE *fp;
     char name[50];
     //sprintf(name,"pred_row_%d_col_%d.txt",row,col);
-    sprintf(name,"typethree_Vall_Cthreeweek_fut_immi_VFSus_alt_%lf_1.txt",VFSusF[bbf]);
+    // sprintf(name,"typethree_Vall_Cthreeweek_fut_immi_VFSus_alt_%lf_1.txt",VFSusF[bbf]);
     //sprintf(name,"fv_bf_%f_row_%d_col_%d.txt",bfungus[bbf],row,col);
+	sprintf(name, "JHN_KBS1daily_test1", row, col); //SH attempt at naming output based on above lines
 
     fp=fopen(name,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
 

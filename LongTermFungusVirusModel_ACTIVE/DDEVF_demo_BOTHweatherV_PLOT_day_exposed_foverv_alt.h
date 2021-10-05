@@ -224,7 +224,7 @@ double E_V[n2+1]; double E_F[gstepsF+1]; double E_VF[n1+1];
 int num_weeks=MAXT3/7;
 
 // -----------------------------------//CK// calculating ending blooming times //CK//--------------------------------------- //
-
+/* //SH REMOVE BECAUSE WANT RESTING SPORES TO START BLOOMING FROM DAY 1
 DD10=0.0;		R_start = 0.0;
 test_day = line_ticker;
 
@@ -238,9 +238,9 @@ while(DD10 <= DDstart){
 //printf("temp now: %f DD10: %f R_start: %f test_day: %d\n", DDtemp_now, DD10, R_start, test_day);		//getc(stdin);
 }
 //printf("temp now: %f DD10: %f R_start: %f test_day: %d\n", DDtemp_now, DD10, R_start, test_day);		//getc(stdin);
+*/
 
-
-//R_start=0.0;
+R_start=0.0; //SH Resting spores start blooming from day 1
 
 DD10=0.0;		R_end = 0.0;
 test_day = line_ticker;

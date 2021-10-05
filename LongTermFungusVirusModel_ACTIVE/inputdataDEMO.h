@@ -159,7 +159,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 
 	//if (FlagF==0)	Params->DAY_F[j]=Params->MAXT2[j];
 }
-//ALL BELOW IS COLINS OLD STUFF
+//SH ALL BELOW IS COLINS OLD STUFF
 
 /*-------------------------------Experimental Data Sets ---------------------------------*/
 for (j=1;j<=DATA_SETS;j++)	{
@@ -208,7 +208,6 @@ for (j=1;j<=DATA_SETS;j++)	{
 //getc(stdin);
 
 //printf("just before Weater Data...\n");
-
 
 /*-------------------------------Realistic Weather Data Sets ---------------------------------*/
 for (j=1;j<=DATA_SETS;j++)	{

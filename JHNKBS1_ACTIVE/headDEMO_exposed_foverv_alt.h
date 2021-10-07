@@ -28,6 +28,7 @@ char *strFileNameDate;
 #define DATA_SETS 1		        // number of data sets
 #define NUM_PARS 100		        // number of parameters to be passed from main to hood
 #define SIMU 64
+//#define DIM 15						// number of differential equations
 
 const double h = 0.01;		        // time step
 

@@ -477,9 +477,9 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 // ------------------------------------------------------------------------------------------------------- //
 //}   //end of the infinite while loop
 
-// free_i3tensor(Params.DATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
+free_i3tensor(Params.DATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
 // free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
-// free_d3tensor(Params.WDATA,0,100,0,MAX_WEEKS2,0,4);
+free_d3tensor(Params.WDATA,0,100,0,MAX_WEEKS2,0,4);
 //free_i3tensor(Params.WDATA,0,0,0,MAX_WEEKS2,0,2);
 //free(Params.Rain);
 //free(Params.MaxT);
@@ -487,4 +487,8 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 //printf("DONE!!!\n");
 
 return 0;
+<<<<<<< HEAD
 }
+=======
+// }
+>>>>>>> parent of bd75cce (Remove tensor lines)

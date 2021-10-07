@@ -68,17 +68,59 @@ STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 int i,pop;
 
+//fprintf(fp_results,"F only AVE T 5000 loops I: %d\t %f\t %f\t",pro,Params->PARS[pro],best_post_hood);
 fprintf(fp_results,"%d\t %f\t",pro,best_post_hood);
 
+//for (i=0;i<=50+DATA_SETS;i++)	{
 for (i=0;i<=num_adj_pars;i++)	{
 	fprintf(fp_results,"%e\t",Params->PARS[i]);
+	//printf("%e\n",Params->PARS[i]);
 }
-
+//for (pop=1;pop<=DATA_SETS;pop++)	{
+//	fprintf(fp_results,"%e,\t",Params->MLE_host[pop]);
+//	//printf("%e\n",Params->PARS[i]);
+//}
 for (pop=1;pop<=DATA_SETS;pop++)		{
 	fprintf(fp_results,"%e\t",Params->MLE_initR[pop]);
+	//printf("%e\n",Params->PARS[i]);
 }
 
 fprintf(fp_results,"\n");
 
 
 }
+/*
+void output_fileINFECTION(void *Paramstuff,FILE *fp_results,double INFECTED,double Rmean, double Rvar,int num_adj_pars,int pro)
+{
+STRUCTURE* Params;
+Params = (STRUCTURE*) Paramstuff;
+int i,pop;
+
+fprintf("%lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", Params.PARS[30+2], Params.PARS[50+1], INFECTED, Params.survivors, Params.total, Rmean, Rvar); //getc(stdin);
+
+fprintf(fp_results,"\n");
+
+
+}
+*/
+
+
+
+
+/*
+void printf_last_parms(char fp_last_parms)
+{
+//char strFileName_last[99];
+//GetString(0,4,strFileName_last,98);		printf("%s\n",strFileName_last);
+FILE *fp_last_parms;
+
+fp_last_parms = fopen(strFileName_last,"w");
+
+for (i=1;i<=50+DATA_SETS;i++)	{
+	fprintf(fp_last_parms,"%e\n",PARAMS[0].PARS[i]);
+}
+fclose(fp_last_parms);
+
+return;
+}
+*/

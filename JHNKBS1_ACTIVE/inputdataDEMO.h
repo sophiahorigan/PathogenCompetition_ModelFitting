@@ -16,11 +16,11 @@ int num_weeks2[DATA_SETS+1];			//CK// used for output to file
 int num_weeks3[DATA_SETS+1];			//CK// used for output to file
 int total_days=0;					// the number of days summed over all data sets (for MISER)
 Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5);
-Params->EXPDATA = i3tensor(0,20,0,MAX_WEEKS,0,5);  //CK// May need to check this.  Not sure what i3tensor does...
-//Params->WDATA = i3tensor(0,20,0,MAX_WEEKS2,0,8);  //CK// May need to check this.  Not sure what i3tensor does...
-
+//Params->EXPDATA = i3tensor(0,20,0,MAX_WEEKS,0,5);  //CK// May need to check this.  Not sure what i3tensor does...
+//Params->WDATA = i3tensor(0,20,0,MAX_WEEKS2,0,8);  //SH// Need to ensure this is correct
+//SH could just hard code in number of weeks
 //printf("just after WDATA...\n");
-Params->CCDATA = d3tensor(0,100,0,MAX_WEEKS2,0,4);  //CK// May need to check this.  Not sure what i3tensor does...
+//Params->CCDATA = d3tensor(0,100,0,MAX_WEEKS2,0,4);  //CK// May need to check this.  Not sure what i3tensor does...
 //JL: Change the second number of d3tensor (=number of years)
 
 double rain;
@@ -32,7 +32,7 @@ int FlagF;
 
 char *file;
 char *file_name="JHN_NoCo"; // SH modified for one observational site
-char *file_name2="KBS1_dailyweather";  //SH weather data for one site
+char *file_name2="KBS1_weatherdaily";  //SH weather data for one site
 // char *file_name3="DEMOweather";  //CK// name for inputing the rain data
 // char *file_name4="CDO_Roscommon_APT_long";  //CK// name for inputing the rain data
 // char *fakeweather="fakeweather";
@@ -44,6 +44,7 @@ char *code_name="ftp";
 char numbs[5];
 /*------------------------------- Data Sets ---------------------------------*/
 /* -------- SH Observational Data ------- */
+//SH when adding in more datasets, increase DATA_SETS value and that will loop through all
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
 	FILE *ftp_data;
@@ -67,8 +68,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
 
-	while (fscanf(ftp_data,"%d %d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &Ddata[i],&D2data[i])!= EOF)			{
-		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][4]=Ddata[i]; Params->DATA[j][i][5]=D2data[i];
+	while (fscanf(ftp_data,"%d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &Ddata[i])!= EOF)			{ //SH when dealing with years add another input
+		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][4]=Ddata[i]; Params->DATA[j][i][5]=0; //SH filling years with 0 because only one year
 		//printf("FERALS: i=%d\t pop:%d\t healthy:%d\t viral:%d\t fungal:%d\t week:%d\t week2:%d\n",i,j,Params->DATA[j][i][0],Params->DATA[j][i][1],Params->DATA[j][i][2], Params->DATA[j][i][3], Params->DATA[j][i][4]);
 		//if ((Fdata[i]>0) && (FlagF<1))	{
 		//	FlagF=2;

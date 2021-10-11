@@ -122,10 +122,10 @@ typedef struct
 	int MAXT2[DATA_SETS+1];		    // number of days in EXPERIMENTAL data set (different for each EXPERIMENTAL data set)
 	int MAXT3[DATA_SETS+1];		    // number of days in WEATHER data set (different for each WEATHER data set)
 	int ***DATA;				    // 3-dimensional array that holds all the data
-	int ***EXPDATA;				    // 3-dimensional array that holds all the EXPERIMENTAL data
-	//int ***WDATA;				    // 3-dimensional array that holds all the WEATHER data
-	double ***CCDATA;
-	double WDATA[DATA_SETS+1][999][8][100]; //SH Change last value to determine the number of years
+	//int ***EXPDATA;				    // 3-dimensional array that holds all the EXPERIMENTAL data
+	//double ***WDATA;				    // 3-dimensional array that holds all the WEATHER data
+	//double ***CCDATA;
+	double WDATA[DATA_SETS+1][366][8][100]; //SH days, weeks, years
 	double test_data[1000][36];
 
 	double AcceptedVect[NUM_PARS];

@@ -20,6 +20,7 @@ int View = 0;  //CK// turn to 1 to print line search progress.  turn to 0 to run
 ////////// Make it fit nuF, rather than R(0), for each population.  Sounds simple enough....
 
 STRUCTURE Params;
+
 int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is the i^th input)
 //printf("Profile Parameter is %d\n",pro);	fflush(stdout);
 // ------------------------------------- Adustable accuracy vs. speed ------------------------------------------------ //
@@ -114,6 +115,7 @@ r_seed=random_setup();
 // -------------------- parameter high/low values and increments and fixed parameter values ------------------------- //
 global_fixed_parms(&Params);  // gets Params.PARS[i] for fixed parameters from bounds.h
 parm_range_inc(&Params,parm_inc,host_inc,initR_inc,num_adj_pars); // gets Params.parm_set,low,high,R_END from bounds.h
+
 // ------------------------------------ Declare Likelidhood Quanitites ----------------------------------------------- //
 //double pop_lhood, pop_lhood2, pop_err,post_hood;	// population lhood (and posterior lhood) calculated for each initS and initR
 //double pop_best_lhood;					// likelihood and error for best initS and initR
@@ -479,7 +481,7 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 
 free_i3tensor(Params.DATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
 // free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
-free_d3tensor(Params.WDATA,0,100,0,MAX_WEEKS2,0,4);
+//  free_d3tensor(Params.WDATA,0,100,0,MAX_WEEKS2,0,4);
 //free_i3tensor(Params.WDATA,0,0,0,MAX_WEEKS2,0,2);
 //free(Params.Rain);
 //free(Params.MaxT);
@@ -487,8 +489,4 @@ free_d3tensor(Params.WDATA,0,100,0,MAX_WEEKS2,0,4);
 //printf("DONE!!!\n");
 
 return 0;
-<<<<<<< HEAD
 }
-=======
-// }
->>>>>>> parent of bd75cce (Remove tensor lines)

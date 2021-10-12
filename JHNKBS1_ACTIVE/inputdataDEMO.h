@@ -68,8 +68,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
 
-	while (fscanf(ftp_data,"%d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &Ddata[i])!= EOF)			{ //SH when dealing with years add another input
-		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][4]=Ddata[i]; Params->DATA[j][i][5]=0; //SH filling years with 0 because only one year
+	while (fscanf(ftp_data,"%d %d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &Ddata[i], &D2data[i])!= EOF)			{ //SH when dealing with years add another input
+		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][4]=Ddata[i]; Params->DATA[j][i][5]=D2data[i]; //SH added weeks back in
 		//printf("FERALS: i=%d\t pop:%d\t healthy:%d\t viral:%d\t fungal:%d\t week:%d\t week2:%d\n",i,j,Params->DATA[j][i][0],Params->DATA[j][i][1],Params->DATA[j][i][2], Params->DATA[j][i][3], Params->DATA[j][i][4]);
 		//if ((Fdata[i]>0) && (FlagF<1))	{
 		//	FlagF=2;

@@ -83,7 +83,8 @@ double InfVirusAdj=0;
 
 double VPass;          //variable to pass the value of initialV in each generation
 
-
+//SH global declaration of global file fp1 to print daily output into
+FILE *fp1;
 
 
 double FakeWDATA[SIMU][5];

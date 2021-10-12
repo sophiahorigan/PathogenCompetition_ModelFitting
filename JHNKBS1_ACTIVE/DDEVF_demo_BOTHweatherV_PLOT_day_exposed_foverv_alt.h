@@ -892,17 +892,9 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		if(Cprob == 1.0){Cprob2=0.0; Cprob3=0.0;}
 		if(Oprob == 1.0){Oprob2=0.0; Oprob3=0.0;}
 
-		//printf("%d\t %d\t %f\t %f\t %f\t %f\n",pop, day, c1, c2, r1, r2);
-
-		//printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day,p1,p2,p3, Cprob,1.0-Cprob,Cprob2,Cprob3, Oprob,1-Oprob,Oprob2,Oprob3); //getc(stdin);
-		//printf("IF=%e,S=%e\n",IF,y_ode[0]);
-        //printf("nuF=%e,nuR=%e\n",Params->nuF,Params->nuR);
-        //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day,p1,p2,p3, Cprob,1.0-Cprob,Cprob2,Cprob3, Oprob,1-Oprob,Oprob2,Oprob3, FIO_Cc, FIO_Cr, FIO_Oc, FIO_Or, y_ode[0], IF, y_ode[m+n+1],V,Fkill,Vkill); //getc(stdin);
-
-        //printf("muF=%e\n",Params->muF);
-        //printf("Vcadaver=%e\n", Vcadaver);
-		//SH below line prints daily output
-        //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
+		
+		//SH below line prints daily output to global file fp1
+        fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R
         //printf("c2=%e,r2=%e\n",c2,r2);
@@ -911,8 +903,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	//printf("Rstart:%e\t Rend:%e\t R=%e\t nuF=%e\t nuR=%e\t muF=%e\n",R_start, R_end,R,Params->nuF,Params->nuR,Params->muF);
 	//printf("%d\t %e\t %e\n",day-1,Params->size_C,Params->indexR);
 
-	//SH prints daily output to global file fp1
-	fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,FRnext,Vkill,Vnext,Fcadaver,Vcadaver,Fkill+IF+IVF,Vkill+IV,y_ode[0]+Fkill+Vkill+IV+IF+IVF);
+	//fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,FRnext,Vkill,Vnext,Fcadaver,Vcadaver,Fkill+IF+IVF,Vkill+IV,y_ode[0]+Fkill+Vkill+IV+IF+IVF);
 
 	}
 

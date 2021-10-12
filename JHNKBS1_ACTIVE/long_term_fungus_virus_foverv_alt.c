@@ -366,7 +366,7 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 	// fp1 declared globally in head file
 	char name1[50];
 	sprintf(name1, "TEST_daily");
-	fp1=fopen(name1,"w"); //or a+, not sure which
+	fp1=fopen(name1,"a+"); //or a+, not sure which
 	//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
 	DDEVF(&Params,r_seed,dim,pop,48,1,year); // SH change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
 	//}

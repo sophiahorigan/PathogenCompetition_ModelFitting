@@ -190,9 +190,9 @@ double vdensity;
 //VFPass=VFtime;
 // SH need to set initial conditions
 VFSus=15; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.2; //SH from literature
-vdensity=0.01; //SH guesstimate
+sdensity=10000; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.2; //SH guesstimate
 
 //SH KEEP brings initial values into structure
 Params.PARS[30+pop]=sdensity; 

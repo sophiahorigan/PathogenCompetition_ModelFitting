@@ -127,7 +127,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 		Params->WDATA[j][i][0][0]=Ddata2[i]; Params->WDATA[j][i][1][0]=Rain[i]; Params->WDATA[j][i][2][0]=MaxT[i]; Params->WDATA[j][i][3][0]=MinT[i]; //TEMP
 		Params->WDATA[j][i][4][0]=AveT[i]; Params->WDATA[j][i][5][0]=MaxRH[i]; Params->WDATA[j][i][6][0]=MinRH[i]; Params->WDATA[j][i][7][0]=AveRH[i]; //TEMP //SH added column to indicate year
 
-    
+        //printf("%lf\t %lf\n",Params->WDATA[j][i][1][0],Params->WDATA[j][i][4][0]);
 		weeks++; i++;
 		
 	}

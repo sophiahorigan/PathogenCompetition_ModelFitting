@@ -190,9 +190,9 @@ double vdensity;
 //VFPass=VFtime;
 // SH need to set initial conditions
 VFSus=15; //SH random pick 
-sdensity=10000; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.2; //SH guesstimate
+sdensity=100; //SH random pick 
+fdensity=0.2; //SH from literature
+vdensity=0.01; //SH guesstimate
 
 //SH KEEP brings initial values into structure
 Params.PARS[30+pop]=sdensity; 
@@ -368,7 +368,7 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 	sprintf(name1, "TEST_daily");
 	fp1=fopen(name1,"a+"); //or a+, not sure which
 	//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
-	DDEVF(&Params,r_seed,dim,pop,48,1,year); // SH change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
+	DDEVF(&Params,r_seed,dim,pop,48,0,year); // SH change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
 	//}
 	//}//SH params, random seed, x, x, length of epi, start of epi, year
 	fclose(fp1);

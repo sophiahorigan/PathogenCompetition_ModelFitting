@@ -163,7 +163,7 @@ Params->INITS[3] = ave_R;												// initR  //CK// changed to use average R(0
 double initS = Params->INITS[0];			// initS
 double initV = VPass;			// initV, passed from VPass in head file
 double initR = Params->INITS[3];			// initR
-
+printf("initS=%lf\n",initS);
 //printf("CHECKING S(0)!! base S(0)=%f\t temp_S=%f\t temp_V = %f\n",Params->PARS[30+pop],temp_S, temp_V);
 //printf("Start DDVF pop:%d\t initR =%f\t initialS = %f\t initV = %f\n",pop,initR, initS, initV ); getc(stdin);
 
@@ -240,14 +240,14 @@ while(DD10 <= DDstart){
 //printf("temp now: %f DD10: %f R_start: %f test_day: %d\n", DDtemp_now, DD10, R_start, test_day);		//getc(stdin);
 */
 
-R_start=0.0; //SH Resting spores start blooming from day 1
+R_start=hatch; //SH Resting spores start blooming from start day
 
 DD10=0.0;		R_end = 0.0;
 test_day = line_ticker;
 
 while(DD10 <= DDstop){
 
-	DDtemp_now = Params->WDATA[0][test_day][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
+	DDtemp_now = Params->WDATA[1][test_day][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 	if(DDtemp_now<0.0){DDtemp_now=0.0;}
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 	R_end++;
@@ -294,7 +294,7 @@ R_end=stop1*exp(stop2*(lats[pop-1]-lats[0]));
 //sim_results[0][3]=0.0;sim_results[0][4]=0.0;  //CK// No conidia on day 0
 //sim_results[0][5]=initR; sim_results[0][6]=initR;
 //printf("R_start: %f\n", R_start);
-
+/*
 if(R_start<1.0){
 
 	total_rainfall = 0.0;
@@ -400,7 +400,7 @@ if(R_start<1.0){
 
 	//printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,0,1.0,0.0,0.0, Cprob,1.0-Cprob,Cprob2,Cprob3, Oprob,1-Oprob,Oprob2,Oprob3); //getc(stdin);
 
-	printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,0,0.0,0.0,0.0, Cprob,1.0-Cprob,Cprob2,Cprob3, Oprob,1-Oprob,Oprob2,Oprob3, FIO_Cc, FIO_Cr, FIO_Oc, FIO_Or,Params->INITS[0], 0.0, 0.0,0.0,0.0,0.0); //getc(stdin);
+	//printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,0,0.0,0.0,0.0, Cprob,1.0-Cprob,Cprob2,Cprob3, Oprob,1-Oprob,Oprob2,Oprob3, FIO_Cc, FIO_Cr, FIO_Oc, FIO_Or,Params->INITS[0], 0.0, 0.0,0.0,0.0,0.0); //getc(stdin);
 	r2= r1;
 }
 else{
@@ -410,6 +410,7 @@ else{
 	//}
 
 }
+*/
 
 //printf("Pop:%d\t Day:%d\t Week:%d\t Rain1: %f\t Stoch1: %f\t Spores1: %f\n", pop, day, week, total_rainfall, exp(rand_nuF[0]), initR); //getc(stdin);
 
@@ -430,6 +431,7 @@ if (r_germ<0)	r_germ=0;
 //if		(initS>Vstart)	{	S = initS;	}	// S(0) (number of healthy neonates)
 //else					{	S = 0;	printf("Error Rafa\n");			}
 S=initS;
+//printf("S=%lf\n",S);
 V=0; F=0.0; R=0.0;
 for (i=1;i<=n2;i++)		{	E_V[i]=0;			}
 for (i=1;i<=n1;i++)		{	E_VF[i]=0;		    }
@@ -559,7 +561,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	while (t<t_next)	{
 		y_ode[0]=S;	y_ode[m+n+1]=Fcadaver;	Params->POPS[3]=R;
 		y_ode[m+n+3]=Vcadaver;
-		//printf("pop:%d t=%f\t S=%4.3e\t V=%4.3e\t F=%4.3e\t R=%4.3e\n",pop,t,S,V,F,R);
+		//printf("R=%lf\n",R);
 
 		for (i=1;i<=gstepsF;i++)	{
 			//y_ode[1+i]=E_V[i];
@@ -588,11 +590,12 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//Params->nuR = initR;
 		Params->nuV = Params->PARS[2];
 		//Params->muF = specific_muF;
-
-		DDtemp_now = Params->WDATA[0][line_ticker - 1][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
+        printf("%d\n",line_ticker);
+		printf("%lf\n",Params->WDATA[1][line_ticker - 1][3][0]);
+		DDtemp_now = Params->WDATA[1][line_ticker - 1][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 		if(DDtemp_now<0.0){DDtemp_now=0.0;}
 		DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
-
+        //printf("%lf\n",DD10);
 		//if(DD10>=C_end){
         //        Params->size_C=0.0;
                 //Params->indexR=1;
@@ -608,14 +611,14 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//nuF2 = specific_nuF*exp(RH_P*Params->WDATA[pop2][line_ticker - 1][6] + rand_nuF[(int)t]);
 		//nuF2 = specific_nuF*exp(RH_P*Params->WDATA[pop2][line_ticker - 1][6] * exp(rand_nuF[(int)t]));  //JL: Make it the same as DDEVF for MCMC?
 		//if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
-		nuF2 = specific_nuF*exp(RH_P*Params->WDATA[0][line_ticker - 1][1][0]) * exp(rand_nuF[(int)t]);    //JL: Make it the same as DDEVF for MCMC
+		nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][1][0]) * exp(rand_nuF[(int)t]);    //JL: Make it the same as DDEVF for MCMC
 		if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
         //printf("%e\t %e\t %e\n",specific_nuF,RH_P,rand_nuF[(int)t]);
 		Params->nuF = (DD10/fourth_size)*nuF2;
         //printf("%e\t %e\n",DD10,fourth_size);
+        //printf("nuF=%lf\n",Params->nuF);
 
-
-		temp_now = Params->WDATA[0][line_ticker - 1][2][0];  //CK// putting max temp in smaller object
+		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  //CK// putting max temp in smaller object
 		//printf("DDtemp_now=%e, temp_now=%e\n",DDtemp_now,temp_now);
 
 		//Params->muF = specific_muF;	//CK// Conidia Decay Response #2.2  BEST SO FAR!!
@@ -641,7 +644,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
                 total_rainfall=0;
             }
             else{
-                    total_rainfall = Params->WDATA[0][rain_day][0][0]+total_rainfall;
+                    total_rainfall = Params->WDATA[1][rain_day][0][0]+total_rainfall;
             }
 			//printf("line: %d\t accumulating rain: %lf\n", rain_day, total_rainfall);
 		}
@@ -662,6 +665,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//printf("%e\t %e\n",nuR2,DD10/fourth_size);
 		//if(total_rainfall==0.0){Params->nuR=0.0;}
 		if(Params->POPS[3] == 0.0){Params->nuR = 0.0; nuR2 = 0.0;}
+		//printf("nuR=%lf\n",Params->nuR);
 
 //printf("day: %d\t line: %d\t accumulated rain: %lf\n", num_day, line_ticker-1, total_rainfall);		getc(stdin);
 
@@ -895,7 +899,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		
 		//SH below line prints daily output to global file fp1
         fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
-
+		//SH yode[0] host at end of day, IV/IF: individuals in exposed classes
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R
         //printf("c2=%e,r2=%e\n",c2,r2);
 		FlagDay=0;

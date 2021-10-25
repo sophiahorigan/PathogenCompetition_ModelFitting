@@ -1,8 +1,8 @@
-//double DDEVF(void *Paramstuff,double *RandNumsPass,size_t dim,int pop,int maxy_t,double (*sim_results)[7])
-double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q) //SH year is q
-//double DDEVF2(struct STRUCTURE *Params,int pop,double sim_results[1+Params->MAXT[pop]/7][5])
-{
 // DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
+
+double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q) //SH DOES save into array
+
+{
 //printf("DDEVF: population:%d\n",pop);
 //printf("pop2=%d\n",pop2);
 STRUCTURE* Params;
@@ -25,22 +25,8 @@ double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP
 
 int FlagDay=0;
 
-//double junk3 = -300;
-//printf("Resting spores day: %f\n", junk3);
-
-
-//printf("maxt=%d dim=%d\n",Params->MAXT[pop],dim);getc(stdin);
-//printf("determ: nuV=%f\t nuF=%e\n",Params->PARS[2],Params->PARS[3]);//getc(stdin);
-
-//int MAXT3=(Params->EXPDATA[pop2][Params->MAXT2[pop2]][2]+1)*7;
 int MAXT3=maxy_t;
-//if(pop==6){MAXT3=77;}  ///can't figure out why plot 6 (UMBS 2012) is fucked up.  says it only has 2 weeks of data, but that's not true at all...
 
-//printf("data set %d has %d days\n",pop,MAXT3);getc(stdin);
-
-//printf("Final exp week: %d\n", MAXT3);		getc(stdin);
-
-//int DIM = Params->PARS[9]+3;
 int m = Params->PARS[9];
 int n = Params->PARS[8];
 int DIM = m+n+4+2+1;
@@ -66,8 +52,6 @@ double RH_P = Params->PARS[22];   //CK//  Parameter for RH data
 double temp_P = Params->PARS[23];   //CK//  Parameter for temperature data
 double fourth_size=Params->PARS[28];	//CK// degree day when the bugs reach 4th instar
 
-//double stop1	= Params->PARS[16];  //CK// param used for starting date
-//double stop2	= Params->PARS[19];  //CK// param used for starting date
 double DDstart	= Params->PARS[27];  //CK// param used for starting date
 double DDstop	= Params->PARS[19];  //CK// param used for starting date
 
@@ -91,22 +75,6 @@ theta=1;
 
 double DDtemp_now;  //CIK// used simplify decay functions
 
-
-//double alpha = 0.01242568;  //param used to scale accumulating rain.  Will have it be fit later?
-
-//double temp_P = Params->PARS[21];   //CK//  Parameter for temperature data
-//double RH_P = Params->PARS[22];   //CK//  Parameter for RH data
-//double RH_P = Params->PARS[21];   //CK//  Parameter for RH data
-
-
-
-//double specific_nuF = Params->PARS[50+pop];   //Site-specific infection rate for conidia
-//double specific_muF = Params->PARS[40+pop];   //Site-specific decay rate for conidia
-//Params->muF = specific_muF;
-//double size_S = Params->PARS[28];   //Scaling effect of size on susceptibility over time.
-//double fourth_size=Params->PARS[16];	//CK// degree day when the bugs reach 4th instar
-//double C_end=Params->PARS[19];	  //CK// fit param that turns off new conidia production once a specific size has been reached
-
 double nuF2;
 double nuR2;
 
@@ -116,6 +84,12 @@ double FIO_Oc;
 double FIO_Or;
 
 double DD10=0;    //accumulated degree days about 10 degrees C
+
+//SH again, why do I need to declare these again
+double vinfected; //SH to hold daily fraction infected
+double finfected; //SH add coinfected eventually
+double survivors; //SH = IF/IV etc divided by initial host density
+double total;
 
 //double specific_Rend = Params->PARS[40+pop];   //Site-specific decay rate for conidia
 
@@ -163,7 +137,7 @@ Params->INITS[3] = ave_R;												// initR  //CK// changed to use average R(0
 double initS = Params->INITS[0];			// initS
 double initV = VPass;			// initV, passed from VPass in head file
 double initR = Params->INITS[3];			// initR
-printf("initS=%lf\n",initS);
+//printf("initS=%lf\n",initS);
 //printf("CHECKING S(0)!! base S(0)=%f\t temp_S=%f\t temp_V = %f\n",Params->PARS[30+pop],temp_S, temp_V);
 //printf("Start DDVF pop:%d\t initR =%f\t initialS = %f\t initV = %f\n",pop,initR, initS, initV ); getc(stdin);
 
@@ -247,7 +221,7 @@ test_day = line_ticker;
 
 while(DD10 <= DDstop){
 
-	DDtemp_now = Params->WDATA[1][test_day][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
+	DDtemp_now = Params->WDATA[1][test_day][4][0]-10.0;  //JL: Reading in AveT here
 	if(DDtemp_now<0.0){DDtemp_now=0.0;}
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 	R_end++;
@@ -590,9 +564,9 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//Params->nuR = initR;
 		Params->nuV = Params->PARS[2];
 		//Params->muF = specific_muF;
-        printf("%d\n",line_ticker);
-		printf("%lf\n",Params->WDATA[1][line_ticker - 1][3][0]);
-		DDtemp_now = Params->WDATA[1][line_ticker - 1][3][0]-10.0;  //CK// begin calculation of accumulated Degree Days
+        //printf("%d\n",line_ticker);
+		//printf("%lf\n",Params->WDATA[1][line_ticker - 1][4][0]);
+		DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 		if(DDtemp_now<0.0){DDtemp_now=0.0;}
 		DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
         //printf("%lf\n",DD10);
@@ -611,14 +585,14 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//nuF2 = specific_nuF*exp(RH_P*Params->WDATA[pop2][line_ticker - 1][6] + rand_nuF[(int)t]);
 		//nuF2 = specific_nuF*exp(RH_P*Params->WDATA[pop2][line_ticker - 1][6] * exp(rand_nuF[(int)t]));  //JL: Make it the same as DDEVF for MCMC?
 		//if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
-		nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][1][0]) * exp(rand_nuF[(int)t]);    //JL: Make it the same as DDEVF for MCMC
+		nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
 		if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
         //printf("%e\t %e\t %e\n",specific_nuF,RH_P,rand_nuF[(int)t]);
 		Params->nuF = (DD10/fourth_size)*nuF2;
         //printf("%e\t %e\n",DD10,fourth_size);
         //printf("nuF=%lf\n",Params->nuF);
 
-		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  //CK// putting max temp in smaller object
+		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  //JL: Reading in MaxT here
 		//printf("DDtemp_now=%e, temp_now=%e\n",DDtemp_now,temp_now);
 
 		//Params->muF = specific_muF;	//CK// Conidia Decay Response #2.2  BEST SO FAR!!
@@ -896,10 +870,21 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		if(Cprob == 1.0){Cprob2=0.0; Cprob3=0.0;}
 		if(Oprob == 1.0){Oprob2=0.0; Oprob3=0.0;}
 
-		
+
 		//SH below line prints daily output to global file fp1
-        fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
-		//SH yode[0] host at end of day, IV/IF: individuals in exposed classes
+        //fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
+		//SH yode[0] host at end of day, IV/IF: individuals in exposed classes (i.e. infected but not yet killed)
+
+        //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
+
+
+		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
+		sim_output[day-1][1] = 0; //Saving daily fraction S //test
+		sim_output[day-1][2] = IV; //Saving daily fraction V
+		sim_output[day-1][3] = IF; //Saving daily fraction F
+
+		printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]); //SH trying to figure out of I get content into my array 
+
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R
         //printf("c2=%e,r2=%e\n",c2,r2);
 		FlagDay=0;
@@ -956,7 +941,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 t_0=t_next;
 //printf("t_0=%lf\n",t_0);
 }
-SusEnd=y_ode[0];
+SusEnd=y_ode[0]; //susceptibles at end of day 
 
 if (initR==0){
    InfVirusEnd=Vkill+IV+IVF;

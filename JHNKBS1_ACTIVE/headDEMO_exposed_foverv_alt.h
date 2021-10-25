@@ -85,6 +85,11 @@ double VPass;          //variable to pass the value of initialV in each generati
 
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
+double sim_output[55][4]; //array for output
+double vinfected; //SH to hold daily fraction infected
+double finfected; //SH add coinfected eventually
+double survivors; //SH = IF/IV etc divided by initial host density
+double total;
 
 
 double FakeWDATA[SIMU][5];
@@ -132,9 +137,6 @@ typedef struct
 	double AcceptedVect[NUM_PARS];
 	double LoopVect[NUM_PARS];
 
-	double survivors;
-	double total;
-
 	double parm_low[NUM_PARS];
 	double parm_high[NUM_PARS];
 	double parm_step[NUM_PARS];
@@ -153,7 +155,7 @@ typedef struct
 
 	//size_t dim;
 	//int calls;
-	double sim_results[55][4];		// 1st entry larger than the number of weeks in any data set
+	//double sim_results[55][4];		// array to capture output from ddevf to use in fitting routine. 55 rows (more than no days in epi), 4 columns (Day, S, F, V)
 	int th_id;
 	int pop;
 }STRUCTURE;

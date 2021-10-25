@@ -363,31 +363,36 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
 			//printf("WEATHER: i=%d\t day:%lf\t rain:%lf\t maxT:%lf\t minT:%lf\t aveT:%lf\t maxRH:%lf\t minRH:%lf\t aveRH:%lf\n",k,Params.WDATA[pop2][k][0],Params.WDATA[pop2][k][1],Params.WDATA[pop2][k][2],Params.WDATA[pop2][k][3],Params.WDATA[pop2][k][4],Params.WDATA[pop2][k][5],Params.WDATA[pop2][k][6],Params.WDATA[pop2][k][7]);
 		}
 */
+	//double sim_output[48][4]; //SH I guess you need to declare it again right before you use it.
+	// not sure what the point of the head.h file is then...I thought they were global variables
+
+
 	// fp1 declared globally in head file
 	char name1[50];
 	sprintf(name1, "TEST_daily");
 	fp1=fopen(name1,"a+"); //or a+, not sure which
 	//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
-	DDEVF(&Params,r_seed,dim,pop,48,0,year); // SH change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
+	DDEVF(&Params,r_seed,dim,pop,48,0,year); //SH No array
+	//DDEVF(&Params,r_seed,dim,pop,48,0,year, sim_results); // SH array //change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
 	//}
 	//}//SH params, random seed, x, x, length of epi, start of epi, year
 	fclose(fp1);
 
 //SH BELOW I might not need, only prints output at end. above is attempt to print out every day.
-    FILE *fp;
-    char name[50];
+   // FILE *fp;
+   // char name[50];
     // sprintf(name,"typethree_Vall_Cthreeweek_fut_immi_VFSus_alt_%lf_1.txt",VFSusF[bbf]);
     //sprintf(name,"fv_bf_%f_row_%d_col_%d.txt",bfungus[bbf],row,col);
-	sprintf(name, "JHN_KBS1daily_15_10000_0.026_0.2"); //SH attempt at naming output based on above lines
+	//sprintf(name, "JHN_KBS1daily_15_10000_0.026_0.2"); //SH attempt at naming output based on above lines
 
-    fp=fopen(name,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
+   // fp=fopen(name,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
 
-	Params.total = reps*Params.PARS[30+pop];
 
-	INFECTED = 1.0 - (Params.survivors/Params.total);
+
+	// INFECTED = 1.0 - (Params.survivors/Params.total); //SH need to modify to add two infection classes (V/F)
 
 	//printf("%lf\t %lf\t %lf\t %lf\t %lf\n", Params.PARS[30+pop], Params.PARS[50+pop], INFECTED, Params.survivors, Params.total);
-	fprintf(fp,"%d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",year,Params.PARS[30+pop],Params.PARS[50+pop],VPass,InfFungusNext,InfFungusEnd,InfVirusNext,InfVirusEnd); //After dispersal
+	// fprintf(fp,"%d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",year,Params.PARS[30+pop],Params.PARS[50+pop],VPass,InfFungusNext,InfFungusEnd,InfVirusNext,InfVirusEnd); //After dispersal
 	//year, initial s, initial f, initial v, end f to next epi, f at end, v to next epi, v at end
 
     //printf("After an epizootic: %e\t %e\t %e\n",SusEnd,InfFungusEnd,InfVirusEnd); //getc(stdin);
@@ -412,7 +417,7 @@ sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
    // }
     // vdensity=eta*(phivirus/eta*InfVirusNext+gammavirus*vdensity/eta);
     //vdensity=eta*(phivirus/eta*InfVirusAdj+gammavirus*vdensity/eta);
-    fclose(fp);
+    //fclose(fp);
     
     
 

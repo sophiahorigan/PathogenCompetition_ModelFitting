@@ -145,19 +145,6 @@ int MAXT4;
 int reps;	//number of stochastic simulations to do per
 double INFECTED;
 
-// ------------------------------ OUTER MAIN LOOP (used for profile lhood ------------------------------------------ //
-//for (outer_parm=Params.parm_low[pro]; outer_parm<=Params.parm_high[pro]; outer_parm+=Params.parm_step[pro])	{ //pro=20 for S(0)
-//printf("profile=%d\t low=%f\t high=%f\t step=%f\n",pro,Params.parm_low[pro],Params.parm_high[pro],Params.parm_step[pro]);
-//if      (pro==1) printf("max lhood!\n");
-//else if (pro==2||pro==3||pro==5||pro==6||pro==10)	    {
-//	Params.PARS[pro] = pow(10,outer_parm);
-//}
-//else if (pro==4||pro==15||pro==16||pro==17||pro==18)   {
-//	Params.PARS[pro] = outer_parm;
-//}
-//else {	printf("bad profile input\n");	getc(stdin);	}
-
-//while (1==1)	{
 
 //---------------------Write over the initial params with known fit params --------------------------//
 
@@ -190,7 +177,7 @@ double vdensity;
 //VFPass=VFtime;
 // SH need to set initial conditions
 VFSus=15; //SH random pick 
-sdensity=10000; //SH random pick 
+sdensity=100; //SH random pick 
 fdensity=0.026; //SH from literature
 vdensity=0.2; //SH guesstimate
 
@@ -199,186 +186,128 @@ Params.PARS[30+pop]=sdensity;
 VPass=vdensity;
 Params.PARS[50+pop]=fdensity;
 
-/* for (year=0;year<47;year++){
-     //printf("year: %d\n",year);
-    //printf("%lf %lf %lf %lf %lf %lf %lf %lf\n",initialS[0],initialS[1],initialS[2],initialS[3],initialS[4],initialS[5],initialS[6],initialS[7]);
-    //getc(stdin);
-    if (year==16){         //Fungus starts in 1989
-        fdensity=initial_nuF[0];
-    }
-    //for (pop=1;pop<=DATA_SETS;pop++)	{
-    for (pop=1;pop<=1;pop++)	{
-	Params.pop=pop;
-	//pop=1;
-
-	Params.PARS[30+pop]=sdensity;  //CK//  I think these should just be initialS[pop], not initialS[pop-1].  Keep everything where pop starts at 1
-	//Params.PARS[40+pop]=initial_T[pop-1];  //CK// Needs to be [pop-1].  initialS is where the conditions are read in, so it starts at 0 and needs to be adjusted for
-
-	
-
-    if (year<16){
-        Params.PARS[50+pop] = 0;
-    }
-    else{
-    
-    }
-    //printf("%d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",year,Params.PARS[30+pop],Params.PARS[50+pop],VPass,InfFungusEnd,InfVirusEnd,InfFungusAdj,InfVirusAdj);
-	//MAXT3=(Params.EXPDATA[pop][Params.MAXT2[pop2]][2]+1)*7;
-	MAXT4=(Params.EXPDATA[pop][Params.MAXT2[pop2]][2]+1);
-	//printf("MAXT3: %lf MAXT4: %d\n", MAXT3, MAXT4);
-
-	//dim = 3*MAXT3;     //CK//  holds the random variables for each day.  Need 2 per day
-
-	//printf("MAXT3: %lf S_start: %lf\n", MAXT3, S_start);		//getc(stdin);
-
-	double sim_results[MAXT4][7];
-
-	//DDEVF(Params,RandNumsPass,dim,pop,MAXT3,sim_results);
 
 
-            DD10=0.0;
-			test_day = 0;
-			S_start = test_day;
-			if (year<47){
-			   limit = days[year];
-			}else{
-               limit =365;
-			}
-
-			while(DD10 <= hatch & test_day<limit){
-
-				DDtemp_now = Params.CCDATA[year][test_day][3]-Hlim1;  //CK// begin calculation of accumulated Degree Days
-				if(DDtemp_now<0.0){DDtemp_now=0.0;}
-				if(DDtemp_now> Hlim2){DDtemp_now=Hlim2;}
-				DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
-				S_start++;
-				test_day++;
-			//printf("temp now: %lf DD10: %f S_start: %f test_day: %d\n", Params.CCDATA[q][test_day][3], DD10, S_start, test_day);		//getc(stdin);
-			}
-			//printf("S_start in that year: %lf\n", S_start-i*365);
-			//printf("S_start: %lf\n", S_start);
-			//getc(stdin);
-			//printf("S_start: %lf\n", S_start-i*365);		//getc(stdin);
-
-
-			//if(S_start < i*365+166){S_start = i*365+166;}
-
-			//if(S_start > i*365+260){INFECTED += 0.0;}
-			//else{
-
-			DD10=0.0;
-			test_day = S_start;
-			S_end = test_day;
-
-			while(DD10 <= pupate & test_day<limit){
-
-				DDtemp_now = Params.CCDATA[year][test_day][3]-Plim1;  //CK// begin calculation of accumulated Degree Days
-				if(DDtemp_now<0.0){DDtemp_now=0.0;}
-				if(DDtemp_now> Plim2){DDtemp_now=Plim2;}
-				DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
-				S_end++;
-				test_day++;
-			//printf("temp now: %f DD10: %f S_end: %f test_day: %d\n", Params.CCDATA[q][test_day-1][3], DD10, S_end, test_day);		getc(stdin);
-			}
-			//if (S_end-i*365>300){
-            //    S_end=300+i*365;
-			//}
-			//getc(stdin);
-		//printf("test 2 here\n");//getc(stdin);
-
-			MAXT3 = S_end - S_start;	//number of days the bugs are active
-			//printf("%lf\t %lf \t %d\n",S_start,S_end,MAXT3);
-    //printf("S_start: %lf, S_end: %e\n",S_start,S_end);
-	Params.survivors = 0.0;
-	dim = 2*MAXT3;
-
-	//for(k=0; k<=MAXT3; k++){
-    //        Params.WDATA[pop2][k][0] = S_start+k;
-	//		Params.WDATA[pop2][k][1] = Params.CCDATA[year][Params.WDATA[pop2][k][0]][0];
-	//		Params.WDATA[pop2][k][2] = Params.CCDATA[year][Params.WDATA[pop2][k][0]][2];;
-	//		Params.WDATA[pop2][k][3] = 0.0;
-	//		Params.WDATA[pop2][k][4] = Params.CCDATA[year][Params.WDATA[pop2][k][0]][3];
-	//		Params.WDATA[pop2][k][5] = 0.0;
-	//		Params.WDATA[pop2][k][6] = Params.CCDATA[year][Params.WDATA[pop2][k][0]][1];;
-	//		if(Params.WDATA[pop2][k][6] > 100.0){Params.WDATA[pop2][k][6] = 100.0;}
-	//		Params.WDATA[pop2][k][7] = 0.0;
-	//}
-/*
-	double Rmean = 25.87297;  //mean and variance for rain distribution
-double Rvar = 1189.152;
-int sim_length = 64; //length of simulation.  9 weeks now.
-double rain;
-double rtest;
-double rainVEC[72];
-double rhVEC[72];
-double tVEC[72];
-double avetVEC[72];
-double mu;
-double sigma;
-
-mu = log(Rmean/(sqrt(1.0+ Rvar/(Rmean*Rmean))));
-sigma = sqrt(log(1.0+Rvar/(Rmean*Rmean)));
-
-		for(l=0; l<7; l++){
-			rtest=gsl_ran_flat(r_seed,0,1);
-			if(rtest<0.4){rainVEC[l] = gsl_ran_lognormal(r_seed,mu,sigma);}
-			else{rainVEC[l]=0.0;}
-			rhVEC[l] = 60.0;
-			tVEC[l] = 20.0;
-			avetVEC[l] = 16.0;
-		}
-
-
-		for(k=0; k<sim_length; k++){
-
-			rtest=gsl_ran_flat(r_seed,0,1);
-			//rain = sqrt((gsl_ran_gaussian(r_seed,Rvar)*Rmean)^2);
-			if(rtest<0.4){rainVEC[k+7] = gsl_ran_lognormal(r_seed,mu,sigma);}
-			else{rainVEC[k+7] =0.0;}
-
-			avetVEC[k+7] = 7.74475004 - 0.01539812*rainVEC[k+7] - 0.01576258*rainVEC[k+7-4] + 0.84528007*avetVEC[k+7-1] -0.18274862*tVEC[k+7-2];
-			rhVEC[k+7] = 16.99048141 + 0.21041884*rainVEC[k+7] + 0.06407971*rainVEC[k+7-1] + 0.05154560*rainVEC[k+7-4] + 0.53891551*rhVEC[k+7-1] - 0.73050576*avetVEC[k+7] + 1.40696789*avetVEC[k+7-1] - 0.43402751*avetVEC[k+7-2];
-			tVEC[k+7] = 11.29157842 - 0.01080833*rainVEC[k+7-4] + 0.25243351*tVEC[k+7-1] - 0.05371243*tVEC[k+7-2] - 0.09418436*rhVEC[k+7] + 0.02320848*rhVEC[k+7-1] + 0.65369070*avetVEC[k+7];
-
-			Params.WDATA[pop2][k][0] = 499+k;
-			Params.WDATA[pop2][k][1] = rainVEC[k+7];
-			Params.WDATA[pop2][k][2] = tVEC[k+7];
-			Params.WDATA[pop2][k][3] = 0.0;
-			Params.WDATA[pop2][k][4] = avetVEC[k+7];
-			Params.WDATA[pop2][k][5] = 0.0;
-			Params.WDATA[pop2][k][6] = rhVEC[k+7];
-			if(Params.WDATA[pop2][k][6] > 100.0){Params.WDATA[pop2][k][6] = 100.0;}
-			Params.WDATA[pop2][k][7] = 0.0;
-
-            //Params.WDATA[pop2][k][0] = FakeWDATA[k][0];
-			//Params.WDATA[pop2][k][1] = FakeWDATA[k][1];
-			//Params.WDATA[pop2][k][2] = FakeWDATA[k][2];
-			//Params.WDATA[pop2][k][3] = 0.0;
-			//Params.WDATA[pop2][k][4] = FakeWDATA[k][3];
-			//Params.WDATA[pop2][k][5] = 0.0;
-			//Params.WDATA[pop2][k][6] = FakeWDATA[k][4];
-			//if(Params.WDATA[pop2][k][6] > 100.0){Params.WDATA[pop2][k][6] = 100.0;}
-			//Params.WDATA[pop2][k][7] = 0.0;
-			//printf("%lf\t %lf\t %lf\t %lf\t %lf\n",Params.WDATA[pop2][k][0],Params.WDATA[pop2][k][1],Params.WDATA[pop2][k][2],Params.WDATA[pop2][k][4],Params.WDATA[pop2][k][6]);
-			//printf("WEATHER: i=%d\t day:%lf\t rain:%lf\t maxT:%lf\t minT:%lf\t aveT:%lf\t maxRH:%lf\t minRH:%lf\t aveRH:%lf\n",k,Params.WDATA[pop2][k][0],Params.WDATA[pop2][k][1],Params.WDATA[pop2][k][2],Params.WDATA[pop2][k][3],Params.WDATA[pop2][k][4],Params.WDATA[pop2][k][5],Params.WDATA[pop2][k][6],Params.WDATA[pop2][k][7]);
-		}
-*/
-	//double sim_output[48][4]; //SH I guess you need to declare it again right before you use it.
-	// not sure what the point of the head.h file is then...I thought they were global variables
-
-
-	// fp1 declared globally in head file
+	//************SH prints output each day into file******************
 	char name1[50];
 	sprintf(name1, "TEST_daily");
 	fp1=fopen(name1,"a+"); //or a+, not sure which
 	//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
-	DDEVF(&Params,r_seed,dim,pop,48,0,year); //SH No array
-	//DDEVF(&Params,r_seed,dim,pop,48,0,year, sim_results); // SH array //change S_start to 0 and MAXT3 to 48 (length of epizootic) to just run for one year
-	//}
-	//}//SH params, random seed, x, x, length of epi, start of epi, year
+	DDEVF(&Params,r_seed,dim,pop,48,0,year);
 	fclose(fp1);
 
-//SH BELOW I might not need, only prints output at end. above is attempt to print out every day.
+
+
+	//*****************************SH saves output into array without printing file**************//
+	//DDEVF(&Params,r_seed,dim,pop,48,0,year);
+	//printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
+
+	//SH make sure sim_output looks correct (day, S, V, F)
+	/*
+	int loop1, loop2;
+	for(loop1 = 0; loop1 < 48; loop1++){
+		for (loop2 = 0; loop2 < 4; loop2++){
+			printf("sim_output[%d][%d] = %e\n", loop1, loop2, sim_output[loop1][loop2]);
+		}	
+	} */
+
+
+
+
+
+
+
+
+//SH ****** let's calculate a likelihood!! *******//
+
+	//SH data input to compare to sim_results
+	//SH int because that's what the likelihood calculation wants
+	//const 
+	const unsigned int JHN_NoCo[48][3] = {
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{42, 7, 0},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{29, 18, 1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{33, 15, 0},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{36, 11, 1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{38, 10, 1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{25, 21, 4},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{19, 30, 2},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{11, 33, 2},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{7, 41, 1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1},
+		{-1, -1, -1}
+	};
+
+/*
+int loop3, loop4;
+	for(loop3 = 0; loop3 < 49; loop3++){
+		for (loop4 = 0; loop4 < 4; loop4++){
+			printf("JHN_NoCo[%d][%d] = %e\n", loop3, loop4, JHN_NoCo[loop3][loop4]);
+		}	
+	} 
+*/
+
+int m; int n; double lhood_JHN = 0;
+
+for (m = 0; m < 48; m++){
+	for (n = 0; n < 3; n++){
+		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, *sim_output[m][n], JHN_NoCo[m][n]);
+		printf("%d\n", lhood_JHN);
+	}	
+}
+printf("%d\n", lhood_JHN);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//**************SH prints output at end of week****************//
    // FILE *fp;
    // char name[50];
     // sprintf(name,"typethree_Vall_Cthreeweek_fut_immi_VFSus_alt_%lf_1.txt",VFSusF[bbf]);

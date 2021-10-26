@@ -85,7 +85,7 @@ double VPass;          //variable to pass the value of initialV in each generati
 
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
-double sim_output[55][4]; //array for output
+double *sim_output[55][3]; //array for output
 double vinfected; //SH to hold daily fraction infected
 double finfected; //SH add coinfected eventually
 double survivors; //SH = IF/IV etc divided by initial host density

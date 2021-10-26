@@ -870,20 +870,21 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		if(Cprob == 1.0){Cprob2=0.0; Cprob3=0.0;}
 		if(Oprob == 1.0){Oprob2=0.0; Oprob3=0.0;}
 
-
+		//printf("%d\t %e\t %e\t %e\n", day-1, S, IV, IF);
 		//SH below line prints daily output to global file fp1
-        //fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
+        fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 		//SH yode[0] host at end of day, IV/IF: individuals in exposed classes (i.e. infected but not yet killed)
 
         //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 
-
+		//printf("%d\t %e\t %e\t %e\n", day-1, S, IV, IF);
 		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
-		sim_output[day-1][1] = 0; //Saving daily fraction S //test
-		sim_output[day-1][2] = IV; //Saving daily fraction V
-		sim_output[day-1][3] = IF; //Saving daily fraction F
+		sim_output[day-1][0] = S; //Saving daily S 
+		sim_output[day-1][1] = IV; //Saving daily S 
+		sim_output[day-1][2] = IF; //Saving daily V
 
-		printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]); //SH trying to figure out of I get content into my array 
+
+		//printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]); //SH trying to figure out of I get content into my array 
 
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R
         //printf("c2=%e,r2=%e\n",c2,r2);

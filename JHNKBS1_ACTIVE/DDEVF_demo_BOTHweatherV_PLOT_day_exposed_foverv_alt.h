@@ -879,9 +879,9 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 		//printf("%d\t %e\t %e\t %e\n", day-1, S, IV, IF);
 		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
-		sim_output[day-1][0] = S; //Saving daily S 
-		sim_output[day-1][1] = IV; //Saving daily S 
-		sim_output[day-1][2] = IF; //Saving daily V
+		sim_output[day-1][0] = S/initS; //Saving daily S 
+		sim_output[day-1][1] = IV/initS; //Saving daily S 
+		sim_output[day-1][2] = IF/initS; //Saving daily V
 
 
 		//printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]); //SH trying to figure out of I get content into my array 

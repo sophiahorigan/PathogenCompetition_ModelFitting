@@ -188,120 +188,138 @@ Params.PARS[50+pop]=fdensity;
 
 
 
-	//************SH prints output each day into file******************
-	char name1[50];
-	sprintf(name1, "TEST_daily");
-	fp1=fopen(name1,"a+"); //or a+, not sure which
-	//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
-	DDEVF(&Params,r_seed,dim,pop,48,0,year);
-	fclose(fp1);
-
-
-
-	//*****************************SH saves output into array without printing file**************//
-	//DDEVF(&Params,r_seed,dim,pop,48,0,year);
-	//printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
-
-	//SH make sure sim_output looks correct (day, S, V, F)
-	/*
-	int loop1, loop2;
-	for(loop1 = 0; loop1 < 48; loop1++){
-		for (loop2 = 0; loop2 < 4; loop2++){
-			printf("sim_output[%d][%d] = %e\n", loop1, loop2, sim_output[loop1][loop2]);
-		}	
-	} */
-
-
-
-
-
-
-
-
-//SH ****** let's calculate a likelihood!! *******//
-
-	//SH data input to compare to sim_results
-	//SH int because that's what the likelihood calculation wants
-	//const 
-	const unsigned int JHN_NoCo[48][3] = {
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{42, 7, 0},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{29, 18, 1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{33, 15, 0},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{36, 11, 1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{38, 10, 1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{25, 21, 4},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{19, 30, 2},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{11, 33, 2},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{7, 41, 1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1},
-		{-1, -1, -1}
-	};
-
+//************SH prints output each day into file******************//
 /*
-int loop3, loop4;
-	for(loop3 = 0; loop3 < 49; loop3++){
-		for (loop4 = 0; loop4 < 4; loop4++){
-			printf("JHN_NoCo[%d][%d] = %e\n", loop3, loop4, JHN_NoCo[loop3][loop4]);
-		}	
-	} 
+char name1[50];
+sprintf(name1, "TEST_daily");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);
 */
 
+
+//*****************************SH saves output into array without printing file**************//
+//*
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
+/*/
+
+
+//**************************SH prints content of sim_output********************************///
+/*
+int loop1, loop2;
+for(loop1 = 0; loop1 < 48; loop1++){
+	for (loop2 = 0; loop2 < 3; loop2++){
+		printf("sim_output[%d][%d] = %e\n", loop1, loop2, sim_output[loop1][loop2]);
+	}	
+} 
+*/
+
+
+//************* SH hard code data **********/
+const int JHN_NoCo[55][3] = {
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{42, 7, 0},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{29, 18, 1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{33, 15, 0},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{36, 11, 1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{38, 10, 1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{25, 21, 4},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{19, 30, 2},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{11, 33, 2},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{7, 41, 1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1},
+	{-1, -1, -1}
+};
+int (*ptr_JHN_NoCo)[55][3]; 
+
+//**************SH prints content of JHN_NoCo******************//
+/*
+int loop3, loop4;
+for(loop3 = 0; loop3 < 48; loop3++){
+	for (loop4 = 0; loop4 < 3; loop4++){
+		printf("JHN_NoCo[%i][%i] = %i\n", loop3, loop4, JHN_NoCo[loop3][loop4]);
+	}	
+}
+*/
+
+
+//**************SH Check that prt_sim_output prints same as sim_output*******************//
+int loop1, loop2;
+for(loop1 = 0; loop1 < 48; loop1++){
+	for (loop2 = 0; loop2 < 3; loop2++){
+		printf("sim_output[%d][%d] = %e\n", loop1, loop2, sim_output[loop1][loop2]);
+		printf("ptr_sim_output[%d][%d] = %e\n", loop1, loop2, *(*(ptr_sim_output+loop1) + loop2));
+	}	
+}
+
+
+//***********SH check that prt_JHN_NoCo prints same as JHN_NoCo***************//
+/*
+int loop3, loop4;
+for(loop3 = 0; loop3 < 48; loop3++){
+	for (loop4 = 0; loop4 < 3; loop4++){
+		printf("JHN_NoCo[%i][%i] = %i\n", loop3, loop4, JHN_NoCo[loop3][loop4]);
+		printf("ptr_JHN_NoCo[%i][%i] = %i\n", loop3, loop4, ptr_JHN_NoCo[loop3][loop4]);
+	}	
+}
+*/
+
+
+//*************** SH let's calculate a likelihood!! ******************//
+/*
 int m; int n; double lhood_JHN = 0;
 
 for (m = 0; m < 48; m++){
-	for (n = 0; n < 3; n++){
-		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, *sim_output[m][n], JHN_NoCo[m][n]);
-		printf("%d\n", lhood_JHN);
-	}	
+	if (ptr_JHN_NoCo[m][0] != -1) {
+		for (n = 0; n < 3; n++){
+			lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, ptr_sim_output[m][n], ptr_JHN_NoCo[m][n]);
+			printf("%d\n", lhood_JHN);
+		}	
+	}
+	else{
+
+	}
 }
 printf("%d\n", lhood_JHN);
-
-
-
-
-
-
-
-
-
-
+*/
 
 
 

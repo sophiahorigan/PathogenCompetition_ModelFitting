@@ -86,7 +86,6 @@ double VPass;          //variable to pass the value of initialV in each generati
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
 double sim_output[55][3]; //array for output
-double (*ptr_sim_output)[55][3]; //SH attempted to make a pointer for the array to pass into gsl_multinom
 
 double vinfected; //SH to hold daily fraction infected
 double finfected; //SH add coinfected eventually

@@ -189,32 +189,22 @@ Params.PARS[50+pop]=fdensity;
 
 
 //************SH prints output each day into file******************//
-/*
+
 char name1[50];
-sprintf(name1, "TEST_daily");
+sprintf(name1, "sim_output_");
 fp1=fopen(name1,"a+"); //or a+, not sure which
 //for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
 DDEVF(&Params,r_seed,dim,pop,48,0,year);
 fclose(fp1);
-*/
+
 
 
 //*****************************SH saves output into array without printing file**************//
-//*
+/*
 DDEVF(&Params,r_seed,dim,pop,48,0,year);
 printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
-/*/
-
-
-//**************************SH prints content of sim_output********************************///
-/*
-int loop1, loop2;
-for(loop1 = 0; loop1 < 48; loop1++){
-	for (loop2 = 0; loop2 < 3; loop2++){
-		printf("sim_output[%d][%d] = %e\n", loop1, loop2, sim_output[loop1][loop2]);
-	}	
-} 
 */
+
 
 
 //************* SH hard code data **********/
@@ -306,20 +296,18 @@ for(loop3 = 0; loop3 < 48; loop3++){
 
 //*************** SH let's calculate a likelihood!! ******************//
 
-int m; int n; double lhood_JHN = 0;
+int m; double lhood_JHN = 0;
 
 for (m = 0; m < 48; m++){
-	if (JHN_NoCo[m][0] != -1) {
-		for (n = 0; n < 3; n++){
-			lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, sim_output[m][n], JHN_NoCo[m][n]);
-			printf("%d\n", lhood_JHN);
-		}	
+	if (JHN_NoCo[m][0] != -1) {	
+		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, sim_output[m], JHN_NoCo[m]);
+		printf("%lf\n", lhood_JHN);
 	}
 	else{
 
 	}
 }
-printf("%d\n", lhood_JHN);
+printf("%lf\n", lhood_JHN);
 
 
 

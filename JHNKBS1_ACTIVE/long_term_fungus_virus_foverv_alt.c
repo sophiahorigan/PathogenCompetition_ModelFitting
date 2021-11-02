@@ -268,7 +268,7 @@ const int JHN_NoCo[55][3] = {
 	{-1, -1, -1},
 	{-1, -1, -1}
 };
-int (*ptr_JHN_NoCo)[55][3]; 
+//int (*ptr_JHN_NoCo)[55][3]; 
 
 //**************SH prints content of JHN_NoCo******************//
 /*
@@ -282,6 +282,7 @@ for(loop3 = 0; loop3 < 48; loop3++){
 
 
 //**************SH Check that prt_sim_output prints same as sim_output*******************//
+/*
 int loop1, loop2;
 for(loop1 = 0; loop1 < 48; loop1++){
 	for (loop2 = 0; loop2 < 3; loop2++){
@@ -289,7 +290,7 @@ for(loop1 = 0; loop1 < 48; loop1++){
 		printf("ptr_sim_output[%d][%d] = %e\n", loop1, loop2, *(*(ptr_sim_output+loop1) + loop2));
 	}	
 }
-
+*/
 
 //***********SH check that prt_JHN_NoCo prints same as JHN_NoCo***************//
 /*
@@ -304,13 +305,13 @@ for(loop3 = 0; loop3 < 48; loop3++){
 
 
 //*************** SH let's calculate a likelihood!! ******************//
-/*
+
 int m; int n; double lhood_JHN = 0;
 
 for (m = 0; m < 48; m++){
-	if (ptr_JHN_NoCo[m][0] != -1) {
+	if (JHN_NoCo[m][0] != -1) {
 		for (n = 0; n < 3; n++){
-			lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, ptr_sim_output[m][n], ptr_JHN_NoCo[m][n]);
+			lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(3, sim_output[m][n], JHN_NoCo[m][n]);
 			printf("%d\n", lhood_JHN);
 		}	
 	}
@@ -319,7 +320,7 @@ for (m = 0; m < 48; m++){
 	}
 }
 printf("%d\n", lhood_JHN);
-*/
+
 
 
 

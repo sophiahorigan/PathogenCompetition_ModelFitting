@@ -879,9 +879,11 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
         //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 		
 		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
-		sim_output[day-1][0] = S/(initS-Fkill-Vkill); //Saving daily fraction infected S 
-		sim_output[day-1][1] = IV/(initS-Fkill-Vkill); //Saving daily fraction infected V 
-		sim_output[day-1][2] = IF/(initS-Fkill-Vkill); //Saving daily fraction infected F
+		sim_output[day-1][0] = S; //Saving daily fraction infected S 
+		sim_output[day-1][1] = IV; //Saving daily fraction infected V 
+		sim_output[day-1][2] = IF; //Saving daily fraction infected F
+		//printf("Regular S=%e\t IV=%e\t IF=%e\n", S, IV, IF);
+		//printf("Fraction S=%e\t IV=%e\t IF=%e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
 
 		fprintf(fp1, "%e\t %e\t %e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
 

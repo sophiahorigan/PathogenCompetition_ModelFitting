@@ -45,18 +45,15 @@ double VFtime=10;
 double VFPass;
 
 //JL: Long-term survival rates for the pathogens and fecundity
-//double phivirus=15;          //from Fuller et al. 2012
 double phivirus=40;
 double gammavirus=0.01;
 double phifungus=0.25;
 double gammafungus=0.95;
 double psifungus=0.95;
 double eta=100;
-//double fecundity=5.5;         //from Fuller et al. 2012, for host-pathogen only model
+double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1};
 double fecundity=74.6;
 //JL: Predation parameters
-//double preda=0;
-//double predb=0;
 double preda=0.967;           //Predation parameters, for host-pathogen-predator model
 double predb=0.14*0.39/0.64;
 
@@ -64,7 +61,7 @@ double predb=0.14*0.39/0.64;
 double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
 //double VFSusF[15]={150,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500};
 double VFSus;
-double coinf_V=0.0; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
+double coinf_V=0.5; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
 
 
 //JL: Recording the status at the end of an epizootic

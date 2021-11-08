@@ -31,7 +31,7 @@ double minRH;
 int FlagF;
 
 char *file;
-char *file_name="JHN_NoCo"; // SH modified for one observational site
+char *file_name="JHN_Co"; // SH modified for one observational site
 char *file_name2="KBS1_weatherdaily";  //SH weather data for one site
 // char *file_name3="DEMOweather";  //CK// name for inputing the rain data
 // char *file_name4="CDO_Roscommon_APT_long";  //CK// name for inputing the rain data
@@ -68,8 +68,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
 
-	while (fscanf(ftp_data,"%d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &Ddata[i])!= EOF)			{ //SH when dealing with years add another input
-		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][4]=Ddata[i];  
+	while (fscanf(ftp_data,"%d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &FVdata[i], &Ddata[i])!= EOF)			{ //SH when dealing with years add another input
+		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=FVdata[i]; Params->DATA[j][i][4]=Ddata[i];  
 		//printf("FERALS: i=%d\t pop:%d\t healthy:%d\t viral:%d\t fungal:%d\t week:%d\t week2:%d\n",i,j,Params->DATA[j][i][0],Params->DATA[j][i][1],Params->DATA[j][i][2], Params->DATA[j][i][3], Params->DATA[j][i][4]);
 		//if ((Fdata[i]>0) && (FlagF<1))	{
 		//	FlagF=2;

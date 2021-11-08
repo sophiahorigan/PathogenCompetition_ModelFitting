@@ -208,7 +208,7 @@ printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]
 
 
 //************* SH hard code data **********/
-const int JHN_NoCo[55][3] = {
+const int JHN_Co[55][4] = {
 	{-1, -1, -1, -1},
 	{-1, -1, -1, -1},
 	{-1, -1, -1, -1},
@@ -277,8 +277,8 @@ for(loop3 = 0; loop3 < 48; loop3++){
 int m; double lhood_JHN = 0;
 
 for (m = 0; m < 48; m++){
-	if (JHN_NoCo[m][0] != -1) {	
-		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(4, sim_output[m], JHN_NoCo[m]);
+	if (JHN_Co[m][0] != -1) {	
+		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(4, sim_output[m], JHN_Co[m]);
 		printf("%lf\n", lhood_JHN);
 	}
 	else{

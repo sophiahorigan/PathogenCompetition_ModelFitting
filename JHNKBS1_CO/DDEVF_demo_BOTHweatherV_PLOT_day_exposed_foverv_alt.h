@@ -136,8 +136,9 @@ line_ticker = num_day;
 
 line_ticker=line_ticker-1;
 
-double S,V,F,R;	double IV=0, IF=0, IVF=0;
-double E_V[n2+1]; double E_F[gstepsF+1]; double E_VF[n1+1]; double E_FV[gstepsF+1];
+double S,V,F,R;	double IV=0, IF=0, IVF=0,IFV=0; //SH IFV captures coinfections
+double E_V[n2+1]; double E_F[gstepsF+1]; double E_VF[n1+1]; double E_FV[gstepsF+1]; //VF: early infected virus that can be coinfected
+//FV are coinfected indls
 int num_weeks=MAXT3/7;
 
 // -----------------------------------//CK// calculating ending blooming times //CK//--------------------------------------- //
@@ -294,7 +295,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		getc(stdin);
 	}
 	// -------------------------- integrate until next stoppage event ---------------------------------- //
-	while (t<t_next)	{
+	while (t<t_next)	{ //SH this is day
 		y_ode[0]=S;	y_ode[m+n+1]=Fcadaver;	Params->POPS[3]=R;
 		y_ode[m+n+3]=Vcadaver;
 
@@ -363,7 +364,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		IF=0;
 		IV=0;
 		IVF=0;
-
+		IFV=0;
 
 	if ((day+1)%7==0)	{
 		ConiBefore=y_ode[m+1]*nuF2;  //CK// Saving the conidia 24 hours before feral collection
@@ -386,6 +387,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 		for (i=1;i<=gstepsF;i++)	{
 			E_FV[i]=y_ode[gstepsF+gstepsV+6+i];
+			IFV += E_FV[i];
 			IF += (1-coinf_V)*E_FV[i];
 			IV += coinf_V*E_FV[i];
 		}
@@ -506,10 +508,13 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
         //printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 		
 		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
-		sim_output[day-1][0] = S; //Saving daily fraction infected S 
-		sim_output[day-1][1] = IV; //Saving daily fraction infected V 
-		sim_output[day-1][2] = IF; //Saving daily fraction infected F
-		sim_output[day-1][3] = IVF; //Saving daily fraction coinfected 
+		sim_output[day-1][0] = S/(initS-Fkill-Vkill); //Saving daily fraction infected S 
+		sim_output[day-1][1] = IV/(initS-Fkill-Vkill); //Saving daily fraction infected V 
+		sim_output[day-1][2] = IF/(initS-Fkill-Vkill)); //Saving daily fraction infected F
+		sim_output[day-1][3] = IFV/(initS-Fkill-Vkill); //Saving daily fraction coinfected 
+
+		//how to get it to the correct fraction
+
 		//printf("Regular S=%e\t IV=%e\t IF=%e\n", S, IV, IF);
 		//printf("Fraction S=%e\t IV=%e\t IF=%e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
 

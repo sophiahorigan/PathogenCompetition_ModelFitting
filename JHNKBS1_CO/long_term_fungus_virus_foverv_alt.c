@@ -153,7 +153,6 @@ fclose(fp1);
 //*****************************SH saves output into array without printing file**************//
 /*
 DDEVF(&Params,r_seed,dim,pop,48,0,year);
-printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
 */
 
 
@@ -239,6 +238,7 @@ for (m = 0; m < 48; m++){
 printf("%lf\n", lhood_JHN);
 
 
+printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
 
 
 

@@ -382,7 +382,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		for (i=1;i<=n2;i++)	{
 			E_V[i]=y_ode[gstepsF+n1+i];
 			IV += E_V[i];
-=		}
+		}
 
 		for (i=1;i<=gstepsF;i++)	{
 			E_FV[i]=y_ode[gstepsF+gstepsV+6+i];

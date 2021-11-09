@@ -4,6 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <omp.h>
+#include <unistd.h>
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>

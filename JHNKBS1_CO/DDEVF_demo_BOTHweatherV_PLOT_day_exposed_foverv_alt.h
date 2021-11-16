@@ -388,8 +388,8 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		for (i=1;i<=gstepsF;i++)	{
 			E_FV[i]=y_ode[gstepsF+gstepsV+6+i];
 			IFV += E_FV[i];
-			IF += (1-coinf_V)*E_FV[i];
-			IV += coinf_V*E_FV[i];
+			//IF += (1-coinf_V)*E_FV[i]; //SH these are double counting coinfections I think.
+			//IV += coinf_V*E_FV[i];
 		}
 
 		if (day==MAXT3-7){
@@ -510,15 +510,13 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
 		sim_output[day-1][0] = S/(initS-Fkill-Vkill); //Saving daily fraction infected S 
 		sim_output[day-1][1] = IV/(initS-Fkill-Vkill); //Saving daily fraction infected V 
-		sim_output[day-1][2] = IF/(initS-Fkill-Vkill)); //Saving daily fraction infected F
+		sim_output[day-1][2] = IF/(initS-Fkill-Vkill); //Saving daily fraction infected F
 		sim_output[day-1][3] = IFV/(initS-Fkill-Vkill); //Saving daily fraction coinfected 
-
-		//how to get it to the correct fraction
 
 		//printf("Regular S=%e\t IV=%e\t IF=%e\n", S, IV, IF);
 		//printf("Fraction S=%e\t IV=%e\t IF=%e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
 
-		//fprintf(fp1, "%e\t %e\t %e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
+		fprintf(fp1, "%d\t %e\t %e\t %e\t %e\n", day-1, S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill), IFV/(initS-Fkill-Vkill));
 
 
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R

@@ -62,7 +62,7 @@ double predb=0.14*0.39/0.64;
 double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
 //double VFSusF[15]={150,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500};
 double VFSus;
-double coinf_V=0.5; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
+double coinf_V=0; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
 
 
 //JL: Recording the status at the end of an epizootic

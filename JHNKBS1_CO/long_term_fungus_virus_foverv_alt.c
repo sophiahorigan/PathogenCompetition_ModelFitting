@@ -127,10 +127,10 @@ double vdensity;
 //for (bbf=0;bbf<15;bbf++){ //SH removed for now, just set VfSus to something
 //VFPass=VFtime;
 // SH need to set initial conditions
-VFSus=15; //SH random pick 
-sdensity=100; //SH random pick 
+VFSus=5; //SH random pick 
+sdensity=1000; //SH random pick 
 fdensity=0.026; //SH from literature
-vdensity=0.2; //SH guesstimate
+vdensity=0.3; //SH guesstimate
 
 //SH KEEP brings initial values into structure
 Params.PARS[30+pop]=sdensity; 
@@ -236,10 +236,6 @@ for (m = 0; m < 48; m++){
 	}
 }
 printf("%lf\n", lhood_JHN);
-
-
-printf("%e\t %e\t %e\t", sim_output[12][1], sim_output[12][2], sim_output[12][3]);
-
 
 
 

@@ -132,7 +132,7 @@ sprintf(name1, "sim_output_block1");
 fp1=fopen(name1,"a+"); 
 
 int i_tmt; 
-for (int i_tmt = 1; int i_tmt < 5; int i_tmt++){
+for (i_tmt = 1; i_tmt < 5; i_tmt++){
 	if (i_tmt = 1){ //FUNGUS ONLY
 		VFSus=2; 
 		sdensity=100; 
@@ -375,21 +375,26 @@ const int BlockOne_exp[200][4] = {
 
 
 //*************** SH let's calculate a likelihood!! ******************//
-/*
-int m; double lhood_JHN = 0;
 
-for (m = 0; m < 48; m++){
-	if (JHN_Co[m][0] != -1) {	
-		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(4, sim_output[m], JHN_Co[m]);
-		printf("%lf\n", lhood_JHN);
-	}
-	else{
+int m; int n; double lhood_tmt = 0; double lhood_block = 0;
 
+for (m = 0; m < 192; m++){
+	for (n = 0; n < 48; n++){
+		if(BlockOne_exp[m][0] != -1){
+			lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], BlockOne_exp[m]);
+			printf("%lf\n", lhood_tmt);
+		}
+		printf("END OF TREATMENT. Likelihood sum for treatment = %lf\n", lhood_tmt);
+		lhood_block = lhood_block + lhood_tmt;
+		n = 0;
+		lhood_tmt = 0;
 	}
+		else{
+		}
 }
-printf("%lf\n", lhood_JHN);
+printf("Likelihood sum across treamtments = %lf\n", lhood_block);
 
-*/
+
 
 //**************SH prints output at end of week****************//
    // FILE *fp;

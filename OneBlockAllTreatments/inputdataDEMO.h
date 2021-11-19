@@ -44,6 +44,7 @@ char *code_name="ftp";
 char numbs[5];
 /*------------------------------- Data Sets ---------------------------------*/
 /* -------- SH Observational Data ------- */
+/* //SH bring back if you ever decide not to just hard code.
 //SH when adding in more datasets, increase DATA_SETS value and that will loop through all
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
@@ -93,6 +94,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 //getc(stdin);
 
 //printf("just before Experimental Data...\n");getc(stdin);
+*/
+
 
 /*-------------------------------Weather Data Sets ---------------------------------*/
 /* -------- SH Weather Data ------- */

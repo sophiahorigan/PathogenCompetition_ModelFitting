@@ -1,6 +1,6 @@
 // DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
 
-double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q) //SH DOES save into array
+double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q, int tmt) //SH DOES save into array
 
 {
 
@@ -505,12 +505,31 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		printf("%e\t %e\t %e\t %e\t %e\n", Fkill, Fkill_cum, Vkill, Vkill_cum, dailydead);
 		*/
 
-		//SH attempt to fill array each day with four values. going to try printing it in the main .c file
-		sim_output[day-1][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
-		sim_output[day-1][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
-		sim_output[day-1][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
-		sim_output[day-1][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
-
+//*******************************Appends output for each treatment run based on one epizootic length of 48**************************//
+		if (tmt = 1){
+			sim_output[day-1][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		}
+		if (tmt = 2){
+			sim_output[day-1+48][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1+48][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1+48][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1+48][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		}
+		if (tmt = 3){
+			sim_output[day-1+96][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1+96][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1+96][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1+96][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		}
+		if (tmt = 4){
+			sim_output[day-1+144][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1+144][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1+144][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1+144][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		}
 		//printf("Regular S=%e\t IV=%e\t IF=%e\n", S, IV, IF);
 		//printf("Fraction S=%e\t IV=%e\t IF=%e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
 

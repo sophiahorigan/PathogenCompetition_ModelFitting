@@ -123,39 +123,58 @@ double sdensity;
 double fdensity;
 double vdensity;
 
-//int bbf;
-//for (bbf=0;bbf<15;bbf++){ //SH removed for now, just set VfSus to something
-//VFPass=VFtime;
-// SH need to set initial conditions
-VFSus=2; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
 
-//SH KEEP brings initial values into structure
-Params.PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params.PARS[50+pop]=fdensity;
-
-
-
-//************SH prints output each day into file******************//
+//****************loops through initial conditions for each treatment********************//
+//prints output to file
 
 char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
+sprintf(name1, "sim_output_block1");
+fp1=fopen(name1,"a+"); 
+
+int i_tmt; 
+for (int i_tmt = 1; int i_tmt < 5; int i_tmt++){
+	if (i_tmt = 1){ //FUNGUS ONLY
+		VFSus=2; 
+		sdensity=100; 
+		fdensity=0.026; 
+		vdensity=0; 
+		Params.PARS[30+pop]=sdensity; 
+		VPass=vdensity;
+		Params.PARS[50+pop]=fdensity;
+		DDEVF(&Params,r_seed,dim,pop,48,0,year, 1);
+	}
+	if (i_tmt =2){ //VIRUS ONLY
+		VFSus=2; 
+		sdensity=100; 
+		fdensity=0;
+		vdensity=0.05; 
+		Params.PARS[30+pop]=sdensity; 
+		VPass=vdensity;
+		Params.PARS[50+pop]=fdensity;
+		DDEVF(&Params,r_seed,dim,pop,48,0,year, 2);
+	}
+	if (i_tmt = 3){ //FUNGUS-VIRUS
+		VFSus=2; 
+		sdensity=100; 
+		fdensity=0.0236; 
+		vdensity=0.05; 
+		Params.PARS[30+pop]=sdensity; 
+		VPass=vdensity;
+		Params.PARS[50+pop]=fdensity;
+		DDEVF(&Params,r_seed,dim,pop,48,0,year, 3);
+	}
+	if (i_tmt = 4){ //CONTROL
+		VFSus=2; 
+		sdensity=100; 
+		fdensity=0; 
+		vdensity=0; 
+		Params.PARS[30+pop]=sdensity; 
+		VPass=vdensity;
+		Params.PARS[50+pop]=fdensity;
+		DDEVF(&Params,r_seed,dim,pop,48,0,year, 4);
+	}
 fclose(fp1);
-
-
-
-//*****************************SH saves output into array without printing file**************//
-/*
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-*/
-
-
+}
 
 //************* SH hard code data **********/
 const int BlockOne_exp[200][4] = {
@@ -354,20 +373,9 @@ const int BlockOne_exp[200][4] = {
 };
 //int (*ptr_JHN_NoCo)[55][3]; 
 
-//**************SH prints content of JHN_NoCo******************//
-/*
-int loop3, loop4;
-for(loop3 = 0; loop3 < 48; loop3++){
-	for (loop4 = 0; loop4 < 3; loop4++){
-		printf("JHN_NoCo[%i][%i] = %i\n", loop3, loop4, JHN_NoCo[loop3][loop4]);
-	}	
-}
-*/
-
-
 
 //*************** SH let's calculate a likelihood!! ******************//
-
+/*
 int m; double lhood_JHN = 0;
 
 for (m = 0; m < 48; m++){
@@ -381,7 +389,7 @@ for (m = 0; m < 48; m++){
 }
 printf("%lf\n", lhood_JHN);
 
-
+*/
 
 //**************SH prints output at end of week****************//
    // FILE *fp;

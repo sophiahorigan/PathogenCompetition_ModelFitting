@@ -25,6 +25,8 @@ int FlagDay=0;
 
 int MAXT3=maxy_t;
 
+int k = tmt; //SH looping through treamtent numbers below
+
 int m = Params->PARS[9];
 int n = Params->PARS[8]; 
 int DIM = m+n+4+2+1+m; //SH need to add an m in this? need to increase anyways 
@@ -141,6 +143,8 @@ double S,V,F,R;	double IV=0, IF=0, IVF=0,IFV=0; //SH IFV captures coinfections
 double E_V[n2+1]; double E_F[gstepsF+1]; double E_VF[n1+1]; double E_FV[gstepsF+1]; //VF: early infected virus that can be coinfected
 //FV are coinfected indls
 int num_weeks=MAXT3/7;
+
+
 
 // -----------------------------------//CK// calculating ending blooming times //CK//--------------------------------------- //
 /* //SH REMOVE BECAUSE WANT RESTING SPORES TO START BLOOMING FROM DAY 1
@@ -506,34 +510,33 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		*/
 
 //*******************************Appends output for each treatment run based on one epizootic length of 48**************************//
-		if (tmt = 1){
+		//printf("Value of k %i\n", k);
+		if (k == 1){
 			sim_output[day-1][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
 			sim_output[day-1][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
 			sim_output[day-1][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
 			sim_output[day-1][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
 		}
-		if (tmt = 2){
-			sim_output[day-1+48][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
-			sim_output[day-1+48][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
-			sim_output[day-1+48][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
-			sim_output[day-1+48][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		else if (k == 2){
+			sim_output[day-1+47][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1+47][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1+47][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1+47][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
 		}
-		if (tmt = 3){
-			sim_output[day-1+96][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
-			sim_output[day-1+96][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
-			sim_output[day-1+96][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
-			sim_output[day-1+96][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		else if (k == 3){
+			sim_output[day-1+95][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1+95][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1+95][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1+95][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
 		}
-		if (tmt = 4){
-			sim_output[day-1+144][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
-			sim_output[day-1+144][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
-			sim_output[day-1+144][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
-			sim_output[day-1+144][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
+		else if (k == 4){
+			sim_output[day-1+143][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
+			sim_output[day-1+143][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
+			sim_output[day-1+143][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
+			sim_output[day-1+143][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
 		}
-		//printf("Regular S=%e\t IV=%e\t IF=%e\n", S, IV, IF);
-		//printf("Fraction S=%e\t IV=%e\t IF=%e\n", S/(initS-Fkill-Vkill), IV/(initS-Fkill-Vkill), IF/(initS-Fkill-Vkill));
-
-		fprintf(fp1, "%d\t %e\t %e\t %e\t %e\n", day-1, S/(y_ode[0]+IV+IF+IVF), IV/(y_ode[0]+IV+IF+IVF), IF/(y_ode[0]+IV+IF+IVF), IFV/(y_ode[0]+IV+IF+IVF));
+		
+		fprintf(fp1, "%i\t %d\t %e\t %e\t %e\t %e\n", k, day-1, S/(y_ode[0]+IV+IF+IVF), IV/(y_ode[0]+IV+IF+IVF), IF/(y_ode[0]+IV+IF+IVF), IFV/(y_ode[0]+IV+IF+IVF));
 
 
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R

@@ -143,7 +143,7 @@ for (i_tmt = 1; i_tmt < 5; i_tmt++){
 		Params.PARS[50+pop]=fdensity;
 		DDEVF(&Params,r_seed,dim,pop,48,0,year, 1);
 	}
-	if (i_tmt =2){ //VIRUS ONLY
+	else if (i_tmt = 2){ //VIRUS ONLY
 		VFSus=2; 
 		sdensity=100; 
 		fdensity=0;
@@ -153,7 +153,7 @@ for (i_tmt = 1; i_tmt < 5; i_tmt++){
 		Params.PARS[50+pop]=fdensity;
 		DDEVF(&Params,r_seed,dim,pop,48,0,year, 2);
 	}
-	if (i_tmt = 3){ //FUNGUS-VIRUS
+	else if (i_tmt = 3){ //FUNGUS-VIRUS
 		VFSus=2; 
 		sdensity=100; 
 		fdensity=0.0236; 
@@ -163,7 +163,7 @@ for (i_tmt = 1; i_tmt < 5; i_tmt++){
 		Params.PARS[50+pop]=fdensity;
 		DDEVF(&Params,r_seed,dim,pop,48,0,year, 3);
 	}
-	if (i_tmt = 4){ //CONTROL
+	else if (i_tmt = 4){ //CONTROL
 		VFSus=2; 
 		sdensity=100; 
 		fdensity=0; 
@@ -175,6 +175,16 @@ for (i_tmt = 1; i_tmt < 5; i_tmt++){
 	}
 fclose(fp1);
 }
+
+//**************SH prints content of sim_output******************//
+/*
+int loop3, loop4;
+for(loop3 = 0; loop3 < 192; loop3++){
+	for (loop4 = 0; loop4 < 4; loop4++){
+		printf("sim_output[%i][%i] = %e\n", loop3, loop4, sim_output[loop3][loop4]);
+	}	
+}
+*/
 
 //************* SH hard code data **********/
 const int BlockOne_exp[200][4] = {
@@ -376,21 +386,22 @@ const int BlockOne_exp[200][4] = {
 
 //*************** SH let's calculate a likelihood!! ******************//
 
-int m; int n; double lhood_tmt = 0; double lhood_block = 0;
+int m = 0; int n; double lhood_tmt = 0; double lhood_block = 0;
 
-for (m = 0; m < 192; m++){
+
+ while (m < 192){
 	for (n = 0; n < 48; n++){
 		if(BlockOne_exp[m][0] != -1){
 			lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], BlockOne_exp[m]);
 			printf("%lf\n", lhood_tmt);
-		}
-		printf("END OF TREATMENT. Likelihood sum for treatment = %lf\n", lhood_tmt);
-		lhood_block = lhood_block + lhood_tmt;
-		n = 0;
-		lhood_tmt = 0;
+		} 
+		m++;
 	}
-		else{
-		}
+	printf("END OF TREATMENT. Likelihood sum for treatment = %lf\n", lhood_tmt);
+	lhood_block = lhood_block + lhood_tmt;
+	n = 0;
+	lhood_tmt = 0;
+		
 }
 printf("Likelihood sum across treamtments = %lf\n", lhood_block);
 

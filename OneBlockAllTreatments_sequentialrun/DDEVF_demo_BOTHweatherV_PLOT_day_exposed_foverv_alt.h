@@ -358,26 +358,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		if(Params->POPS[3] == 0.0){Params->nuR = 0.0; nuR2 = 0.0;}
 
 
-
-//*** add dispersal here! use migration function to calculate movement based on current value of E_F
-//*** ADD
-// add into params, which passes to ODE_Solver
-//
-//	for treatment 1
-//   net1 = dispersal_func(dispersal_param, d2,1)*densities? + dispersal_func(dispersal_param, d3,1) + dispersal_func(dispersal_param, d4,1)
-//				- dispersal_func(dispersal_param, d1,2)
-//?? where do densities go, out here or in the ode-sovler? 
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
 		t=ODE_Solver(t,t_next,Params,y_ode);
 
 		S=y_ode[0];	Fcadaver=y_ode[m+n+1]; Vcadaver=y_ode[m+n+3];

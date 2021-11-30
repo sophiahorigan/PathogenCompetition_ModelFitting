@@ -37,20 +37,54 @@ double Finf = y[0]*nuF*C;
 double Rinf = y[0]*nuF*R;
 
 
-// ------------------------------------------ ODEs -------------------------------------------- //
-//if		(y[0]<.000001)	dydt[0]=0;
-//else
+//------DISPERSAL TO DO-------//
+// 1. make each equation x4 
+	// a. make sure y_ode can hold it (dim)
+// 2. pull conidia net dispersal from PARAMS and add to each conidia equation (from DDEVF)
 
+
+
+// ------------------------------------------ ODEs -------------------------------------------- //
+// ********************************************************************* TREATMENT 1 ****************************************************
 dydt[0]  = -y[0]*(nuF*y[m+n+1] + nuR*R)-y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV);
 dydt[1]  = nuF*y[m+n+1]*y[0] + nuR*R*y[0] - m*lambdaF*y[1];
-//for (i=1;i<=n1;i++){
-//    dydt[1] += (nuF*y[m+n+1] + nuR*R)*y[m+i]*VFSus;
-//}
-
 for(i=2; i <= m; i++){
 	dydt[i]=m*lambdaF*(y[i-1] -y[i]);
 }
 
+//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
+dydt[m+1] = y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV)-n*lambdaV*y[m+1]-y[m+1]*(nuF*y[m+n+1] + nuR*R)*VFSus;
+for (i=2;i<=n1;i++){
+    dydt[m+i]=n*lambdaV*(y[m+i-1]-y[m+i])-y[m+i]*(nuF*y[m+n+1] + nuR*R)*VFSus;
+}
+
+//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
+dydt[m+n1+1]=n*lambdaV*y[m+n1]-n*lambdaV*y[m+n1+1];
+for (i=2;i<=n2;i++){
+    dydt[m+n1+i]=n*lambdaV*(y[m+n1+i-1]-y[m+n1+i]);
+}
+dydt[m+n+1] = m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m])*size_C - muF*y[m+n+1];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
+dydt[m+n+2] = indexR*m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m]);
+dydt[m+n+3] = n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V-muV*y[m+n+3];  //Class of cadavers infected by virus
+dydt[m+n+4] = n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V;
+dydt[m+n+5] = m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m]);
+dydt[m+n+6] = indexV*(n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V);
+
+//Recording the hosts already infected with virus and taken over by the fungus
+dydt[m+n+6+1] = (nuF*y[m+n+1] + nuR*R)*y[m+1]*VFSus- m*lambdaF*y[m+n+6+1];
+for (i=2;i<=n1;i++){
+    dydt[m+n+6+1] += (nuF*y[m+n+1] + nuR*R)*y[m+i]*VFSus;
+}
+for(i=2; i <= m; i++){
+	dydt[m+n+6+i]=m*lambdaF*(y[m+n+6+i-1] -y[m+n+6+i]);
+}
+
+// ******************************************************************** TREATMENT 2 ***************************************************
+dydt[0]  = -y[0]*(nuF*y[m+n+1] + nuR*R)-y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV);
+dydt[1]  = nuF*y[m+n+1]*y[0] + nuR*R*y[0] - m*lambdaF*y[1];
+for(i=2; i <= m; i++){
+	dydt[i]=m*lambdaF*(y[i-1] -y[i]);
+}
 
 //First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
 dydt[m+1] = y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV)-n*lambdaV*y[m+1]-y[m+1]*(nuF*y[m+n+1] + nuR*R)*VFSus;
@@ -80,6 +114,78 @@ for(i=2; i <= m; i++){
 }
 
 
+// ****************************************************************** TREATMENT 3 **********************************************************
+dydt[0]  = -y[0]*(nuF*y[m+n+1] + nuR*R)-y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV);
+dydt[1]  = nuF*y[m+n+1]*y[0] + nuR*R*y[0] - m*lambdaF*y[1];
+for(i=2; i <= m; i++){
+	dydt[i]=m*lambdaF*(y[i-1] -y[i]);
+}
+
+//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
+dydt[m+1] = y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV)-n*lambdaV*y[m+1]-y[m+1]*(nuF*y[m+n+1] + nuR*R)*VFSus;
+for (i=2;i<=n1;i++){
+    dydt[m+i]=n*lambdaV*(y[m+i-1]-y[m+i])-y[m+i]*(nuF*y[m+n+1] + nuR*R)*VFSus;
+}
+
+//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
+dydt[m+n1+1]=n*lambdaV*y[m+n1]-n*lambdaV*y[m+n1+1];
+for (i=2;i<=n2;i++){
+    dydt[m+n1+i]=n*lambdaV*(y[m+n1+i-1]-y[m+n1+i]);
+}
+dydt[m+n+1] = m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m])*size_C - muF*y[m+n+1];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
+dydt[m+n+2] = indexR*m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m]);
+dydt[m+n+3] = n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V-muV*y[m+n+3];  //Class of cadavers infected by virus
+dydt[m+n+4] = n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V;
+dydt[m+n+5] = m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m]);
+dydt[m+n+6] = indexV*(n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V);
+
+//Recording the hosts already infected with virus and taken over by the fungus
+dydt[m+n+6+1] = (nuF*y[m+n+1] + nuR*R)*y[m+1]*VFSus- m*lambdaF*y[m+n+6+1];
+for (i=2;i<=n1;i++){
+    dydt[m+n+6+1] += (nuF*y[m+n+1] + nuR*R)*y[m+i]*VFSus;
+}
+for(i=2; i <= m; i++){
+	dydt[m+n+6+i]=m*lambdaF*(y[m+n+6+i-1] -y[m+n+6+i]);
+}
+
+// ********************************************************************* TREATMENT 4 *******************************************************
+dydt[0]  = -y[0]*(nuF*y[m+n+1] + nuR*R)-y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV);
+dydt[1]  = nuF*y[m+n+1]*y[0] + nuR*R*y[0] - m*lambdaF*y[1];
+for(i=2; i <= m; i++){
+	dydt[i]=m*lambdaF*(y[i-1] -y[i]);
+}
+
+//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
+dydt[m+1] = y[0]*nuV*y[m+n+3]*pow((y[0]/S0),squareCVV)-n*lambdaV*y[m+1]-y[m+1]*(nuF*y[m+n+1] + nuR*R)*VFSus;
+for (i=2;i<=n1;i++){
+    dydt[m+i]=n*lambdaV*(y[m+i-1]-y[m+i])-y[m+i]*(nuF*y[m+n+1] + nuR*R)*VFSus;
+}
+
+//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
+dydt[m+n1+1]=n*lambdaV*y[m+n1]-n*lambdaV*y[m+n1+1];
+for (i=2;i<=n2;i++){
+    dydt[m+n1+i]=n*lambdaV*(y[m+n1+i-1]-y[m+n1+i]);
+}
+dydt[m+n+1] = m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m])*size_C - muF*y[m+n+1];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
+dydt[m+n+2] = indexR*m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m]);
+dydt[m+n+3] = n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V-muV*y[m+n+3];  //Class of cadavers infected by virus
+dydt[m+n+4] = n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V;
+dydt[m+n+5] = m*lambdaF*(y[m]+(1-coinf_V)*y[m+n+6+m]);
+dydt[m+n+6] = indexV*(n*lambdaV*y[m+n]+m*lambdaF*y[m+n+6+m]*coinf_V);
+
+//Recording the hosts already infected with virus and taken over by the fungus
+dydt[m+n+6+1] = (nuF*y[m+n+1] + nuR*R)*y[m+1]*VFSus- m*lambdaF*y[m+n+6+1];
+for (i=2;i<=n1;i++){
+    dydt[m+n+6+1] += (nuF*y[m+n+1] + nuR*R)*y[m+i]*VFSus;
+}
+for(i=2; i <= m; i++){
+	dydt[m+n+6+i]=m*lambdaF*(y[m+n+6+i-1] -y[m+n+6+i]);
+}
+
+
+
+
+
 return GSL_SUCCESS;
 }
 
@@ -94,15 +200,9 @@ double h_init=1.0e-5;
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
-//int DIM = Params->PARS[9]+3;
-int DIM = Params->PARS[9]+Params->PARS[8]+4+2+1+Params->PARS[9];
-
-//printf("ODE_solver:\n parm 2=%f parm 3=%f parm 4=%f parm 5=%f parm 6=%f\n",
-//	   Params->PARS[2],Params->PARS[3],Params->PARS[4],Params->PARS[5],Params->PARS[6]);
-//getc(stdin);
+int DIM = 4*(Params->PARS[9]+Params->PARS[8]+4+2+1+Params->PARS[9]); //SH multiplied by 4 to hold all equations for each treatment
 
 const gsl_odeiv_step_type *solver_ode	= gsl_odeiv_step_rkf45; // Runge-Kutta Fehlberg (4, 5)
-//const gsl_odeiv_step_type *solver_ode = gsl_odeiv_step_rk4;
 
 // returns pointer to a newly allocated instance of a stepping function of type 'solver_ode' for a system of DIM dimensions //
 gsl_odeiv_step *step_ode	= gsl_odeiv_step_alloc(solver_ode, DIM);
@@ -115,7 +215,6 @@ sys_ode.function  = fast_odes;
 sys_ode.dimension = (size_t)(DIM);
 sys_ode.params	  = Params;
 
-//double y_err[DIM]; double dydt_in[DIM];	double dydt_out[DIM];
 
 // ----------------------------------- Integrate Over Time ------------------------------------ //
 while (t_ode<t_end)	{

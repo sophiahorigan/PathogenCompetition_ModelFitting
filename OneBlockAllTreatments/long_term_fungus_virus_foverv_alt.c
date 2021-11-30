@@ -123,57 +123,24 @@ double sdensity;
 double fdensity;
 double vdensity;
 
+// SH need to set initial conditions
+VFSus=2; //SH random pick 
+sdensity=100; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.01; //SH guesstimate
 
-//****************loops through initial conditions for each treatment********************//
+//SH KEEP brings initial values into structure
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+
 //prints output to file
-
 char name1[50];
-sprintf(name1, "sim_output_block1");
-fp1=fopen(name1,"a+"); 
-
-int i_tmt; 
-for (i_tmt = 1; i_tmt < 5; i_tmt++){
-	if (i_tmt == 1){ //FUNGUS ONLY
-		VFSus=2; 
-		sdensity=100; 
-		fdensity=0.026; 
-		vdensity=0; 
-		Params.PARS[30+pop]=sdensity; 
-		VPass=vdensity;
-		Params.PARS[50+pop]=fdensity;
-		DDEVF(&Params,r_seed,dim,pop,48,0,year, 1);
-	}
-	else if (i_tmt == 2){ //VIRUS ONLY
-		VFSus=2; 
-		sdensity=100; 
-		fdensity=0;
-		vdensity=0.05; 
-		Params.PARS[30+pop]=sdensity; 
-		VPass=vdensity;
-		Params.PARS[50+pop]=fdensity;
-		DDEVF(&Params,r_seed,dim,pop,48,0,year, 2);
-	}
-	else if (i_tmt == 3){ //FUNGUS-VIRUS
-		VFSus=2; 
-		sdensity=100; 
-		fdensity=0.0236; 
-		vdensity=0.05; 
-		Params.PARS[30+pop]=sdensity; 
-		VPass=vdensity;
-		Params.PARS[50+pop]=fdensity;
-		DDEVF(&Params,r_seed,dim,pop,48,0,year, 3);
-	}
-	else if (i_tmt == 4){ //CONTROL
-		VFSus=2; 
-		sdensity=100; 
-		fdensity=0; 
-		vdensity=0; 
-		Params.PARS[30+pop]=sdensity; 
-		VPass=vdensity;
-		Params.PARS[50+pop]=fdensity;
-		DDEVF(&Params,r_seed,dim,pop,48,0,year, 4);
-	}
-}
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
 fclose(fp1);
 
 //**************SH prints content of sim_output******************//
@@ -386,25 +353,18 @@ const int BlockOne_exp[200][4] = {
 
 //*************** SH let's calculate a likelihood!! ******************//
 
-int m = 0; int n; double lhood_tmt = 0; double lhood_block = 0;
+int m; double lhood_JHN = 0;
 
-
- while (m < 192){
-	for (n = 0; n < 48; n++){
-		if(BlockOne_exp[m][0] != -1){
-			lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], BlockOne_exp[m]);
-			printf("%lf\n", lhood_tmt);
-		} 
-		m++;
+for (m = 0; m < 48; m++){
+	if (JHN_Co[m][0] != -1) {	
+		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(4, sim_output[m], JHN_Co[m]);
+		printf("%lf\n", lhood_JHN);
 	}
-	printf("END OF TREATMENT. Likelihood sum for treatment = %lf\n", lhood_tmt);
-	lhood_block = lhood_block + lhood_tmt;
-	n = 0;
-	lhood_tmt = 0;
-		
-}
-printf("Likelihood sum across treamtments = %lf\n", lhood_block);
+	else{
 
+	}
+}
+printf("%lf\n", lhood_JHN);
 
 
 //**************SH prints output at end of week****************//

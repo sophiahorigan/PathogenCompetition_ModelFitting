@@ -34,14 +34,9 @@ char *strFileNameDate;
 const double h = 0.01;		        // time step
 
 double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
-//double exposetime = 12.0;
-//double lambdaV	= 1/12.0;
-
-//double rsquareCVV=1/1.5;
 double squareCVV=0.86*0.86;
 
 double exposetime = 16;
-//double VFtime[7]={4,5,6,7,8,9,10};
 double VFtime=10;
 double VFPass;
 
@@ -54,13 +49,13 @@ double psifungus=0.95;
 double eta=100;
 double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1};
 double fecundity=74.6;
+
 //JL: Predation parameters
 double preda=0.967;           //Predation parameters, for host-pathogen-predator model
 double predb=0.14*0.39/0.64;
 
-
+//Enhanced susceptibility and coinfection parameters
 double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
-//double VFSusF[15]={150,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500};
 double VFSus;
 double coinf_V=0; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
 
@@ -86,19 +81,19 @@ double InfVirusAdj=0;
 
 double VPass;          //variable to pass the value of initialV in each generation
 
+
+
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
-double sim_output[200][4]; //array for output for entire block (4 treatments of 48 day epizootics)
+double sim_output[55][16]; //array for output for entire block 48 days x (4 treatments x 4 conditions per treatment)
 
-double vinfected; //SH to hold daily fraction infected
-double finfected; //SH add coinfected eventually
-double survivors; //SH = IF/IV etc divided by initial host density
-double total;
+//double vinfected; //SH to hold daily fraction infected
+//double finfected; //SH add coinfected eventually
+//double survivors; //SH = IF/IV etc divided by initial host density
+//double total;
 
 
 double FakeWDATA[SIMU][5];
-//int days[20]={365, 366, 365, 365, 365, 366, 365, 365, 364, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365}; //1991-2010
-//int days[30]={365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 364, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 364, 364, 365, 366, 365, 365};  //1989-2018
 int days[47]={365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 366, 365, 365, 364}; //1973-2019
 //CK Structure for experimental data!!!
 
@@ -125,8 +120,8 @@ typedef struct
 	double R_END[DATA_SETS+1];
 	double INITS[DATA_SETS+1];
 	double POPS[4];
-	double EV[100];
-	double EF[100];
+	double EV[400];
+	double EF[400];
 	double DAY_F[DATA_SETS+1];	    // day where fungal infection first happens
 	int MAXT[DATA_SETS+1];		    // number of days in data set (different for each data set)
 	int MAXT2[DATA_SETS+1];		    // number of days in EXPERIMENTAL data set (different for each EXPERIMENTAL data set)
@@ -162,6 +157,18 @@ typedef struct
 	//double sim_results[55][4];		// array to capture output from ddevf to use in fitting routine. 55 rows (more than no days in epi), 4 columns (Day, S, F, V)
 	int th_id;
 	int pop;
+
+	// ****** DISPERSAL PARAMETERS *********
+	//params to hold net daily conidia dispersal, added to ODE's
+	double coni_net1; //net for treatment 1
+	double coni_net2;
+	double coni_net3;
+	double coin_net4;
+
+	double distance_array[6] = {5, 5, 5, 5, 5, 5} //d12, d13, d14, d23, d24, d34
+
+	double dispersal; // dispersal parameter for dispersal function. will be fitting.
+
 }STRUCTURE;
 
 

@@ -85,7 +85,7 @@ double VPass;          //variable to pass the value of initialV in each generati
 
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
-double sim_output[55][16]; //array for output for entire block 48 days x (4 treatments x 4 conditions per treatment)
+double sim_output[200][4]; //array for output for entire block 48 days x (4 treatments x 4 conditions per treatment)
 
 //double vinfected; //SH to hold daily fraction infected
 //double finfected; //SH add coinfected eventually

@@ -11,7 +11,7 @@ int View = 0;  //CK// turn to 1 to print line search progress.  turn to 0 to run
 
 
 ////////////
-///NOTE:  Going to try to change nuF to a site-specific parameter and make R(0) a general parameter
+///NOTE:  Going to try to change nuF to a site-specific parameter and make R(0) a general parameter	
 ////////// Just going to try making a new parameter for average R(0).  Make it number 23.
 ////////// Comment out param #3 (general nuF) but leave structure in place if we go back to it
 ////////// Pipe param #23 into R for all populations
@@ -353,18 +353,24 @@ const int BlockOne_exp[200][4] = {
 
 //*************** SH let's calculate a likelihood!! ******************//
 
-int m; double lhood_JHN = 0;
+int m = 0; int n; double lhood_tmt = 0; double lhood_block = 0;
 
-for (m = 0; m < 48; m++){
-	if (JHN_Co[m][0] != -1) {	
-		lhood_JHN = lhood_JHN + gsl_ran_multinomial_lnpdf(4, sim_output[m], JHN_Co[m]);
-		printf("%lf\n", lhood_JHN);
-	}
-	else{
 
+ while (m < 192){
+	for (n = 0; n < 48; n++){
+		if(BlockOne_exp[m][0] != -1){
+			lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], BlockOne_exp[m]);
+			printf("%lf\n", lhood_tmt);
+		} 
+		m++;
 	}
+	printf("END OF TREATMENT. Likelihood sum for treatment = %lf\n", lhood_tmt);
+	lhood_block = lhood_block + lhood_tmt;
+	n = 0;
+	lhood_tmt = 0;
+		
 }
-printf("%lf\n", lhood_JHN);
+printf("Likelihood sum across treamtments = %lf\n", lhood_block);
 
 
 //**************SH prints output at end of week****************//

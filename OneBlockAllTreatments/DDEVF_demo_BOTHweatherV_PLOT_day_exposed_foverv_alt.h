@@ -27,8 +27,8 @@ int MAXT3=maxy_t;
 
 //int k = tmt; //SH looping through treamtent numbers below
 
-int m = Params->PARS[9];
-int n = Params->PARS[8]; 
+int n = Params->PARS[8]; //number of virus exposed classes
+int m = Params->PARS[9]; //number of fungus exposed classes
 int DIM = 4*(m+n+4+2+1+m); //SH multipled by 4 to hold all equations
 
 int n1=(VFPass/exposetime)*Params->PARS[8];    //The number of the first group of exposed classes to virus
@@ -115,7 +115,7 @@ double initR = Params->INITS[3];			// initR
 
 
 // ----------------------------------------- Fixed Parameters ---------------------------------------------- //
-int gstepsV		= (int) Params->PARS[8];	int gstepsF	= (int) Params->PARS[9];
+int gstepsV		= (int) Params->PARS[8];	int gstepsF	= (int) Params->PARS[9]; //gstepsV = m, gstepsF = n
 double ratio = 1;
 double neo_v	= 7.0;			// latent period of neonates (days) FUNGUS ONLY MODEL!
 double R_end;   //CK//  Change value for function of latitude
@@ -478,7 +478,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		IVF_2=0;
 		IFV_2=0;
 
-		//TREATMENT 2
+		//TREATMENT 3
 		S_3=y_ode[0];	Fcadaver_3=y_ode[m+n+1]; Vcadaver_3=y_ode[m+n+3];
 		FRnext_3=y_ode[m+n+2];			// killed populations
 		Vkill_3=y_ode[m+n+4];
@@ -489,7 +489,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		IVF_3=0;
 		IFV_3=0;
 
-		//TREATMENT 2
+		//TREATMENT 4
 		S_4=y_ode[0];	Fcadaver_4=y_ode[m+n+1]; Vcadaver_4=y_ode[m+n+3];
 		FRnext_4=y_ode[m+n+2];			// killed populations
 		Vkill_4=y_ode[m+n+4];
@@ -506,43 +506,101 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		ConiBefore=y_ode[m+1]*nuF2;  //CK// Saving the conidia 24 hours before feral collection
 		RestBefore = Params->POPS[3]*nuR2;
 	}
+		//TREATMENT 1
 		for (i=1;i<=gstepsF;i++)	{
-			E_F[i]=y_ode[i];
-			IF += E_F[i];
+			E_F_1[i]=y_ode[i];
+			IF_1 += E_F_1[i];
 		}
 
 		for (i=1;i<=n1;i++)	{
-			E_VF[i]=y_ode[gstepsF+i];
-			IVF += E_VF[i];
+			E_VF_1[i]=y_ode[gstepsF+i];
+			IVF_1 += E_VF_1[i];
 		}
 
 		for (i=1;i<=n2;i++)	{
-			E_V[i]=y_ode[gstepsF+n1+i];
-			IV += E_V[i];
+			E_V_1[i]=y_ode[gstepsF+n1+i];
+			IV_1 += E_V_1[i];
 		}
 
 		for (i=1;i<=gstepsF;i++)	{
-			E_FV[i]=y_ode[gstepsF+gstepsV+6+i];
-			IFV += E_FV[i];
+			E_FV_1[i]=y_ode[gstepsF+gstepsV+6+i];
+			IFV_1 += E_FV_1[i];
+			//IF += (1-coinf_V)*E_FV[i]; //SH these are double counting coinfections I think.
+			//IV += coinf_V*E_FV[i];
+		}
+
+		//TREATMENT 2
+		for (i=1;i<=gstepsF;i++)	{
+			E_F_2[i]=y_ode[i];
+			IF_2 += E_F_2[i];
+		}
+
+		for (i=1;i<=n1;i++)	{
+			E_VF_2[i]=y_ode[gstepsF+i];
+			IVF_2 += E_VF_2[i];
+		}
+
+		for (i=1;i<=n2;i++)	{
+			E_V_2[i]=y_ode[gstepsF+n1+i];
+			IV_2 += E_V_2[i];
+		}
+
+		for (i=1;i<=gstepsF;i++)	{
+			E_FV_2[i]=y_ode[gstepsF+gstepsV+6+i];
+			IFV_2 += E_FV_2[i];
+			//IF += (1-coinf_V)*E_FV[i]; //SH these are double counting coinfections I think.
+			//IV += coinf_V*E_FV[i];
+		}
+
+		//TREATMENT 3
+		for (i=1;i<=gstepsF;i++)	{
+			E_F_3[i]=y_ode[i];
+			IF_3 += E_F_3[i];
+		}
+
+		for (i=1;i<=n1;i++)	{
+			E_VF_3[i]=y_ode[gstepsF+i];
+			IVF_3 += E_VF_3[i];
+		}
+
+		for (i=1;i<=n2;i++)	{
+			E_V_3[i]=y_ode[gstepsF+n1+i];
+			IV_3 += E_V_3[i];
+		}
+
+		for (i=1;i<=gstepsF;i++)	{
+			E_FV_3[i]=y_ode[gstepsF+gstepsV+6+i];
+			IFV_3 += E_FV_3[i];
+			//IF += (1-coinf_V)*E_FV[i]; //SH these are double counting coinfections I think.
+			//IV += coinf_V*E_FV[i];
+		}
+		
+		//TREATMENT 4
+		for (i=1;i<=gstepsF;i++)	{
+			E_F_4[i]=y_ode[i];
+			IF_4 += E_F_4[i];
+		}
+
+		for (i=1;i<=n1;i++)	{
+			E_VF_4[i]=y_ode[gstepsF+i];
+			IVF_4 += E_VF_4[i];
+		}
+
+		for (i=1;i<=n2;i++)	{
+			E_V_4[i]=y_ode[gstepsF+n1+i];
+			IV_4 += E_V_4[i];
+		}
+
+		for (i=1;i<=gstepsF;i++)	{
+			E_FV_4[i]=y_ode[gstepsF+gstepsV+6+i];
+			IFV_4 += E_FV_4[i];
 			//IF += (1-coinf_V)*E_FV[i]; //SH these are double counting coinfections I think.
 			//IV += coinf_V*E_FV[i];
 		}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+		//I think I can delete the stuff below?
 
 		/*if (day==MAXT3-7){
             InfFungusWeekbefore=Fkill+IF;
@@ -652,16 +710,35 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 
 //*******************************Appends output for each treatment run based on one epizootic length of 48**************************//
-		//printf("Value of k %i\n", k);
-		if (k == 1){
-			sim_output[day-1][0] = S/(y_ode[0]+IV+IF+IVF); //Saving daily fraction uninfected S 
-			sim_output[day-1][1] = IV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected V 
-			sim_output[day-1][2] = IF/(y_ode[0]+IV+IF+IVF); //Saving daily fraction infected F
-			sim_output[day-1][3] = IFV/(y_ode[0]+IV+IF+IVF); //Saving daily fraction coinfected 
-		}
+
+
+		//TREATMENT 1	
+		sim_output[day-1][0] = S_1/(y_ode[0]+IV_1+IF_1+IVF_1); //Saving daily fraction uninfected S 
+		sim_output[day-1][1] = IV_1/(y_ode[0]+IV_1+IF_1+IVF_1); //Saving daily fraction infected V 
+		sim_output[day-1][2] = IF_1/(y_ode[0]+IV_1+IF_1+IVF_1); //Saving daily fraction infected F
+		sim_output[day-1][3] = IFV_1/(y_ode[0]+IV_1+IF_1+IVF_1); //Saving daily fraction coinfected 
+		
+		//TREATMENT 2
+		sim_output[day-1+47][0] = S_2/(y_ode[0]+IV_2+IF_2+IVF_2); //Saving daily fraction uninfected S 
+		sim_output[day-1+47][1] = IV_2/(y_ode[0]+IV_2+IF_2+IVF_2); //Saving daily fraction infected V 
+		sim_output[day-1+47][2] = IF_2/(y_ode[0]+IV_2+IF_2+IVF_2); //Saving daily fraction infected F
+		sim_output[day-1+47][3] = IFV_2/(y_ode[0]+IV_2+IF_2+IVF_2); //Saving daily fraction coinfected 
+	
+		//TREATMENT 3
+		sim_output[day-1+95][0] = S_3/(y_ode[0]+IV_3+IF_3+IVF_3); //Saving daily fraction uninfected S 
+		sim_output[day-1+95][1] = IV_3/(y_ode[0]+IV_3+IF_3+IVF_3); //Saving daily fraction infected V 
+		sim_output[day-1+95][2] = IF_3/(y_ode[0]+IV_3+IF_3+IVF_3); //Saving daily fraction infected F
+		sim_output[day-1+95][3] = IFV_3/(y_ode[0]+IV_3+IF_3+IVF_3); //Saving daily fraction coinfected 
+	
+		//TREATMENT 4
+		sim_output[day-1+143][0] = S_4/(y_ode[0]+IV_4+IF_4+IVF_4); //Saving daily fraction uninfected S 
+		sim_output[day-1+143][1] = IV_4/(y_ode[0]+IV_4+IF_4+IVF_4); //Saving daily fraction infected V 
+		sim_output[day-1+143][2] = IF_4/(y_ode[0]+IV_4+IF_4+IVF_4); //Saving daily fraction infected F
+		sim_output[day-1+143][3] = IFV_4/(y_ode[0]+IV_4+IF_4+IVF_4); //Saving daily fraction coinfected 
+	
 		
 		
-		fprintf(fp1, "%i\t %d\t %e\t %e\t %e\t %e\n", k, day-1, S/(y_ode[0]+IV+IF+IVF), IV/(y_ode[0]+IV+IF+IVF), IF/(y_ode[0]+IV+IF+IVF), IFV/(y_ode[0]+IV+IF+IVF));
+		fprintf(fp1, "%d\t %e\t %e\t %e\t %e\n %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n", day-1, S_1/(y_ode[0]+IV_1+IF_1+IVF_1), IV_1/(y_ode[0]+IV_1+IF_1+IVF_1), IF_1/(y_ode[0]+IV_1+IF_1+IVF_1), IFV_1/(y_ode[0]+IV_1+IF_1+IVF_1), S_2/(y_ode[0]+IV_2+IF_2+IVF_2), IV_2/(y_ode[0]+IV_2+IF_2+IVF_2), IF_2/(y_ode[0]+IV_2+IF_2+IVF_2), IFV_2/(y_ode[0]+IV_2+IF_2+IVF_2), S_3/(y_ode[0]+IV_3+IF_3+IVF_3), IV_3/(y_ode[0]+IV_3+IF_3+IVF_3), IF_3/(y_ode[0]+IV_3+IF_3+IVF_3), IFV_3/(y_ode[0]+IV_3+IF_3+IVF_3), S_4/(y_ode[0]+IV_4+IF_4+IVF_4), IV_4/(y_ode[0]+IV_4+IF_4+IVF_4), IF_4/(y_ode[0]+IV_4+IF_4+IVF_4), IFV_4/(y_ode[0]+IV_4+IF_4+IVF_4));
 
 
 		c2=c1;	r2=r1;   //make today's C and R yesterday's C and R
@@ -683,6 +760,8 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 t_0=t_next;
 //printf("t_0=%lf\n",t_0);
 }
+/* //SH end of epizootic info
+
 SusEnd=y_ode[0]; //susceptibles at end of day 
 
 if (initR==0){
@@ -699,6 +778,6 @@ else{
 }
 InfFungusAdj=InfFungusEnd-InfFungusWeekbefore;
 InfVirusAdj=InfVirusEnd-InfVirusWeekbefore;
-
+*/
 return 0;
 }

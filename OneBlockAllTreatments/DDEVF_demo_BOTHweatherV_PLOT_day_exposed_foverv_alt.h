@@ -34,9 +34,9 @@ int DIM = 4*(m+n+4+2+1+m); //SH multipled by 4 to hold all equations
 int n1=(VFPass/exposetime)*Params->PARS[8];    //The number of the first group of exposed classes to virus
 int n2=n-n1;                  //The number of the first group of exposed classes to virus
 
-double t=h;		double t_next=h;	double t_0=h;	int i;				// time loop and index
+double t=h;		double t_next=h;	double t_0=h;	int i,j;				// time loop and index
 double epsilon = pow(10,-6);
-double y_ode[DIM]; //SH this might be important
+double y_ode[DIM]; //**SH** this holds 
 double rand_nuR[MAXT3];
 double rand_nuF[MAXT3];
 
@@ -142,7 +142,7 @@ double S[num_tmts]; double V[num_tmts]; double F[num_tmts]; double R[num_tmts];
 double IV[num_tmts]; double IF[num_tmts]; double IVF[num_tmts]; double IFV[num_tmts];
 
 //exposed class declaratoin
-double E_V[num_tmts, n2+1]; double E_F[num_tmts, gstepsF+1]; double E_VF[num_tmts, n1+1]; double E_FV[gstepsF+1];
+double E_V[num_tmts][n2+1]; double E_F[num_tmts][gstepsF+1]; double E_VF[num_tmts][n1+1]; double E_FV[gstepsF+1];
 
 //treatment indexing to fill arrays
 
@@ -182,17 +182,20 @@ for(i=0, i<4, i++){ //Will need to fit!!
 	V[i] = 0;
 	F[i] = 0;
 	R[i] = 0;
+
+	for (j=1;j<=n2;j++){
+		E_V[i][j]=0;
+	}
+	for (j=1;j<=n1;j++){
+		E_VF[i][j]=0;
+	}
+	for (j=1;j<=gstepsF;j++){
+		E_F[i][j]=0;
+		E_FV[i][j]=0;
+	}
+
 }
-for (i=1;i<=n2;i++){
-	E_V[i]=0;
-}
-for (i=1;i<=n1;i++){
-	E_VF[i]=0;
-}
-for (i=1;i<=gstepsF;i++){
-	E_F[i]=0;
-	E_FV[i]=0;
-}
+
 
 //long-term state params
 double Vnext[num_tmts];
@@ -302,10 +305,10 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	//indexing variables
 	int tmt;
 	int tmt_index[num_tmts];
-	int max_class = m+n+1+gstepsF;
+	int max_class = m+n+6+gstepsF;
 	tmt_index[0] = 0; //treatment 1 index addition is zero
 	for(tmt=1, tmt<num_tmts, tmt++;){	//create tmt array 
-		tmt_index[tmt] = tmt_index[tmt]+ max_class;
+		tmt_index[tmt] = tmt_index[tmt-1]+ max_class; //SH can maybe multiply 
 	}
 
 	while (t<t_next)	{ //for one day
@@ -415,6 +418,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 	//*** SH START BELOW TO REPLICATE**//
 
+	//SH check to see if I need this, given that I don't have cages
 	if ((day+1)%7==0)	{
 		ConiBefore=y_ode[m+1]*nuF2;  //CK// Saving the conidia 24 hours before feral collection
 		RestBefore = Params->POPS[3]*nuR2;
@@ -565,6 +569,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		sim_output[day-1+day_index[tmt]][1] = IV[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt}+IF[tmt]+IVF[tmt]); //Saving daily fraction infected V 
 		sim_output[day-1+day_index[tmt]][2] = IF[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt]+IF[tmt]+IVF[tmt]); //Saving daily fraction infected F
 		sim_output[day-1+day_index[tmt]][3] = IFV[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt]+IF[tmt]+IVF[tmt]); //Saving daily fraction coinfected 
+	
 	}
 
 		

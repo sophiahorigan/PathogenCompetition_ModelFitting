@@ -15,10 +15,10 @@ int num_weeks[DATA_SETS+1];			// used for output to file
 int num_weeks2[DATA_SETS+1];			//CK// used for output to file
 int num_weeks3[DATA_SETS+1];			//CK// used for output to file
 int total_days=0;					// the number of days summed over all data sets (for MISER)
-Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5);
+Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5); //SH could use i3tensor 
 //Params->EXPDATA = i3tensor(0,20,0,MAX_WEEKS,0,5);  //CK// May need to check this.  Not sure what i3tensor does...
 //Params->WDATA = i3tensor(0,20,0,MAX_WEEKS2,0,8);  //SH// Need to ensure this is correct
-//SH could just hard code in number of weeks
+
 //printf("just after WDATA...\n");
 //Params->CCDATA = d3tensor(0,100,0,MAX_WEEKS2,0,4);  //CK// May need to check this.  Not sure what i3tensor does...
 //JL: Change the second number of d3tensor (=number of years)

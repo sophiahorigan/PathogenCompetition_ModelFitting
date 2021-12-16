@@ -44,9 +44,7 @@ char *code_name="ftp";
 
 char numbs[5];
 /*------------------------------- Data Sets ---------------------------------*/
-/* -------- SH Observational Data ------- */
-///SH bring back if you ever decide not to just hard code.
-//SH when adding in more datasets, increase DATA_SETS value and that will loop through all
+/* -------- SH Experimental Data ------- */
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
 	FILE *ftp_data;
@@ -82,9 +80,49 @@ num_weeks3[j]=i;
 
 }
 
+/* -------- SH Observational Data Data ------- */
+//OBS1 = JHN
+//OBS2 = ROB
+//OBS3 = YHN
+
+for (j=1;j<=DATA_SETS;j++)	{ //can use same DATA_SETS as exp for now, if bringing in hyde park make DATA_SETS_OBS
+	weeks=0;	i=0;	FlagF=0;
+	FILE *ftp_data;
+
+	sprintf(numbs,"%d",j); //number in .txt name (incrementing for each dataset)
+
+	file = (char*)calloc((strlen(file_name)+strlen(file_type)+strlen(numbs)+1),sizeof(char)); //SH name multiple weather files in incrementing order
+	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
+
+	strcat(file,file_name3);
+	strcat(file,numbs);
+	strcat(file,file_type);
+
+	strcat(code,code_name);
+	strcat(code,numbs);
 
 
-/*-------------------------------Weather Data Sets ---------------------------------*/
+	ftp_data=fopen(file,"r");
+	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
+
+	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
+	//block one
+		printf("%i, I am here!!", j);
+		Params->OBSDATA[j][i][0]=Sdata[i]; Params->OBSDATA[j][i][1]=Vdata[i]; Params->OBSDATA[j][i][2]=Fdata[i]; Params->OBSDATA[j][i][3]=FVdata[i];  
+		printf("%i\t %i\t %i\t %i\t %i\n",j, Params->OBSDATA[j][i][0],Params->OBSDATA[j][i][1], Params->OBSDATA[j][i][2], Params->OBSDATA[j][i][3]);
+
+	weeks++; i++;
+}
+
+fclose(ftp_data);
+
+num_weeks3[j]=i;
+
+}
+
+
+
+
 /* -------- SH Weather Data ------- */
 for (j=1;j<=DATA_SETS_WEATHER;j++)	{
 	weeks=0;	i=0;	FlagF=0;

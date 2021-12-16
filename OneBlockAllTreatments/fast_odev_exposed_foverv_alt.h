@@ -25,14 +25,25 @@ int n1=(VFPass/exposetime)*Params->PARS[8];    //virus exposed that can be taken
 int n2=n-n1;                //The number of the first group of exposed classes to virus
 
 //state variables
-double S[4] = {Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0]}; //SH NEED TO CHANGE
+double S[7] = {Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0]}; //SH NEED TO CHANGE
 //double C = y[m+n+1];
 double R  = Params->POPS[3];
 
 //indexing
 int i;
-int num_tmts = 4;
+int num_tmts;
 int tmt;
+
+// Blocks
+if (/* condition */)
+{
+	num_tmts = 4;
+}
+else{
+	num_tmts = 1;
+}
+
+
 
 //double Finf = y[0]*nuF*C;
 //double Rinf = y[0]*nuF*R;
@@ -54,7 +65,7 @@ for(tmt=1; tmt<num_tmts; tmt++){	//create tmt array
 	tmt_index[tmt] = tmt_index[tmt-1]+ max_class; //SH can maybe multiply 
 }
 
-for(tmt=0; tmt<4; tmt++){
+for(tmt=0; tmt<num_tmts; tmt++){
 	dydt[0+tmt_index[tmt]]  = -y[0+tmt_index[tmt]]*(nuF*y[m+n+1+tmt_index[tmt]] + nuR*R)-y[0+tmt_index[tmt]]*nuV*y[m+n+3+tmt_index[tmt]]*pow((y[0+tmt_index[tmt]]/S[tmt]),squareCVV);
 	dydt[1+tmt_index[tmt]]  = nuF*y[m+n+1+tmt_index[tmt]]*y[0+tmt_index[tmt]] + nuR*R*y[0+tmt_index[tmt]] - m*lambdaF*y[1+tmt_index[tmt]];
 	for(i=2; i <= m; i++){
@@ -87,6 +98,12 @@ for(tmt=0; tmt<4; tmt++){
 	for(i=2; i <= m; i++){
 		dydt[m+n+6+i+tmt_index[tmt]]=m*lambdaF*(y[m+n+6+i-1+tmt_index[tmt]] -y[m+n+6+i+tmt_index[tmt]]);
 	}
+
+	if (/* condition */)
+	{
+		/* code */
+	}
+	
 }
 
 return GSL_SUCCESS;

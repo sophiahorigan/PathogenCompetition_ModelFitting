@@ -130,7 +130,7 @@ typedef struct
 
 	//Data Arrays
 	int EXPDATA[DATA_SETS+1][800][4];	// 3-dimensional array that holds all the EXPERIMENTAL data
-	//int ***OBSDATA;				    // 3-dimensional array that holds all the OBSERVATIONAL data
+	int OBSDATA[DATA_SETS+1][150][4];			    // 3-dimensional array that holds all the OBSERVATIONAL data
 	double WDATA[DATA_SETS_WEATHER+1][366][8][100]; //SH dataset, days, weeks, years
 
 

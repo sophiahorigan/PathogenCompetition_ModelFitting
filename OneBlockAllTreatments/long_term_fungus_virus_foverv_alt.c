@@ -125,23 +125,99 @@ double sdensity;
 double fdensity;
 double vdensity;
 
-// SH need to set initial conditions
+// Block 1
 VFSus=2; //SH random pick 
 sdensity=100; //SH random pick 
 fdensity=0.026; //SH from literature
 vdensity=0.01; //SH guesstimate
 
-//SH KEEP brings initial values into structure
 Params.PARS[30+pop]=sdensity; 
 VPass=vdensity;
 Params.PARS[50+pop]=fdensity;
 
-
-//prints output to file
 char name1[50];
 sprintf(name1, "sim_output_");
 fp1=fopen(name1,"a+"); //or a+, not sure which
-//for(j=0; j<reps; j++){ //SH add loop back in when doing multiple years
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);
+
+// Block 2
+VFSus=2; //SH random pick 
+sdensity=100; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.01; //SH guesstimate
+
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+char name1[50];
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);
+
+// Block 3
+VFSus=2; //SH random pick 
+sdensity=100; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.01; //SH guesstimate
+
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+char name1[50];
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);
+
+// OBS1 (JHN)
+VFSus=2; //SH random pick 
+sdensity=100; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.01; //SH guesstimate
+
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+char name1[50];
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);
+
+// OBS2 (ROB)
+VFSus=2; //SH random pick 
+sdensity=100; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.01; //SH guesstimate
+
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+char name1[50];
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);
+
+// OBS (YSN)
+VFSus=2; //SH random pick 
+sdensity=100; //SH random pick 
+fdensity=0.026; //SH from literature
+vdensity=0.01; //SH guesstimate
+
+Params.PARS[30+pop]=sdensity; 
+VPass=vdensity;
+Params.PARS[50+pop]=fdensity;
+
+char name1[50];
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
 DDEVF(&Params,r_seed,dim,pop,48,0,year);
 fclose(fp1);
 

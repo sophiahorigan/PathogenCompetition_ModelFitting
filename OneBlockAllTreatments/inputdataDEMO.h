@@ -15,7 +15,9 @@ int num_weeks[DATA_SETS+1];			// used for output to file
 int num_weeks2[DATA_SETS+1];			//CK// used for output to file
 int num_weeks3[DATA_SETS+1];			//CK// used for output to file
 int total_days=0;					// the number of days summed over all data sets (for MISER)
-Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5); //SH could use i3tensor 
+
+//SH Need to figure out
+//Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5);
 //Params->EXPDATA = i3tensor(0,20,0,MAX_WEEKS,0,5);  //CK// May need to check this.  Not sure what i3tensor does...
 //Params->WDATA = i3tensor(0,20,0,MAX_WEEKS2,0,8);  //SH// Need to ensure this is correct
 
@@ -66,9 +68,10 @@ for (j=1;j<=DATA_SETS;j++)	{
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 
 	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
-
-	Params->DATA_BLOCKONE[j][i][0]=Sdata[i]; Params->DATA_BLOCKONE[j][i][1]=Vdata[i]; Params->DATA_BLOCKONE[j][i][2]=Fdata[i]; Params->DATA_BLOCKONE[j][i][3]=FVdata[i];  
-	printf("%i\t %i\t %i\t %i\n",Params->DATA_BLOCKONE[j][i][0],Params->DATA_BLOCKONE[j][i][1], Params->DATA_BLOCKONE[j][i][2], Params->DATA_BLOCKONE[j][i][3]);
+	//block one
+		//printf("%i, I am here!!", j);
+		Params->EXPDATA[j][i][0]=Sdata[i]; Params->EXPDATA[j][i][1]=Vdata[i]; Params->EXPDATA[j][i][2]=Fdata[i]; Params->EXPDATA[j][i][3]=FVdata[i];  
+		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->EXPDATA[j][i][0],Params->EXPDATA[j][i][1], Params->EXPDATA[j][i][2], Params->EXPDATA[j][i][3]);
 
 	weeks++; i++;
 }
@@ -83,7 +86,7 @@ num_weeks3[j]=i;
 
 /*-------------------------------Weather Data Sets ---------------------------------*/
 /* -------- SH Weather Data ------- */
-for (j=1;j<=DATA_SETS;j++)	{
+for (j=1;j<=DATA_SETS_WEATHER;j++)	{
 	weeks=0;	i=0;	FlagF=0;
 	FILE *ftp_data;
 

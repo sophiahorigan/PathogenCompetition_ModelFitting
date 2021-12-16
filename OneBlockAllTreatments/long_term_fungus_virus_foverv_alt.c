@@ -164,8 +164,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 
 	while (m < 192){
 		for (n = 0; n < 48; n++){
-			if(Params.DATA_BLOCKONE[j][m][0] != -1){
-				lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], Params.DATA_BLOCKONE[j][m]);
+			if(Params.EXPDATA[j][m][0] != -1){
+				lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], Params.EXPDATA[j][m]);
 				printf("%lf\n", lhood_tmt);
 			} 
 			m++;
@@ -176,7 +176,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 		lhood_tmt = 0;
 			
 	}
-	printf("Likelihood sum across treamtments = %lf\n", lhood_block);
+	printf("Likelihood for block %i = %lf\n", j, lhood_block);
 
 }
 //**************SH prints output at end of week****************//
@@ -204,6 +204,6 @@ for (j=1;j<=DATA_SETS;j++)	{
     sdensity=fecundity*SusEnd*(1-(2*preda*predb*sdensity)/(predb*predb+sdensity*sdensity))+1e-5;
     
 
-free_i3tensor(Params.DATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
+//free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
 return 0;
 }

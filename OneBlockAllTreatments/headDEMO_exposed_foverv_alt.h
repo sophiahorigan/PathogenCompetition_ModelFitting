@@ -26,7 +26,8 @@
 
 char *strFileNameDate;
 
-#define DATA_SETS 1		        // number of data sets
+#define DATA_SETS 3		        // number of epizootic data sets
+#define DATA_SETS_WEATHER 1		// number of weather data sets
 #define NUM_PARS 100		        // number of parameters to be passed from main to hood
 #define SIMU 64
 //#define DIM 15						// number of differential equations
@@ -125,24 +126,18 @@ typedef struct
 	double DAY_F[DATA_SETS+1];	    // day where fungal infection first happens
 	int MAXT[DATA_SETS+1];		    // number of days in data set (different for each data set)
 	int MAXT2[DATA_SETS+1];		    // number of days in EXPERIMENTAL data set (different for each EXPERIMENTAL data set)
-	int MAXT3[DATA_SETS+1];		    // number of days in WEATHER data set (different for each WEATHER data set)
-	int ***DATA;				    // 3-dimensional array that holds all the data
+	int MAXT3[DATA_SETS+1];		    // number of days in WEATHER data set (different for each WEATHER data set)				   
 
-//SH do I need these?
-	//int ***EXPDATA;				    // 3-dimensional array that holds all the EXPERIMENTAL data
-	//double ***WDATA;				    // 3-dimensional array that holds all the WEATHER data
-	//double ***CCDATA;
+	//Data Arrays
+	int EXPDATA[DATA_SETS+1][800][4];	// 3-dimensional array that holds all the EXPERIMENTAL data
+	//int ***OBSDATA;				    // 3-dimensional array that holds all the OBSERVATIONAL data
+	double WDATA[DATA_SETS_WEATHER+1][366][8][100]; //SH dataset, days, weeks, years
+
+
+	//SH Epizootic Data
+	//int DATA_BLOCK_1[DATA_SETS+1][192][4]; //192 = 4 x 48 day epi's
+
 	double test_data[1000][36];
-
-	//SH Experimental Data
-	int DATA_BLOCKONE[DATA_SETS+1][192][4]; //192 = 4 x 48 day epi's
-	int DATA_BLOCKTWO[DATA_SETS+1][192][4];
-	int DATA_BLOCKTHREE[DATA_SETS+1][192][4];
-	int DATA_OBS1[DATA_SETS+1][48][4]; //one 48 day epi
-	int DATA_OBS2[DATA_SETS+1][48][4];
-	int DATA_OBS3[DATA_SETS+1][48][4];
-	//SH Weather data
-	double WDATA[DATA_SETS+1][366][8][100]; //SH dataset, days, weeks, years
 
 	double AcceptedVect[NUM_PARS];
 	double LoopVect[NUM_PARS];

@@ -31,11 +31,10 @@ double minRH;
 int FlagF;
 
 char *file;
-char *file_name="JHN_Co"; // SH modified for one observational site
+char *file_name="DATA_BLOCK"; //3 total. each .txt needs incrementing number to work with j (dataset) loop below 
 char *file_name2="KBS1_weatherdaily";  //SH weather data for one site
-// char *file_name3="DEMOweather";  //CK// name for inputing the rain data
-// char *file_name4="CDO_Roscommon_APT_long";  //CK// name for inputing the rain data
-// char *fakeweather="fakeweather";
+char *file_name3="DATA_OBS"; //3 total
+
 char *file_type=".txt";
 
 char *code;
@@ -44,14 +43,13 @@ char *code_name="ftp";
 char numbs[5];
 /*------------------------------- Data Sets ---------------------------------*/
 /* -------- SH Observational Data ------- */
-/* //SH bring back if you ever decide not to just hard code.
+///SH bring back if you ever decide not to just hard code.
 //SH when adding in more datasets, increase DATA_SETS value and that will loop through all
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
 	FILE *ftp_data;
 
-//printf("just before numbs...\n");
-	sprintf(numbs,"%d",j);
+	sprintf(numbs,"%d",j); //number in .txt name (incrementing for each dataset)
 
 	file = (char*)calloc((strlen(file_name)+strlen(file_type)+strlen(numbs)+1),sizeof(char)); //SH name multiple weather files in incrementing order
 	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
@@ -63,38 +61,24 @@ for (j=1;j<=DATA_SETS;j++)	{
 	strcat(code,code_name);
 	strcat(code,numbs);
 
-//printf("just before fopen...\n");
 
 	ftp_data=fopen(file,"r");
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
-	//else				{printf("open data %d success \n",j);	fflush(stdout);	}
 
-	while (fscanf(ftp_data,"%d %d %d %d\n",&Sdata[i],&Vdata[i],&Fdata[i], &FVdata[i], &Ddata[i])!= EOF)			{ //SH when dealing with years add another input
-		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=FVdata[i]; Params->DATA[j][i][4]=Ddata[i];  
-		//printf("FERALS: i=%d\t pop:%d\t healthy:%d\t viral:%d\t fungal:%d\t week:%d\t week2:%d\n",i,j,Params->DATA[j][i][0],Params->DATA[j][i][1],Params->DATA[j][i][2], Params->DATA[j][i][3], Params->DATA[j][i][4]);
-		//if ((Fdata[i]>0) && (FlagF<1))	{
-		//	FlagF=2;
-		//	Params->DAY_F[j]=7*i;
-		//}
+	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
 
-		weeks++; i++;
-	}
-	fclose(ftp_data);
+	Params->DATA_BLOCKONE[j][i][0]=Sdata[i]; Params->DATA_BLOCKONE[j][i][1]=Vdata[i]; Params->DATA_BLOCKONE[j][i][2]=Fdata[i]; Params->DATA_BLOCKONE[j][i][3]=FVdata[i];  
+	printf("%i\t %i\t %i\t %i\n",Params->DATA_BLOCKONE[j][i][0],Params->DATA_BLOCKONE[j][i][1], Params->DATA_BLOCKONE[j][i][2], Params->DATA_BLOCKONE[j][i][3]);
 
-	Params->DAY_F[j]=0.0;  //CK// making resting spores start blooming on first day
-
-	Params->MAXT[j]=7*(weeks-1);				// number of days
-	total_days += Params->MAXT[j];
-	//printf("data set %d has %d days\t total=%d\n",j,Params->MAXT[j],total_days);getc(stdin);
-	num_weeks[j]=i;
-
-	//if (FlagF==0)	Params->DAY_F[j]=Params->MAXT[j];
+	weeks++; i++;
 }
-//printf("Params->DATA[1][0][4]=%d\n",Params->DATA[1][0][4]);
-//getc(stdin);
 
-//printf("just before Experimental Data...\n");getc(stdin);
-*/
+fclose(ftp_data);
+
+num_weeks3[j]=i;
+
+}
+
 
 
 /*-------------------------------Weather Data Sets ---------------------------------*/

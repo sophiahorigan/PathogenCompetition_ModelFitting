@@ -20,12 +20,12 @@ double indexV = Params->indexV;
 
 //exposed classes
 int m = Params->PARS[9]; //fungus
-int n = Params->PARS[8];  //
+int n = Params->PARS[8];  //virus
 int n1=(VFPass/exposetime)*Params->PARS[8];    //virus exposed that can be taken over by fungus
 int n2=n-n1;                //The number of the first group of exposed classes to virus
 
 //state variables
-double S[4] = {Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0]} //SH NEED TO CHANGE
+double S[4] = {Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0]}; //SH NEED TO CHANGE
 //double C = y[m+n+1];
 double R  = Params->POPS[3];
 
@@ -48,13 +48,13 @@ int tmt;
 // ------------------------------------------ ODEs -------------------------------------------- //
 
 int tmt_index[num_tmts];
-int max_class = m+n+6+gstepsF;
+int max_class = m+n+6+m;
 tmt_index[0] = 0; //treatment 1 index addition is zero
-for(tmt=1, tmt<num_tmts, tmt++;){	//create tmt array 
+for(tmt=1; tmt<num_tmts; tmt++){	//create tmt array 
 	tmt_index[tmt] = tmt_index[tmt-1]+ max_class; //SH can maybe multiply 
 }
 
-for(tmt=0, tmt<4, tmt++;){
+for(tmt=0; tmt<4; tmt++){
 	dydt[0+tmt_index[tmt]]  = -y[0+tmt_index[tmt]]*(nuF*y[m+n+1+tmt_index[tmt]] + nuR*R)-y[0+tmt_index[tmt]]*nuV*y[m+n+3+tmt_index[tmt]]*pow((y[0+tmt_index[tmt]]/S[tmt]),squareCVV);
 	dydt[1+tmt_index[tmt]]  = nuF*y[m+n+1+tmt_index[tmt]]*y[0+tmt_index[tmt]] + nuR*R*y[0+tmt_index[tmt]] - m*lambdaF*y[1+tmt_index[tmt]];
 	for(i=2; i <= m; i++){
@@ -124,11 +124,12 @@ while (t_ode<t_end)	{
 	status_ode = gsl_odeiv_evolve_apply(evol_ode, tol_ode, step_ode, &sys_ode, &t_ode, t_end, &h_init, y_ode);
 
 	for (i=0;i<DIM;i++)	{
-		if (y_ode[i]>0)		{
+		if (y_ode[i]>=0)		{
 			// keep y_ode as is
 		}
-		else				{
-			//printf("y(%d) NEGATIVE or not a number\n",i);
+		else  {//why can't it be zero?
+			//printf("NEGATIVE OR NAN y_ode[%i]=%e\n", i, y_ode[i]);				{
+			printf("y(%d) NEGATIVE or not a number\n",i);
 			y_ode[i]=0;
 		}
 		if (i==Params->PARS[9]+Params->PARS[8]+3 || i==Params->PARS[9]+Params->PARS[8]+1){
@@ -137,6 +138,7 @@ while (t_ode<t_end)	{
 		else{
 		if (y_ode[i]>Params->INITS[0])	{
 			printf("y(%d) TOO LARGE!!\n",i);
+			//printf("TOO LARGE y_ode[%i]=%e\n", i, y_ode[i]);	
 			y_ode[i]=Params->INITS[0];
 		}
 		}

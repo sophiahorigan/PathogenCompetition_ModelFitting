@@ -57,7 +57,7 @@ double predb=0.14*0.39/0.64;
 //Enhanced susceptibility and coinfection parameters
 double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
 double VFSus;
-double coinf_V=0; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
+double coinf_V=0.1; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
 
 
 //JL: Recording the status at the end of an epizootic
@@ -127,11 +127,22 @@ typedef struct
 	int MAXT2[DATA_SETS+1];		    // number of days in EXPERIMENTAL data set (different for each EXPERIMENTAL data set)
 	int MAXT3[DATA_SETS+1];		    // number of days in WEATHER data set (different for each WEATHER data set)
 	int ***DATA;				    // 3-dimensional array that holds all the data
+
+//SH do I need these?
 	//int ***EXPDATA;				    // 3-dimensional array that holds all the EXPERIMENTAL data
 	//double ***WDATA;				    // 3-dimensional array that holds all the WEATHER data
 	//double ***CCDATA;
-	double WDATA[DATA_SETS+1][366][8][100]; //SH days, weeks, years
 	double test_data[1000][36];
+
+	//SH Experimental Data
+	int DATA_BLOCKONE[DATA_SETS+1][192][4]; //192 = 4 x 48 day epi's
+	int DATA_BLOCKTWO[DATA_SETS+1][192][4];
+	int DATA_BLOCKTHREE[DATA_SETS+1][192][4];
+	int DATA_OBS1[DATA_SETS+1][48][4]; //one 48 day epi
+	int DATA_OBS2[DATA_SETS+1][48][4];
+	int DATA_OBS3[DATA_SETS+1][48][4];
+	//SH Weather data
+	double WDATA[DATA_SETS+1][366][8][100]; //SH dataset, days, weeks, years
 
 	double AcceptedVect[NUM_PARS];
 	double LoopVect[NUM_PARS];
@@ -143,18 +154,11 @@ typedef struct
 	double MLE[NUM_PARS];
 	double MLE_host[DATA_SETS+1];
 	double MLE_initR[DATA_SETS+1];
-	//double MLE_gamma[DATA_SETS+1];
 
-	//double gamma_hood[DATA_SETS+1][100];	// 100 needs to be bigger than parm_inc (hood for each gamma value)
-	//double best_gamma[DATA_SETS+1][100];
 	double best_initS[DATA_SETS+1];
 	double best_initR[DATA_SETS+1];
 
 	int parm_inc;
-
-	//size_t dim;
-	//int calls;
-	//double sim_results[55][4];		// array to capture output from ddevf to use in fitting routine. 55 rows (more than no days in epi), 4 columns (Day, S, F, V)
 	int th_id;
 	int pop;
 
@@ -165,7 +169,7 @@ typedef struct
 	double coni_net3;
 	double coin_net4;
 
-	double distance_array[6] = {5, 5, 5, 5, 5, 5} //d12, d13, d14, d23, d24, d34
+	double distance_array[6]; //d12, d13, d14, d23, d24, d34
 
 	double dispersal; // dispersal parameter for dispersal function. will be fitting.
 

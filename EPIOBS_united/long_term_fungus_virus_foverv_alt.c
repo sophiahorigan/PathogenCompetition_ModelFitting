@@ -139,19 +139,21 @@ Params.PARS[50+pop]=fdensity;
 
 for (j=1;j<=DATA_SETS;j++)	{
 
-	DDEVF(&Params,r_seed,dim,pop,48,0,year,j;
+	//printf("THIS IS J IN MAIN LOOP = %i\n", j);
+
+	DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
 
 	int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0;
-	if(j<=3){
+	if (j==1 || j==2 || j==3) { //three block sites with subpopulations
 		while (m < epi_length*4){
 			for (n = 0; n < epi_length; n++){
 				if(Params.DATA[j][m][0] != -1){
-					lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, sim_output[j][m], Params.DATA[j][m]);
+					lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
 					printf("%lf\n", lhood_sub);
 				} 
 				m++;
 			}
-			printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_tmt);
+			printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
 			lhood_meta = lhood_meta + lhood_sub;
 			n = 0;
 			lhood_sub = 0;
@@ -159,17 +161,17 @@ for (j=1;j<=DATA_SETS;j++)	{
 		}
 		printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
 		}
-	else{
+	if (j==4 || j==5 || j==6) { //three observational sites with no subpopulations
 		for (n = 0; n < epi_length; n++){
 			if(Params.DATA[j][m][0] != -1){
-				lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, sim_output[j][m], Params.DATA[j][m]);
+				lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
 				printf("%lf\n", lhood_meta);
 			}
-		m++	
-	}
+		m++;
+		}
 	lhood_meta = 0;	
+	}
 }
-
 
 /*char name1[50];
 sprintf(name1, "sim_output_");

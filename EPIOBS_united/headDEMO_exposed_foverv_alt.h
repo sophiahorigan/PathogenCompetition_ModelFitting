@@ -132,11 +132,11 @@ typedef struct
 	//int EXPDATA[DATA_SETS+1][800][4];	// 3-dimensional array that holds all the EXPERIMENTAL data
 	//int OBSDATA[DATA_SETS+1][150][4];			    // 3-dimensional array that holds all the OBSERVATIONAL data
 
-	double DATA[DATA_SETS][1000][4]; // array that holds all data, exp and obs
+	int DATA[DATA_SETS][1000][4]; // array that holds all data, exp and obs
 	double MODEL[DATA_SETS][1000][4]; // array for model output
 	double WDATA[DATA_SETS_WEATHER+1][366][8][100]; //SH dataset, days, weeks, years
 
-	int num_sub;
+	int numsub;
 
 	//SH Epizootic Data
 	//int DATA_BLOCK_1[DATA_SETS+1][192][4]; //192 = 4 x 48 day epi's

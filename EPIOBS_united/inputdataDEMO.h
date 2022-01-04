@@ -33,9 +33,9 @@ double minRH;
 int FlagF;
 
 char *file;
-char *file_name="DATA_BLOCK"; //3 total. each .txt needs incrementing number to work with j (dataset) loop below 
+char *file_name="DATA_"; //1-3 EPI, 4-6 OBS
+//1 block 1, 2 block 2, 3 block 3, 4 jhn, 5 rob, 6 ysn
 char *file_name2="KBS1_weatherdaily";  //SH weather data for one site
-char *file_name3="DATA_OBS"; //3 total
 
 char *file_type=".txt";
 
@@ -69,7 +69,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 	//block one
 		//printf("%i, I am here!!", j);
 		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=FVdata[i];  
-		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->EXPDATA[j][i][0],Params->EXPDATA[j][i][1], Params->EXPDATA[j][i][2], Params->EXPDATA[j][i][3]);
+		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->DATA[j][i][0],Params->DATA[j][i][1], Params->DATA[j][i][2], Params->DATA[j][i][3]);
 
 	weeks++; i++;
 }

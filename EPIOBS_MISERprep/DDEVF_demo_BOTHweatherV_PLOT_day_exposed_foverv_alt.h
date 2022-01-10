@@ -1,6 +1,6 @@
 // DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
 
-double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q) //SH DOES save into array
+double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
 
 {
 
@@ -24,19 +24,37 @@ double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP
 int FlagDay=0;
 
 int MAXT3=maxy_t;
+int num_sub;
+int j = dataset;
+printf("Hey there! j= %i\n", j);
 
-//int k = tmt; //SH looping through treamtent numbers below
+// ******************************************************** //SH// TREATMENT STRUCTURE //SH// ******************************************************** //
+if (j==1 || j==2 || j==3) { //epi data
+	//printf("In loop one j= %i\n", j);
+	Params->numsub=4;
+	num_sub = Params->numsub;
+	//printf("In loop one num_sub = %i\n", num_sub);
+}
+if (j==4 || j==5 || j==6) { // obs data
+	//printf("In loop two j= %i\n", j);	
+	Params->numsub=1;
+	num_sub = Params->numsub;
+	//printf("In loop two num_sub = %i\n", num_sub);
+}
+
+//printf("numsub = %i", num_sub);
 
 int n = Params->PARS[8]; //number of virus exposed classes
 int m = Params->PARS[9]; //number of fungus exposed classes
-int DIM = 4*(m+n+4+2+1+m); //SH multipled by 4 to hold all equations
+int DIM = num_sub*(m+n+4+2+1+m); //SH multipled by 4 to hold all equations
+//printf("j = %i\t num_sub = %i\t DIM = %i\n", j, num_sub, DIM);	
 
 VFPass=exposetime-1/Params->PARS[18]; 
 
 int n1=(VFPass/exposetime)*Params->PARS[8];    //The number of the first group of exposed classes to virus
 int n2=n-n1;                  //The number of the first group of exposed classes to virus
 
-double t=h;		double t_next=h;	double t_0=h;	int i;	int j;			// time loop and index
+double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
 double epsilon = pow(10,-6);
 double y_ode[DIM]; //**SH** this holds 
 double rand_nuR[MAXT3];
@@ -83,12 +101,12 @@ double DD10=0;    //accumulated degree days about 10 degrees C
 
 // ----------------------------------- Generate Random Numbers -------------------------------------------- //
 for (i=0;i<=MAXT3;i++)	{
-	rand_nuR[i]=0;
+	rand_nuR[i]=0;//0 means no stochasticity
 	rand_nuF[i]=0;
 	//rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[12]);
 	//printf("i(%d)\t var1=%f\t var2=%f\t rand parts: nuR=%e\t nuF=%e\n",i,Params->PARS[11],Params->PARS[12],rand_nuR[i],rand_nuF[i]);
 }//getc(stdin);
-
+//stochasticity
 
 
 
@@ -135,16 +153,13 @@ line_ticker=line_ticker-1;
 
 int num_weeks=MAXT3/7;
 
-// ******************************************************** //SH// TREATMENT STRUCTURE //SH// ******************************************************** //
-
-int num_tmts = 4;
-
+//SH CHECK WITH GREG
 //state variable declaration
-double S[num_tmts]; double V[num_tmts]; double F[num_tmts]; double R[num_tmts];
-double IV[num_tmts]; double IF[num_tmts]; double IVF[num_tmts]; double IFV[num_tmts];
+double S[num_sub]; double V[num_sub]; double F[num_sub]; double R[num_sub];
+double IV[num_sub]; double IF[num_sub]; double IVF[num_sub]; double IFV[num_sub];
 
 //exposed class declaratoin
-double E_V[num_tmts][n2+1]; double E_F[num_tmts][gstepsF+1]; double E_VF[num_tmts][n1+1]; double E_FV[num_tmts][gstepsF+1];
+double E_V[num_sub][n2+1]; double E_F[num_sub][gstepsF+1]; double E_VF[num_sub][n1+1]; double E_FV[num_sub][gstepsF+1];
 
 //treatment indexing to fill arrays
 
@@ -178,36 +193,38 @@ if (r_germ<0)	r_germ=0;
 // ----------------------------------------- initialize results ------------------------------------------- //
 
 //single epizootic state params
-for(i=0; i<4; i++){ 
+//printf("numsub = %i\n", num_sub);
+for(i=0; i<num_sub; i++){ 
 	S[i] = initS;
-	V[i] = 0;
+	//printf()
+	V[i] = 0; //SH TEST FILLING THIS IN
 	F[i] = 0;
 	R[i] = 0;
 
-	for (j=1;j<=n2;j++){
-		E_V[i][j]=0;
+	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
+		E_V[i][ii]=0;
 	}
-	for (j=1;j<=n1;j++){
-		E_VF[i][j]=0;
+	for (ii=1;ii<=n1;ii++){
+		E_VF[i][ii]=0;
 	}
-	for (j=1;j<=gstepsF;j++){
-		E_F[i][j]=0;
-		E_FV[i][j]=0;
+	for (ii=1;ii<=gstepsF;ii++){
+		E_F[i][ii]=0;
+		E_FV[i][ii]=0;
 	}
 
 }
 
 
 //long-term state params
-double Vnext[num_tmts];
-double Vkill[num_tmts];
-double Vcadaver[num_tmts];
+double Vnext[num_sub];
+double Vkill[num_sub];
+double Vcadaver[num_sub];
 
-double Fnext[num_tmts];
-double Fkill[num_tmts];
-double Fcadaver[num_tmts];
+double Fnext[num_sub];
+double Fkill[num_sub];
+double Fcadaver[num_sub];
 
-for(i=0; i<4; i++){ //Will need to fit!!
+for(i=0; i<num_sub; i++){ //Will need to fit!!
 	Vnext[i] = 0;
 	Vkill[i] = 0;
 	Vcadaver[i] = 0;
@@ -218,8 +235,6 @@ for(i=0; i<4; i++){ //Will need to fit!!
 
 
 double timing[6]={r_germ,R_end,MAXT3};
-
-
 
 // -------------------- MAIN LOOP!! (calculate populations as time is increased) -------------------------- //
 
@@ -304,40 +319,41 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	// -------------------------- integrate until next stoppage event ---------------------------------- //
 	
 	//indexing variables
-	int tmt;
-	int tmt_index[num_tmts];
-	int max_class = m+n+7+gstepsF; 
-	tmt_index[0] = 0; //treatment 1 index addition is zero
-	for(tmt=1; tmt<num_tmts; tmt++){	//create tmt array 
-		tmt_index[tmt] = tmt_index[tmt-1]+ max_class; //SH can maybe multiply 
-		//printf("tmt_index=%i", tmt_index[tmt]);
+	int sub;
+	int sub_index[num_sub];
+	int max_class = m+n+7+gstepsF;
+	sub_index[0] = 0; //treatment 1 index addition is zero
+	for(sub=1; sub<num_sub; sub++){	//create sub array 
+		sub_index[sub] = sub_index[sub-1]+ max_class; //SH can maybe multiply 
+		//printf("sub_index=%i", sub_index[sub]);
 	}
 	
 
 	while (t<t_next)	{ //for one day
 		
-		for(tmt=0; tmt<4; tmt++){ //for each treatment
-			y_ode[0+tmt_index[tmt]]=S[tmt];	y_ode[m+n+1+tmt_index[tmt]]=Fcadaver[tmt];	Params->POPS[3]=R[tmt];
-			//printf("initS[%i] = %e\n", tmt, S[tmt]);
-			//printf("y_ode[%i] = %e\n", tmt_index[tmt], y_ode[0+tmt_index[tmt]]);
-			y_ode[m+n+3+tmt_index[tmt]]=Vcadaver[tmt];
+		for(sub=0; sub<num_sub; sub++){ //for each treatment
+			y_ode[0+sub_index[sub]]=S[sub];	y_ode[m+n+1+sub_index[sub]]=Fcadaver[sub];	Params->POPS[3]=R[sub];
+			//printf("PreODES[%i] = %e\n", sub, S[sub]);
+			//printf("y_ode[%i] = %e\n", sub_index[sub], y_ode[0+sub_index[sub]]);
+			y_ode[m+n+3+sub_index[sub]]=Vcadaver[sub];
 			
 			for (i=1;i<=gstepsF;i++)	{
-				y_ode[i+tmt_index[tmt]]=E_F[tmt][i];
+				y_ode[i+sub_index[sub]]=E_F[sub][i];
 			}
 			for (i=1;i<=n1;i++)	{
-				y_ode[gstepsF+i+tmt_index[tmt]]=E_VF[tmt][i];
+				y_ode[gstepsF+i+sub_index[sub]]=E_VF[sub][i];
+				//printf("EVF = %lf\n", E_VF[sub][i+sub_index[sub]]);
 			}
 			for (i=1;i<=n2;i++)	{
-				y_ode[gstepsF+n1+i+tmt_index[tmt]]=E_V[tmt][i];
+				y_ode[gstepsF+n1+i+sub_index[sub]]=E_V[sub][i];
 			}
-			y_ode[m+n+2+tmt_index[tmt]]=Fnext[tmt];
-			y_ode[m+n+4+tmt_index[tmt]]=Vkill[tmt];
-			y_ode[m+n+5+tmt_index[tmt]]=Fkill[tmt];
-			y_ode[m+n+6+tmt_index[tmt]]=Vnext[tmt];
+			y_ode[m+n+2+sub_index[sub]]=Fnext[sub];
+			y_ode[m+n+4+sub_index[sub]]=Vkill[sub];
+			y_ode[m+n+5+sub_index[sub]]=Fkill[sub];
+			y_ode[m+n+6+sub_index[sub]]=Vnext[sub];
 
 			for (i=1;i<=gstepsF;i++)	{
-				y_ode[m+n+6+i+tmt_index[tmt]]=E_FV[tmt][i]; //end of fill for each treatment
+				y_ode[m+n+6+i+sub_index[sub]]=E_FV[sub][i]; //end of fill for each treatment
 			}
 		}
 		int k;
@@ -345,7 +361,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			printf("y_ode[%i]=%e\n", k, y_ode[k]);
 			//getc(stdin);
 		}
-
 
 
 
@@ -411,22 +426,21 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 
 //update state variables
-	for(tmt=0; tmt<4; tmt++){
-		S[tmt]=y_ode[0+tmt_index[tmt]];
-		Fcadaver[tmt]=y_ode[m+n+1+tmt_index[tmt]]; 
-		Vcadaver[tmt]=y_ode[m+n+3+tmt_index[tmt]];
-		Fnext[tmt]=y_ode[m+n+2+tmt_index[tmt]];			
-		Vkill[tmt]=y_ode[m+n+4+tmt_index[tmt]];
-		Fkill[tmt]=y_ode[m+n+5+tmt_index[tmt]];			
-		Vnext[tmt]=y_ode[m+n+6+tmt_index[tmt]];
-		IF[tmt]=0;
-		IV[tmt]=0;
-		IVF[tmt]=0;
-		IFV[tmt]=0;
+	for(sub=0; sub<num_sub; sub++){
+		S[sub]=y_ode[0+sub_index[sub]]; //SH ASK GREG: FOR OBS SITE, THIS ISN'T GETTING UPDATED
+		//printf("POSTODES[%i] = %e\n", sub, S[sub]);
+		Fcadaver[sub]=y_ode[m+n+1+sub_index[sub]]; 
+		Vcadaver[sub]=y_ode[m+n+3+sub_index[sub]];
+		Fnext[sub]=y_ode[m+n+2+sub_index[sub]];			
+		Vkill[sub]=y_ode[m+n+4+sub_index[sub]];
+		Fkill[sub]=y_ode[m+n+5+sub_index[sub]];			
+		Vnext[sub]=y_ode[m+n+6+sub_index[sub]];
+		IF[sub]=0;
+		IV[sub]=0;
+		IVF[sub]=0;
+		IFV[sub]=0;
 	}
 		
-
-	//*** SH START BELOW TO REPLICATE**//
 
 	//SH check to see if I need this, given that I don't have cages
 	if ((day+1)%7==0)	{
@@ -434,39 +448,38 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		RestBefore = Params->POPS[3]*nuR2;
 	}
 
-	for(tmt=0; tmt<4; tmt++){	
+	for(sub=0; sub<num_sub; sub++){	
 	
 		for (i=1;i<=gstepsF;i++)	{
-			E_F[tmt][i]=y_ode[i+tmt_index[tmt]];
-			IF[tmt] += E_F[tmt][i];
+			E_F[sub][i]=y_ode[i+sub_index[sub]];
+			IF[sub] += E_F[sub][i];
 		}
 
 		for (i=1;i<=n1;i++)	{
-			E_VF[tmt][i]=y_ode[gstepsF+i+tmt_index[tmt]];
-			IVF[tmt] += E_VF[tmt][i];
+			E_VF[sub][i]=y_ode[gstepsF+i+sub_index[sub]];
+			IVF[sub] += E_VF[sub][i];
 		}
 
 		for (i=1;i<=n2;i++)	{
-			E_V[tmt][i]=y_ode[gstepsF+n1+i+tmt_index[tmt]];
-			IV[tmt] += E_V[tmt][i];
+			E_V[sub][i]=y_ode[gstepsF+n1+i+sub_index[sub]];
+			IV[sub] += E_V[sub][i];
 		}
 
 		for (i=1;i<=gstepsF;i++)	{
-			E_FV[tmt][i]=y_ode[gstepsF+gstepsV+6+i+tmt_index[tmt]];
-			IFV[tmt] += E_FV[tmt][i];
+			E_FV[sub][i]=y_ode[gstepsF+gstepsV+6+i+sub_index[sub]];
+			IFV[sub] += E_FV[sub][i];
 			//IF += (1-coinf_V)*E_FV[i]; //SH these are double counting coinfections I think.
 			//IV += coinf_V*E_FV[i];
 		}
 
 	}
 
-
 //*************************SH below line prints daily output to global file fp1 **************/
 //fprintf(fp1, "%d\t %d\t %d\n", S/initS, IV/initS, IF/initS);
 //fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 //SH yode[0] host at end of day, IV/IF: individuals in exposed classes (i.e. infected but not yet killed)
 
-//printf("%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
+//printf("DAILY OUTPUT %d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0+sub_index[sub]],Fkill[sub],Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
 
 
 //*******************************Appends output for each treatment run based on one epizootic length of 48**************************//
@@ -474,26 +487,18 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//LOOP THROUGH ARRAYS
 	int day_index[4] = {0, 47, 95, 143}; //to append 48 day epizootics //probably a better way to do this
 	
-	for(tmt=0; tmt<4; tmt++){	
+	for(sub=0; sub<num_sub; sub++){	
 
-		sim_output[day-1+day_index[tmt]][0] = S[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt]+IF[tmt]+IVF[tmt]); //Saving daily fraction uninfected S 
-		sim_output[day-1+day_index[tmt]][1] = IV[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt]+IF[tmt]+IVF[tmt]); //Saving daily fraction infected V 
-		sim_output[day-1+day_index[tmt]][2] = IF[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt]+IF[tmt]+IVF[tmt]); //Saving daily fraction infected F
-		sim_output[day-1+day_index[tmt]][3] = IFV[tmt]/(y_ode[0+tmt_index[tmt]]+IV[tmt]+IF[tmt]+IVF[tmt]); //Saving daily fraction coinfected 
-	
+		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction uninfected S 
+		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected V 
+		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected F
+		Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction coinfected 
+
+		//printf("S=%e\t V=%e\t F=%e\t FV=%e\n", Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
 	}
 
 	//SH need to fix print statement
 	//fprintf(fp1, "%d\t %e\t %e\t %e\t %e\n %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n", day-1, S_1/(y_ode[0]+IV_1+IF_1+IVF_1), IV_1/(y_ode[0]+IV_1+IF_1+IVF_1), IF_1/(y_ode[0]+IV_1+IF_1+IVF_1), IFV_1/(y_ode[0]+IV_1+IF_1+IVF_1), S_2/(y_ode[0]+IV_2+IF_2+IVF_2), IV_2/(y_ode[0]+IV_2+IF_2+IVF_2), IF_2/(y_ode[0]+IV_2+IF_2+IVF_2), IFV_2/(y_ode[0]+IV_2+IF_2+IVF_2), S_3/(y_ode[0]+IV_3+IF_3+IVF_3), IV_3/(y_ode[0]+IV_3+IF_3+IVF_3), IF_3/(y_ode[0]+IV_3+IF_3+IVF_3), IFV_3/(y_ode[0]+IV_3+IF_3+IVF_3), S_4/(y_ode[0]+IV_4+IF_4+IVF_4), IV_4/(y_ode[0]+IV_4+IF_4+IVF_4), IF_4/(y_ode[0]+IV_4+IF_4+IVF_4), IFV_4/(y_ode[0]+IV_4+IF_4+IVF_4));
-
-
-		//c2=c1;	r2=r1;   //make today's C and R yesterday's C and R
-        //printf("c2=%e,r2=%e\n",c2,r2);
-		//FlagDay=0;
-		//FlagWeek=0;
-	//printf("Rstart:%e\t Rend:%e\t R=%e\t nuF=%e\t nuR=%e\t muF=%e\n",R_start, R_end,R,Params->nuF,Params->nuR,Params->muF);
-	//printf("%d\t %e\t %e\n",day-1,Params->size_C,Params->indexR);
-
 	//fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,FRnext,Vkill,Vnext,Fcadaver,Vcadaver,Fkill+IF+IVF,Vkill+IV,y_ode[0]+Fkill+Vkill+IV+IF+IVF);
 
 	}
@@ -506,24 +511,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 t_0=t_next;
 //printf("t_0=%lf\n",t_0);
 }
-/* //SH end of epizootic info
 
-SusEnd=y_ode[0]; //susceptibles at end of day 
-
-if (initR==0){
-   InfVirusEnd=Vkill+IV+IVF;
-   InfFungusNext=0;
-   InfFungusEnd=0;
-   InfVirusNext=Vkill+IV+IVF;
-}
-else{
-   InfVirusEnd=Vkill+IV+IVF;
-   InfFungusNext=FRnext+IF;
-   InfFungusEnd=Fkill+IF;
-   InfVirusNext=Vkill+IV+IVF;
-}
-InfFungusAdj=InfFungusEnd-InfFungusWeekbefore;
-InfVirusAdj=InfVirusEnd-InfVirusWeekbefore;
-*/
 return 0;
 }

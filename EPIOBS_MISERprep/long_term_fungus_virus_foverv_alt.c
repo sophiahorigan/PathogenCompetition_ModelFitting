@@ -57,6 +57,7 @@ double distance_array[6] = {5, 5, 5, 5, 5, 5};
 int i=0; int j;int ii; int jj; int k; int l;
 int num_adj_pars=29;			// number of adjustable parameters
 int pop;
+int epi_length = 48;
 
 // -------------------------------------------- MISTER STUFF --------------------------------------------------------- //
 inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
@@ -125,7 +126,7 @@ double sdensity;
 double fdensity;
 double vdensity;
 
-// Block 1
+//INITIAL CONDITIONS
 VFSus=2; //SH random pick 
 sdensity=100; //SH random pick 
 fdensity=0.026; //SH from literature
@@ -135,92 +136,63 @@ Params.PARS[30+pop]=sdensity;
 VPass=vdensity;
 Params.PARS[50+pop]=fdensity;
 
-//char name1[50];
-//sprintf(name1, "sim_output_");
-//fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-//fclose(fp1);
+//SET J
+//j=1, j=2, j=2 : 3 blocks
+//j=4, j=5, j=6 : 3 obs
+//j = 6;
+//int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0;
+
+for(j=1;j<=DATA_SETS;j++){
+	DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
+}
+
+//j=1;
+//DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
+
+
+
+//Loop for meta with sub (experimental)
 /*
-// Block 2
-VFSus=2; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
+if (j==1 || j==2 || j==3) { //three block sites with subpopulations
+	DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
+		while (m < epi_length*4){
+			for (n = 0; n < epi_length; n++){
+				if(Params.DATA[j][m][0] != -1){
+					printf("model = %e\t, data = %e\n", Params.MODEL[j][m], Params.DATA[j][m]);
+					lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
+					printf("%lf\n", lhood_sub);
+				} 
+				m++;
+			}
+			printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
+			lhood_meta = lhood_meta + lhood_sub;
+		}
+		printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
+		}
 
-Params.PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params.PARS[50+pop]=fdensity;
-
-char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-fclose(fp1);
-
-// Block 3
-VFSus=2; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
-
-Params.PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params.PARS[50+pop]=fdensity;
-
-char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-fclose(fp1);
-
-// OBS1 (JHN)
-VFSus=2; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
-
-Params.PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params.PARS[50+pop]=fdensity;
-
-char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-fclose(fp1);
-
-// OBS2 (ROB)
-VFSus=2; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
-
-Params.PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params.PARS[50+pop]=fdensity;
-
-char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-fclose(fp1);
-
-// OBS (YSN)
-VFSus=2; //SH random pick 
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
-
-Params.PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params.PARS[50+pop]=fdensity;
-
-char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-fclose(fp1);
+//Loop for meta without sub (observational)
+	if (j==4 || j==5 || j==6) { //three observational sites with no subpopulations
+		DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
+			for (n = 0; n < epi_length; n++){
+				if(Params.DATA[j][m][0] != -1){
+					printf("model = %e\t, data = %e\n", Params.MODEL[j][m], Params.DATA[j][m]);
+					lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
+					//printf("%lf\n", lhood_meta);
+				}
+			m++;
+			}
+		printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
+	}
 */
+
+
+/*char name1[50];
+sprintf(name1, "sim_output_");
+fp1=fopen(name1,"a+"); //or a+, not sure which
+DDEVF(&Params,r_seed,dim,pop,48,0,year);
+fclose(fp1);*/
+
+
 //**************SH prints content of sim_output******************//
 /*
 int loop3, loop4;
@@ -229,30 +201,6 @@ for(loop3 = 0; loop3 < 192; loop3++){
 		printf("sim_output[%i][%i] = %e\n", loop3, loop4, sim_output[loop3][loop4]);
 	}	
 }
-*/
-
-
-//*************** SH let's calculate a likelihood!! ******************//
-/*
-for (j=1;j<=DATA_SETS;j++)	{
-
-	int m = 0; int n; double lhood_tmt = 0; double lhood_block = 0;
-
-	while (m < 192){
-		for (n = 0; n < 48; n++){
-			if(Params.EXPDATA[j][m][0] != -1){
-				lhood_tmt = lhood_tmt + gsl_ran_multinomial_lnpdf(4, sim_output[m], Params.EXPDATA[j][m]);
-				printf("%lf\n", lhood_tmt);
-			} 
-			m++;
-		}
-		printf("END OF TREATMENT. Likelihood sum for treatment = %lf\n", lhood_tmt);
-		lhood_block = lhood_block + lhood_tmt;
-		n = 0;
-		lhood_tmt = 0;
-			
-	}
-	printf("Likelihood for block %i = %lf\n", j, lhood_block);
 */
 
 //**************SH prints output at end of week****************//

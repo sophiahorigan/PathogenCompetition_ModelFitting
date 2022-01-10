@@ -33,9 +33,9 @@ double minRH;
 int FlagF;
 
 char *file;
-char *file_name="DATA_BLOCK"; //3 total. each .txt needs incrementing number to work with j (dataset) loop below 
+char *file_name="DATA_"; //1-3 EPI, 4-6 OBS
+//1 block 1, 2 block 2, 3 block 3, 4 jhn, 5 rob, 6 ysn
 char *file_name2="KBS1_weatherdaily";  //SH weather data for one site
-char *file_name3="DATA_OBS"; //3 total
 
 char *file_type=".txt";
 
@@ -68,8 +68,8 @@ for (j=1;j<=DATA_SETS;j++)	{
 	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
 	//block one
 		//printf("%i, I am here!!", j);
-		Params->EXPDATA[j][i][0]=Sdata[i]; Params->EXPDATA[j][i][1]=Vdata[i]; Params->EXPDATA[j][i][2]=Fdata[i]; Params->EXPDATA[j][i][3]=FVdata[i];  
-		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->EXPDATA[j][i][0],Params->EXPDATA[j][i][1], Params->EXPDATA[j][i][2], Params->EXPDATA[j][i][3]);
+		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=FVdata[i];  
+		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->DATA[j][i][0],Params->DATA[j][i][1], Params->DATA[j][i][2], Params->DATA[j][i][3]);
 
 	weeks++; i++;
 }
@@ -79,49 +79,6 @@ fclose(ftp_data);
 num_weeks3[j]=i;
 
 }
-
-/* -------- SH Observational Data Data ------- */
-//OBS1 = JHN
-//OBS2 = ROB
-//OBS3 = YHN
-
-for (j=1;j<=DATA_SETS;j++)	{ //can use same DATA_SETS as exp for now, if bringing in hyde park make DATA_SETS_OBS
-	weeks=0;	i=0;	FlagF=0;
-	FILE *ftp_data;
-
-	sprintf(numbs,"%d",j); //number in .txt name (incrementing for each dataset)
-
-	file = (char*)calloc((strlen(file_name)+strlen(file_type)+strlen(numbs)+1),sizeof(char)); //SH name multiple weather files in incrementing order
-	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
-
-	strcat(file,file_name3);
-	strcat(file,numbs);
-	strcat(file,file_type);
-
-	strcat(code,code_name);
-	strcat(code,numbs);
-
-
-	ftp_data=fopen(file,"r");
-	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
-
-	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
-	//block one
-		//printf("%i, I am here!!", j);
-		Params->OBSDATA[j][i][0]=Sdata[i]; Params->OBSDATA[j][i][1]=Vdata[i]; Params->OBSDATA[j][i][2]=Fdata[i]; Params->OBSDATA[j][i][3]=FVdata[i];  
-		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->OBSDATA[j][i][0],Params->OBSDATA[j][i][1], Params->OBSDATA[j][i][2], Params->OBSDATA[j][i][3]);
-
-	weeks++; i++;
-}
-
-fclose(ftp_data);
-
-num_weeks3[j]=i;
-
-}
-
-
-
 
 /* -------- SH Weather Data ------- */
 for (j=1;j<=DATA_SETS_WEATHER;j++)	{

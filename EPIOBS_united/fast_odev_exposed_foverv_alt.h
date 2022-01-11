@@ -44,15 +44,21 @@ int sub;
 // ------------------------------------------ ODEs -------------------------------------------- //
 
 int sub_index[num_sub];
-int max_class = m+n+6+m;
+int max_class = m+n+7+m;
 sub_index[0] = 0; //treatment 1 index addition is zero
 for(sub=1; sub<num_sub; sub++){	//createsub array 
 	sub_index[sub] = sub_index[sub-1]+ max_class; //SH can maybe multiply 
 }
 
 for(sub=0; sub<num_sub; sub++){
+	//printf("GREETINGS from line 54 in DDEVF\n");
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R)-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
-	//printf("%lf\t %lf\t %lf\t %lf\t %lf\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S[sub]);
+	//printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]); //SH GREG CHECK; THIS ALWAYS = 0...
+	//getc(stdin);
+	//printf("%e\t %e\t %e\t %e\t %e\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub]);
+	//printf("%e\t %e\t %e\t %e\n", nuF, y[m+n+1+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]]);
+	
+	//getc(stdin);
 	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]];
 	for(i=2; i <= m; i++){
 		dydt[i+sub_index[sub]]=m*lambdaF*(y[i-1+sub_index[sub]] -y[i+sub_index[sub]]);
@@ -126,17 +132,18 @@ while (t_ode<t_end)	{
 			// keep y_ode as is
 		}
 		else  {//why can't it be zero?
-			printf("NEGATIVE OR NAN y_ode[%i]=%e\n", i, y_ode[i]);				
+			//printf("NEGATIVE OR NAN y_ode[%i]=%e\n", i, y_ode[i]);				
 			//printf("y(%d) NEGATIVE or not a number\n",i);
 			y_ode[i]=0;
+			//is this indicative of a problem in the code or just because we don't do negative numbers
 		}
 		if (i==Params->PARS[9]+Params->PARS[8]+3 || i==Params->PARS[9]+Params->PARS[8]+1){
 
 		}
 		else{
 		if (y_ode[i]>Params->INITS[0])	{
-			//printf("y(%d) TOO LARGE!!\n",i);
-			printf("TOO LARGE y_ode[%i]=%e\n", i, y_ode[i]);	
+			printf("y(%d) TOO LARGE!!\n",i);
+			//printf("TOO LARGE y_ode[%i]=%e\n", i, y_ode[i]);	
 			y_ode[i]=Params->INITS[0];
 		}
 		}

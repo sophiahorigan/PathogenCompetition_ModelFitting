@@ -136,29 +136,18 @@ Params.PARS[30+pop]=sdensity;
 VPass=vdensity;
 Params.PARS[50+pop]=fdensity;
 
-//SET J
-//j=1, j=2, j=2 : 3 blocks
-//j=4, j=5, j=6 : 3 obs
-//j = 6;
-//int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0;
 
-for(j=1;j<=DATA_SETS;j++){
+for (j=1;j<=DATA_SETS;j++)	{
+
+	//printf("THIS IS J IN MAIN LOOP = %i\n", j);
+
 	DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
-}
 
-//j=1;
-//DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
-
-
-
-//Loop for meta with sub (experimental)
-/*
-if (j==1 || j==2 || j==3) { //three block sites with subpopulations
-	DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
+	int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0;
+	if (j==1 || j==2 || j==3) { //three block sites with subpopulations
 		while (m < epi_length*4){
 			for (n = 0; n < epi_length; n++){
 				if(Params.DATA[j][m][0] != -1){
-					printf("model = %e\t, data = %e\n", Params.MODEL[j][m], Params.DATA[j][m]);
 					lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
 					printf("%lf\n", lhood_sub);
 				} 
@@ -166,25 +155,23 @@ if (j==1 || j==2 || j==3) { //three block sites with subpopulations
 			}
 			printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
 			lhood_meta = lhood_meta + lhood_sub;
+			n = 0;
+			lhood_sub = 0;
+				
 		}
 		printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
 		}
-
-//Loop for meta without sub (observational)
 	if (j==4 || j==5 || j==6) { //three observational sites with no subpopulations
-		DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
-			for (n = 0; n < epi_length; n++){
-				if(Params.DATA[j][m][0] != -1){
-					printf("model = %e\t, data = %e\n", Params.MODEL[j][m], Params.DATA[j][m]);
-					lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
-					//printf("%lf\n", lhood_meta);
-				}
-			m++;
+		for (n = 0; n < epi_length; n++){
+			if(Params.DATA[j][m][0] != -1){
+				lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, Params.MODEL[j][m], Params.DATA[j][m]);
+				printf("%lf\n", lhood_meta);
 			}
-		printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
+		m++;
+		}
+	lhood_meta = 0;	
 	}
-*/
-
+}
 
 /*char name1[50];
 sprintf(name1, "sim_output_");

@@ -28,6 +28,7 @@ char *strFileNameDate;
 
 #define DATA_SETS 6		        // number of epizootic data sets //one for each metapop
 #define DATA_SETS_WEATHER 1		// number of weather data sets
+#define NUM_METASUB 3			//number of metapopulations with subpopulations
 #define NUM_PARS 100		        // number of parameters to be passed from main to hood
 #define SIMU 64
 //#define DIM 15						// number of differential equations
@@ -135,12 +136,11 @@ typedef struct
 	int DATA[DATA_SETS][1000][4]; // array that holds all data, exp and obs
 	double MODEL[DATA_SETS][1000][4]; // array for model output
 	double WDATA[DATA_SETS_WEATHER+1][366][8][100]; //SH dataset, days, weeks, years
+	int DISTANCE[NUM_METASUB][100][100];
 
 	int numsub;
 
 	//SH Epizootic Data
-	//int DATA_BLOCK_1[DATA_SETS+1][192][4]; //192 = 4 x 48 day epi's
-
 	double test_data[1000][36];
 
 	double AcceptedVect[NUM_PARS];
@@ -162,15 +162,9 @@ typedef struct
 	int pop;
 
 	// ****** DISPERSAL PARAMETERS *********
-	//params to hold net daily conidia dispersal, added to ODE's
-	double coni_net1; //net for treatment 1
-	double coni_net2;
-	double coni_net3;
-	double coin_net4;
 
-	double distance_array[6]; //d12, d13, d14, d23, d24, d34
+	
 
-	double dispersal; // dispersal parameter for dispersal function. will be fitting.
 
 }STRUCTURE;
 

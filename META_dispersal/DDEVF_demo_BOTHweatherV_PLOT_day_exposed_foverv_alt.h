@@ -381,16 +381,13 @@ if(dispersal_on == 1){ //turn off at declaration at top of script
 		double disp; //frac dispersing from subout to subin
 		double netdisp[num_sub];
 
-		double mgr; //migration parameter, to fit
-		double a; //migration parameter, to fit
-
-		double distance[4][4][4]; 
-
+		double mgr = 0.01; //migration parameter, to fit
+		double a = 5; //migration parameter, to fit 
 		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			for(subin = 0; subin < num_sub; subin++){
 				if(subout != subin){
-					//disp = mgr*exp(-a*distance[j][subout][subin]);
+					disp = mgr*exp(-a*Params->DISTANCE[j][subout][subin];
 					disp = 0;
 					netdisp[subout] = netdisp[subout] - disp*C[subout]; 
 					netdisp[subin] = netdisp[subin] + disp*C[subin]; 

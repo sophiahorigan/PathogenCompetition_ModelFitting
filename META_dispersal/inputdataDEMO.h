@@ -16,6 +16,8 @@ int num_weeks2[DATA_SETS+1];			//CK// used for output to file
 int num_weeks3[DATA_SETS+1];			//CK// used for output to file
 int total_days=0;					// the number of days summed over all data sets (for MISER)
 
+int d1[MAX_WEEKS]; int d2[MAX_WEEKS]; int d3[MAX_WEEKS]; int d4[MAX_WEEKS]; //distance array input
+
 //SH Need to figure out
 //Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5);
 //Params->EXPDATA = i3tensor(0,20,0,MAX_WEEKS,0,5);  //CK// May need to check this.  Not sure what i3tensor does...
@@ -36,6 +38,7 @@ char *file;
 char *file_name="DATA_"; //1-3 EPI, 4-6 OBS
 //1 block 1, 2 block 2, 3 block 3, 4 jhn, 5 rob, 6 ysn
 char *file_name2="KBS1_weatherdaily";  //SH weather data for one site
+char *file_name3="distance_"; 
 
 char *file_type=".txt";
 
@@ -44,6 +47,41 @@ char *code_name="ftp";
 
 char numbs[5];
 /*------------------------------- Data Sets ---------------------------------*/
+/* -------- SH Distance Array for Blocks ------- */
+
+for(j=1;j<=NUM_METASUB;j++){ //Three Blocks with distance data
+	weeks=0;	i=0;	FlagF=0;	
+	FILE *ftp_data;
+
+	sprintf(numbs, "%d", j);
+
+	file = (char*)calloc((strlen(file_name)+strlen(file_type)+strlen(numbs)+1),sizeof(char)); //SH name multiple weather files in incrementing order
+	code = (char*)calloc((strlen(code_name)+strlen(numbs)+1),sizeof(char));
+
+	strcat(file,file_name3);
+	strcat(file,numbs);
+	strcat(file,file_type);
+
+	strcat(code,code_name);
+	strcat(code,numbs);
+
+	ftp_data=fopen(file,"r");
+	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
+
+	while (fscanf(ftp_data,"%i %i %i %i \n",&d1[i],&d2[i],&d3[i],&d4[i])!= EOF)			{
+		//printf("%i, I am here!!\n", j);
+		Params->DISTANCE[j][i][0]=d1[i]; Params->DISTANCE[j][i][1]=d2[i]; Params->DISTANCE[j][i][2]=d3[i]; Params->DISTANCE[j][i][3]=d4[i];  
+		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->DISTANCE[j][i][0],Params->DISTANCE[j][i][1], Params->DISTANCE[j][i][2], Params->DISTANCE[j][i][3]);
+	
+	weeks++; i++;
+	}
+
+fclose(ftp_data);
+
+num_weeks3[j]=i;
+}
+
+
 /* -------- SH Experimental Data ------- */
 for (j=1;j<=DATA_SETS;j++)	{
 	weeks=0;	i=0;	FlagF=0;
@@ -121,6 +159,3 @@ for (j=1;j<=DATA_SETS_WEATHER;j++)	{
 	num_weeks3[j]=i;
 	}
 }
-
-
-

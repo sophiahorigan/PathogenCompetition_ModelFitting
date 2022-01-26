@@ -137,8 +137,14 @@ typedef struct
 	double MODEL[DATA_SETS][1000][4]; // array for model output
 	double WDATA[DATA_SETS_WEATHER+1][366][8][100]; //SH dataset, days, weeks, years
 	int DISTANCE[NUM_METASUB][100][100];
+	double DISPROB[NUM_METASUB][100][100];
 
+	//indexing and dispersal params
 	int numsub;
+	double con_mrg;
+	double a;
+	double lar_disp;
+	double poptotal;
 
 	//SH Epizootic Data
 	double test_data[1000][36];
@@ -172,18 +178,7 @@ typedef struct
 #include "inputdataDEMO.h"
 #include "random_setup2.h"
 #include "filenames4.h"
-//#include "bounds_stochWEATHER_dd5.h"
 #include "bounds_RAIN+TEMP+RH8.h"
 #include "prob_dists.h"
 #include "fast_odev_exposed_foverv_alt.h"
-//#include "DDEVF_DEMO_disease1.h"
-//#include "DDEVF_DEMO_window_logistic3.h"
-//#include "DDEVF_demo_onlyW_R+T_PLOT.h"
-//#include "DDEVF_storm_wR+T_MvsV2.h"
-//#include "DDEVF_storm_BOTHweather_PLOT_window_logistic3.h"
 #include "DDEVF_demo_BOTHweatherV_PLOT_day_exposed_foverv_alt.h"
-//#include "hood_popsBASICnew3.h"
-
-//#include "experiments.h"
-//#include "hood.h"
-//#include "uniroot_burnout_solver.h"

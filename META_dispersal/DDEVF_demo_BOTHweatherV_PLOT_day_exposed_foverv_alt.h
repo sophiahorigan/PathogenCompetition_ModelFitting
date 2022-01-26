@@ -32,10 +32,16 @@ int MAXT3=maxy_t;
 int num_sub;
 int j = dataset;
 
+// SUBS
+// SUB 1 (0) = FUNGUS-ONLY
+// SUB 2 (1) = VIRUS-ONLY
+// SUB 3 (2) = FUNGUS-VIRUS
+// SUB 4 (3) = CONTROL
+
 if (j==1 || j==2 || j==3) { //epi data
 	//printf("In loop one j= %i\n", j);
 	Params->numsub=4;
-	num_sub = Params->numsub;
+	num_sub = Params->numsub; 
 	//printf("In loop one num_sub = %i\n", num_sub);
 }
 if (j==4 || j==5 || j==6) { // obs data
@@ -45,7 +51,7 @@ if (j==4 || j==5 || j==6) { // obs data
 	//printf("In loop two num_sub = %i\n", num_sub);
 }
 
-int dispersal_on = 1; //set to 0 for no dispersal
+int larvae_dispersal_on = 1; //set to 0 for no dispersal
 
 //printf("numsub = %i", num_sub);
 
@@ -363,79 +369,87 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 				y_ode[m+n+6+i+sub_index[sub]]=E_FV[sub][i]; //end of fill for each treatment
 			}
 		}
-		int k;
+		
 		/*
+		int k;
 		for(k=0; k<DIM; k++){
 			printf("y_ode[%i]=%e\n", k, y_ode[k]);
 			//getc(stdin);
 		}
 		*/
 
-	//-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
-if(dispersal_on == 1){ //turn off at declaration at top of script
+	//-------------------------------------- LARVAE DISPERSAL -------------------------------------------//
+	if(larvae_dispersal_on == 1){
 
-	if (j==1 || j==2 || j==3){ //only for datasets with subpopulations
+		while(day-1<8){ //dispersal only occurs as first instars, 1 week
 
-		int subout; //indexing
-		int subin; //indexing
-		double disp; //frac dispersing from subout to subin
-		double netdisp[num_sub];
+			if (j==1 || j==2 || j==3){ //only for datasets with subpopulations
 
-		double mgr = 0.01; //migration parameter, to fit
-		double a = 5; //migration parameter, to fit 
-		
-		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
-			for(subin = 0; subin < num_sub; subin++){
-				if(subout != subin){
-					disp = mgr*exp(-a*Params->DISTANCE[j][subout][subin];
-					disp = 0;
-					netdisp[subout] = netdisp[subout] - disp*C[subout]; 
-					netdisp[subin] = netdisp[subin] + disp*C[subin]; 
-					//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
+				int subout; //indexing
+				int subin; //indexing
+				double netVdisp[num_sub] = 0;
+				double fracV; //fracS = 1-fracV //early in epi, only S and V around
+				
+				Params->lar_disp = 0.01; //prob of migrating out //TO FIT
+				
+				for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
+					for(subin = 0; subin < num_sub; subin++){
+						if(subout != subin){
+							Params->poptotal = S[subout]+V[subout]+C[subout]; //FITTING
+							fracV = V[subout]/total; //what frac are virus
+							//EVENT 1: RANDOM INSECTS LEAVE, FRAC ARE V FRAC ARE S
+							netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; //frac of virus infected insects that leave
+							netSdisp[subout] = netSdisp[subout] - lar_disp*poptotal*(1-fracV);
+							//EVENT 2: THEY MAKE IT TO ANOTHER SUBPOP
+							netVdisp[subin] = netdisp[subin] + lar_disp*poptotal*fracV*Params->DISPROB[j][subout][subin]; //prob leave * prob make it 
+							netSdisp[subin] = netSdisp[subin] + lar_disp*poptotal*(1-fracV)*Params->DISPROB[j][subout][subin];
+							//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
+						}
+					}
 				}
-			}
+				for(sub=0; sub<num_sub; sub++){ //update larvae density
+					//printf("pre-disp C[%i]= %e\n", sub, C[sub]);
+					S[sub] = S[sub] + S[sub]*netSdisp[sub]; //net movement * frac that are S
+					V[sub] = V[sub] + V[sub]*netVdisp[sub]; //net movement * frac that are V
+					//printf("post-disp C[%i]= %e\n", sub, C[sub]);
+				}
+			} 
 		}
-		for(sub=0; sub<num_sub; sub++){ //update conidia density
-			//printf("pre-disp C[%i]= %e\n", sub, C[sub]);
-			C[sub] = C[sub] + netdisp[sub];
-			//printf("post-disp C[%i]= %e\n", sub, C[sub]);
+	}
+	//******************************* Weather Stuff ******************************//
+	Params->nuV = Params->PARS[2];
+	DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days
+	if(DDtemp_now<0.0){DDtemp_now=0.0;}
+	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
+
+
+	nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
+	if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
+	Params->nuF = (DD10/fourth_size)*nuF2;
+
+	temp_now = Params->WDATA[1][line_ticker - 1][2][0];  //JL: Reading in MaxT here
+
+	Params->muF = specific_muF*exp(temp_P*temp_now);	//CK// Conidia Decay Response #2.2  BEST SO FAR!!
+	if(Params->muF > pow(10.0,10.0)){Params->muF= pow(10.0,10.0);}
+
+	total_rainfall = 0.0;
+	rain_day= line_ticker - beta - 1;
+
+	for (rain_day= (line_ticker - beta - theta - 1);rain_day <= line_ticker - theta -1;rain_day++)	{
+
+		if (rain_day<0){
+			total_rainfall=0;
 		}
-	} 
-}
-		//******************************* Weather Stuff ******************************//
-		Params->nuV = Params->PARS[2];
-		DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days
-		if(DDtemp_now<0.0){DDtemp_now=0.0;}
-		DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
-       
-
-		nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
-		if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
-		Params->nuF = (DD10/fourth_size)*nuF2;
-
-		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  //JL: Reading in MaxT here
-	
-		Params->muF = specific_muF*exp(temp_P*temp_now);	//CK// Conidia Decay Response #2.2  BEST SO FAR!!
-		if(Params->muF > pow(10.0,10.0)){Params->muF= pow(10.0,10.0);}
-
-		total_rainfall = 0.0;
-		rain_day= line_ticker - beta - 1;
-
-		for (rain_day= (line_ticker - beta - theta - 1);rain_day <= line_ticker - theta -1;rain_day++)	{
-
-			if (rain_day<0){
-                total_rainfall=0;
-            }
-            else{
-                    total_rainfall = Params->WDATA[1][rain_day][0][0]+total_rainfall;
-            }
+		else{
+				total_rainfall = Params->WDATA[1][rain_day][0][0]+total_rainfall;
 		}
-		
-		nuR2=(rain_P/(1+rain_P2*exp(-rain_P3*total_rainfall)) - rain_P/(rain_P2+1))*exp(rand_nuR[(int)t]);  //JL: Should be the same as DDEVF for MCMC?
-		if(nuR2> pow(10.0,10.0)){nuR2= pow(10.0,10.0);}
+	}
 
-		Params->nuR = (DD10/fourth_size)*nuR2;
-		if(Params->POPS[3] == 0.0){Params->nuR = 0.0; nuR2 = 0.0;}
+	nuR2=(rain_P/(1+rain_P2*exp(-rain_P3*total_rainfall)) - rain_P/(rain_P2+1))*exp(rand_nuR[(int)t]);  //JL: Should be the same as DDEVF for MCMC?
+	if(nuR2> pow(10.0,10.0)){nuR2= pow(10.0,10.0);}
+
+	Params->nuR = (DD10/fourth_size)*nuR2;
+	if(Params->POPS[3] == 0.0){Params->nuR = 0.0; nuR2 = 0.0;}
 
 
 //********************************************************

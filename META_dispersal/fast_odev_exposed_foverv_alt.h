@@ -35,10 +35,8 @@ int num_sub = Params->numsub;
 //printf("fast ode num_sub = %i\n", num_sub);
 int sub;
 
-
-//double Finf = y[0]*nuF*C;
-//double Rinf = y[0]*nuF*R;
-
+//dispersal
+int coni_dispersal_on = 1; //set to 0 for no dispersal
 
 
 // ------------------------------------------ ODEs -------------------------------------------- //
@@ -49,6 +47,42 @@ sub_index[0] = 0; //treatment 1 index addition is zero
 for(sub=1; sub<num_sub; sub++){	//createsub array 
 	sub_index[sub] = sub_index[sub-1]+ max_class; //SH can maybe multiply 
 }
+
+//-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
+	// MOVE TO FAST_ODE
+if(coni_dispersal_on == 1){ //turn off at declaration at top of script
+
+	if (num_sub == 4){ //only for datasets with subpopulations
+
+		int subout; //indexing
+		int subin; //indexing
+		double con_disp; //frac dispersing from subout to subin
+		double netdisp[num_sub];
+
+		Params->con_mrg = 0.01; //migration parameter, FIT
+		Params->a = 5; //migration parameter, FIT 
+		
+		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
+			for(subin = 0; subin < num_sub; subin++){
+				if(subout != subin){
+					con_disp = con_mgr*exp(-a*Params->DISTANCE[j][subout][subin]);
+					//con_disp = 0;
+					netdisp[subout] = netdisp[subout] - con_disp*y[m+n+1+sub_index[subout]]; 
+					netdisp[subin] = netdisp[subin] + con_disp*y[m+n+1+sub_index[subin]]; 
+					//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
+				}
+			}
+		}
+		for(sub=0; sub<num_sub; sub++){ //update conidia density
+			//printf("pre-disp C[%i]= %e\n", sub, C[sub]);
+			y[m+n+1+sub_index[sub]] = y[m+n+1+sub_index[sub]] + netdisp[sub];
+			//printf("post-disp C[%i]= %e\n", sub, C[sub]);
+		}
+	} 
+}
+
+
+// MOVE CONIDIA DISPERSAL IN HERE
 
 for(sub=0; sub<num_sub; sub++){
 	//printf("GREETINGS from line 54 in DDEVF\n");

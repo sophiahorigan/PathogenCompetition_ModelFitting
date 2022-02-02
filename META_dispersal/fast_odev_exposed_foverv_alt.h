@@ -37,8 +37,9 @@ int sub;
 
 //dispersal
 int coni_dispersal_on = 1; //set to 0 for no dispersal
-
-
+int j = Params->j; //dataset
+double Cdisp[4] = {0, 0, 0, 0}; //net conidia dispersal
+//printf("Did I find j from params? j = %i\n", j);
 // ------------------------------------------ ODEs -------------------------------------------- //
 
 int sub_index[num_sub];
@@ -49,18 +50,19 @@ for(sub=1; sub<num_sub; sub++){	//createsub array
 }
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
-	// MOVE TO FAST_ODE
 if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
-	if (num_sub == 4){ //only for datasets with subpopulations
-
+	if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+		//printf("I'm in the dispersal loop! j = %i\n", j);
 		int subout; //indexing
 		int subin; //indexing
 		double con_disp; //frac dispersing from subout to subin
-		double netdisp[num_sub];
+		double netdisp[4] = {0, 0, 0, 0};
 
-		Params->con_mrg = 0.01; //migration parameter, FIT
-		Params->a = 5; //migration parameter, FIT 
+		double con_mgr = 0.0001;
+		double a = 5;
+		//Params->con_mrg = 0.01; //migration parameter, FIT
+		//Params->a = 5; //migration parameter, FIT 
 		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			for(subin = 0; subin < num_sub; subin++){
@@ -68,15 +70,15 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 					con_disp = con_mgr*exp(-a*Params->DISTANCE[j][subout][subin]);
 					//con_disp = 0;
 					netdisp[subout] = netdisp[subout] - con_disp*y[m+n+1+sub_index[subout]]; 
-					netdisp[subin] = netdisp[subin] + con_disp*y[m+n+1+sub_index[subin]]; 
+					netdisp[subin] = netdisp[subin] + con_disp*y[m+n+1+sub_index[subout]]; 
 					//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
 				}
 			}
 		}
 		for(sub=0; sub<num_sub; sub++){ //update conidia density
 			//printf("pre-disp C[%i]= %e\n", sub, C[sub]);
-			y[m+n+1+sub_index[sub]] = y[m+n+1+sub_index[sub]] + netdisp[sub];
-			//printf("post-disp C[%i]= %e\n", sub, C[sub]);
+			Cdisp[sub] = y[m+n+1+sub_index[sub]] + netdisp[sub];
+			//printf("j = %i, net C[%i]= %e\n", j, sub, Cdisp[sub]);
 		}
 	} 
 }
@@ -86,7 +88,7 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
 for(sub=0; sub<num_sub; sub++){
 	//printf("GREETINGS from line 54 in DDEVF\n");
-	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R)-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
+	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R)-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
 	//printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]); //SH GREG CHECK; THIS ALWAYS = 0...
 	//getc(stdin);
 	//printf("%e\t %e\t %e\t %e\t %e\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub]);

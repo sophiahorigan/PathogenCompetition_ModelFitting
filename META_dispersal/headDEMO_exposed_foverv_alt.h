@@ -146,6 +146,8 @@ typedef struct
 	double lar_disp;
 	double poptotal;
 
+	int j; //dataset number
+
 	//SH Epizootic Data
 	double test_data[1000][36];
 

@@ -30,7 +30,9 @@ int MAXT3=maxy_t;
 //-------------------------------------- METAPOPULATION STRUCTURE -------------------------------------------//
 
 int num_sub;
-int j = dataset;
+Params->j = dataset;
+int j = Params->j;
+//printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
 
 // SUBS
 // SUB 1 (0) = FUNGUS-ONLY
@@ -380,31 +382,34 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 	//-------------------------------------- LARVAE DISPERSAL -------------------------------------------//
 	if(larvae_dispersal_on == 1){
-
-		while(day-1<8){ //dispersal only occurs as first instars, 1 week
+		//printf("Made it to dispersal! day = %i\n", day-1);
+		if(day-1<8){ //dispersal only occurs as first instars, 1 week
 
 			if (j==1 || j==2 || j==3){ //only for datasets with subpopulations
-
+				//printf("In the larval dispersal loop. j = %i\n", j);
+			
 				int subout; //indexing
 				int subin; //indexing
-				double netVdisp[num_sub] = 0;
+				double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
+				double netSdisp[4] = {0, 0, 0, 0};
 				double fracV; //fracS = 1-fracV //early in epi, only S and V around
 				
-				Params->lar_disp = 0.01; //prob of migrating out //TO FIT
+				double lar_disp = Params->lar_disp; //prob of migrating out //TO FIT
+				double poptotal = Params->poptotal; //pop total, to fit
+				lar_disp = 0.01;
+
 				
 				for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 					for(subin = 0; subin < num_sub; subin++){
-						if(subout != subin){
-							Params->poptotal = S[subout]+V[subout]+C[subout]; //FITTING
-							fracV = V[subout]/total; //what frac are virus
+							poptotal = S[subout]+V[subout]+C[subout]; //?????????????????????? fitting just initial S or entire total pop
+							fracV = V[subout]/poptotal; //what frac are virus
 							//EVENT 1: RANDOM INSECTS LEAVE, FRAC ARE V FRAC ARE S
 							netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; //frac of virus infected insects that leave
 							netSdisp[subout] = netSdisp[subout] - lar_disp*poptotal*(1-fracV);
 							//EVENT 2: THEY MAKE IT TO ANOTHER SUBPOP
-							netVdisp[subin] = netdisp[subin] + lar_disp*poptotal*fracV*Params->DISPROB[j][subout][subin]; //prob leave * prob make it 
+							netVdisp[subin] = netVdisp[subin] + lar_disp*poptotal*fracV*Params->DISPROB[j][subout][subin]; //prob leave * prob make it 
 							netSdisp[subin] = netSdisp[subin] + lar_disp*poptotal*(1-fracV)*Params->DISPROB[j][subout][subin];
 							//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
-						}
 					}
 				}
 				for(sub=0; sub<num_sub; sub++){ //update larvae density
@@ -416,6 +421,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			} 
 		}
 	}
+
 	//******************************* Weather Stuff ******************************//
 	Params->nuV = Params->PARS[2];
 	DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days

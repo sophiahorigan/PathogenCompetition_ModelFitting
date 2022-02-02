@@ -153,6 +153,7 @@ for(m=0; m < epi_length*4; m++){
 //printf("DATA = %i\t %i\t %i\t %i\t %i\n",j, Params->DATA[j][i][0],Params->DATA[j][i][1], Params->DATA[j][i][2], Params->DATA[j][i][3]);
 
 for (j=1;j<=DATA_SETS;j++)	{
+//for (j=1;j<2;j++)	{
 
 	//printf("THIS IS J IN MAIN LOOP = %i\n", j);
 

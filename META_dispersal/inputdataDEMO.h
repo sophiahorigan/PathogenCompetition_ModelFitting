@@ -71,9 +71,9 @@ for(j=1;j<=NUM_METASUB;j++){ //Three Blocks with distance data
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 
 	while (fscanf(ftp_data,"%lf %lf %lf %lf \n",&dp1[i],&dp2[i],&dp3[i],&dp4[i])!= EOF)			{
-		printf("%i, I am here!!\n", j);
+		//printf("%i, I am here!!\n", j);
 		Params->DISPROB[j][i][0]=dp1[i]; Params->DISPROB[j][i][1]=dp2[i]; Params->DISPROB[j][i][2]=dp3[i]; Params->DISPROB[j][i][3]=dp4[i];  
-		printf("%i\t %e\t %e\t %e\t %e\n",j, Params->DISPROB[j][i][0],Params->DISPROB[j][i][1], Params->DISPROB[j][i][2], Params->DISPROB[j][i][3]);
+		//printf("%i\t %e\t %e\t %e\t %e\n",j, Params->DISPROB[j][i][0],Params->DISPROB[j][i][1], Params->DISPROB[j][i][2], Params->DISPROB[j][i][3]);
 	
 	weeks++; i++;
 	}

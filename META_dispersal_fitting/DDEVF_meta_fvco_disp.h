@@ -7,38 +7,37 @@ double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 		//declarations of stuff for plotting
-double PLOT=1.0;
+//double PLOT=1.0;
 
-double Fprob;
-double p1,p2,p3;	        // simulation results (p_i is the probability of being in each of the three classes)
-double Cpar, Cprob, Cprob2, Cprob3;					//CK//
-double Opar, Oprob, Oprob2, Oprob3;					//CK//
-double r1, r2, r3, c1, c2;	            //CK// simulation results (r1 is resting spore density, c1 is condidia density)
-r1 = 0.0; r2=0.0; c1= 0.0; c2=0.0;
+//double Fprob;
+//double p1,p2,p3;	        // simulation results (p_i is the probability of being in each of the three classes)
+//double Cpar, Cprob, Cprob2, Cprob3;					//CK//
+//double Opar, Oprob, Oprob2, Oprob3;					//CK//
+//double r1, r2, r3, c1, c2;	            //CK// simulation results (r1 is resting spore density, c1 is condidia density)
+//r1 = 0.0; r2=0.0; c1= 0.0; c2=0.0;
 
-double cover_C = Params->PARS[17];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
-double cover_R = Params->PARS[20];
-double open_C = Params->PARS[24];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
-double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+//double cover_C = Params->PARS[17];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+//double cover_R = Params->PARS[20];
+//double open_C = Params->PARS[24];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+//double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
 
 int FlagDay=0;
 
 int MAXT3=maxy_t;
 
-//there! j= %i\n", j);
 
 //-------------------------------------- METAPOPULATION STRUCTURE -------------------------------------------//
-
-int num_sub;
-Params->j = dataset;
-int j = Params->j;
-//printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
 
 // SUBS
 // SUB 1 (0) = FUNGUS-ONLY
 // SUB 2 (1) = VIRUS-ONLY
 // SUB 3 (2) = FUNGUS-VIRUS
 // SUB 4 (3) = CONTROL
+
+int num_sub;
+Params->j = dataset;
+int j = Params->j;
+//printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
 
 if (j==1 || j==2 || j==3) { //epi data
 	//printf("In loop one j= %i\n", j);
@@ -76,6 +75,7 @@ double y_ode[DIM]; //**SH** this holds
 double rand_nuR[MAXT3];
 double rand_nuF[MAXT3];
 
+//move these from the PARS to FIXEDPARS
 double ave_R = Params->PARS[50+pop];
 double specific_muF = Params->PARS[6];   //general intercept for MAX TEMP decay function for conidia
 double specific_nuF = Params->PARS[3];   //Site-specific infection rate for conidia
@@ -126,17 +126,32 @@ for (i=0;i<=MAXT3;i++)	{
 
 
 
-// ------------------------------------- INITIAL CONDITIONS ---------------------------------------------- //
+// ------------------------------------- FIT PARAMETERS ---------------------------------------------- //
 
-Params->INITS[0] = Params->PARS[30+pop];			// initS
-Params->INITS[3] = ave_R;												// initR  //CK// changed to use average R(0), not site-specific
+//Params->INITS[0] = Params->PARS[30+pop];			// initS
+//Params->INITS[3] = ave_R;												// initR  //CK// changed to use average R(0), not site-specific
 
-// END OF NEW FUNCTION //
-//EVENTUALLY MAKE FIT SH
-double initS = Params->INITS[0];			// initS
-double initV = VPass;			// initV, passed from VPass in head file
-double initR = Params->INITS[3];			// initR
+//Initial conditions
+if (j==1 || j==2 || j==3) { //epi data
+	Params->INITS[4] = {FITPARS[0], FITPARS[1], FITPARS[2], FITPARS[3]};			
+	//Params->INITV[4] = {FITPARS[4], FITPARS[5], FITPARS[6], FITPARS[7]};	//fitting V	
+	Params->INITR[4] = {FITPARS[8], FITPARS[9], FITPARS[10], FITPARS[11]};
 
+	//setting V based on exp set up
+	Params->INITV[0] = 0; //fungus-only
+	Params->INITV[1] = 0.2; //virus-only
+	Params->INITV[2] = 0.2; //virus-only
+	Params->INITV[3] = 0; //control
+}
+if (j==4 || j==5 || j==6) { // obs data
+	Params->INITS = FITPARS[0];		
+	Params->INITV = FITPARS[4];			
+	Params->INITR = FITPARS[8];
+}
+
+//disperasl parameters
+Params->lar_disp = FITPARS[16]; //prob of migrating out //TO FIT
+double lar_disp = Params->lar_disp;
 
 
 // ----------------------------------------- FIXED PARAMETERS  ---------------------------------------------- //
@@ -148,6 +163,7 @@ double R_end;   //CK//  Change value for function of latitude
 double R_start;   //CK//  Change value for function of latitude
 
 Params->PARS[0]=1.0;
+double initC = 0; //is this always zero? just fit R not C I think.
 
 
 // ------------------------------------- INITIALIZE MODEL PARAMETERS --------------------------------------- //
@@ -171,15 +187,13 @@ line_ticker=line_ticker-1;
 
 int num_weeks=MAXT3/7;
 
-//SH CHECK WITH GREG
+
 //state variable declaration
 double S[num_sub]; double V[num_sub]; double C[num_sub]; double R[num_sub];
 double IV[num_sub]; double IF[num_sub]; double IVF[num_sub]; double IFV[num_sub];
 
 //exposed class declaratoin
 double E_V[num_sub][n2+1]; double E_F[num_sub][gstepsF+1]; double E_VF[num_sub][n1+1]; double E_FV[num_sub][gstepsF+1];
-
-//treatment indexing to fill arrays
 
 
 // ----------------------------------- CONIDIA BLOOMING TIMES --------------------------------------- //
@@ -204,21 +218,25 @@ DD10=0.0;
 
 // ---------------------------- INITIALIZE POPULATION SIZES ------------------------------- //
 
-double Vstart = ratio*initV;						// viral cadavers after infected neonates die //SH need to make 4x?
+//double Vstart = ratio*initV;						// viral cadavers after infected neonates die //SH need to make 4x?
 
 double r_germ = R_start;		//CK// nixing r_time because I made all germ dates start at beginning of the collections
 if (r_germ<0)	r_germ=0;
+
+//---------------FITTING PARAMS---------------------------//
+
+
 
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
 
 //single epizootic state params
 //printf("numsub = %i\n", num_sub);
 for(i=0; i<num_sub; i++){ 
-	S[i] = initS;
+	S[i] = Params->INITS[i]; //array filled for each subpop
 	//printf()
-	V[i] = 0.2; //need to link with main.c eventually
-	C[i] = 0.0236;
-	R[i] = 0;
+	V[i] = Params->INITV[i]; 
+	C[i] = initC;
+	R[i] = Params->INITR[i];
 
 	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
 		E_V[i][ii]=0;
@@ -234,6 +252,7 @@ for(i=0; i<num_sub; i++){
 }
 
 //long-term state params
+//eventually delete
 double Vnext[num_sub];
 double Vkill[num_sub];
 double Fnext[num_sub];
@@ -393,15 +412,11 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 				double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
 				double netSdisp[4] = {0, 0, 0, 0};
 				double fracV; //fracS = 1-fracV //early in epi, only S and V around
-				
-				double lar_disp = Params->lar_disp; //prob of migrating out //TO FIT
-				double poptotal = Params->poptotal; //pop total, to fit
-				lar_disp = 0.01;
+				double poptotal;
 
-				
 				for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 					for(subin = 0; subin < num_sub; subin++){
-							poptotal = S[subout]+V[subout]+C[subout]; //?????????????????????? fitting just initial S or entire total pop
+							poptotal = S[subout]+V[subout]+C[subout];
 							fracV = V[subout]/poptotal; //what frac are virus
 							//EVENT 1: RANDOM INSECTS LEAVE, FRAC ARE V FRAC ARE S
 							netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; //frac of virus infected insects that leave

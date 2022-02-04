@@ -177,10 +177,10 @@ typedef struct
 }STRUCTURE;
 
 
-#include "inputdataDEMO.h"
-#include "random_setup2.h"
-#include "filenames4.h"
+#include "data_input.h"
+#include "random_setup.h"
+#include "filenames.h"
 #include "bounds_RAIN+TEMP+RH8.h"
 #include "prob_dists.h"
-#include "fast_odev_exposed_foverv_alt.h"
-#include "DDEVF_demo_BOTHweatherV_PLOT_day_exposed_foverv_alt.h"
+#include "ode_fvco_disp.h"
+#include "DDEVF_meta_fvco_disp.h"

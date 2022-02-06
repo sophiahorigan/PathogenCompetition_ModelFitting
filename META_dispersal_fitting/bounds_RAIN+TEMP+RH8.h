@@ -1,3 +1,5 @@
+//SH Where are Colin's final parameters?
+
 // ---------------------------------------------------------------------------------------------------------------- //
 double bound(int i,int j)				// bounds on parameters for parhood line search
 {

@@ -58,7 +58,7 @@ double VFSus = Params->VFSus;
 //migration parameters
 Params->con_mrg = FITPARS[14];
 Params->a = FITPARS[15];
-double con_mrg = Params->con_mrg;
+double con_mgr = Params->con_mrg;
 double a = Params->a;
 
 

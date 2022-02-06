@@ -1,4 +1,5 @@
 #include "head_meta.h"
+
 gsl_rng *r;
 
 //////////////////Begin Dot Product////////////////////////////////////////
@@ -14,6 +15,8 @@ float DotProduct (int Length, double *Holder, double *PCA)
   return(answer);
 
 }
+
+//////////////////Begin Main////////////////////////////////////////
 
 int main(void)
 {
@@ -46,29 +49,38 @@ printf("runs=%d\t incs: parm=%2.0f\t S_0=%2.0f\t R_0=%2.0f\n",num_runs,parm_inc,
 
 //double initialR[8+1];      //Try to fit the resting spore density at each site as individual parameters.
 
-//---------------//CK// Initial conditions for S from field observations //CK//-------------------------------------------------------//
+// ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
 
-//double initialS[8]={14.22*2, 242.43125, 18.96*3, 179.23125, 131.090625, 5.53, 4.74, 610.67};	 //CK// my observed average egg density per circle at each
+gsl_rng *r_seed;
+r_seed=random_setup();
+//printf("Random Seed: %f\n", r_seed); getc(stdin);
 
-// ------------------------------------------------------------------------------------------------------------------ //
-int i=0; int j;int ii; int jj; int k;
-int run;	            int changer;	    double index, tot_index;
+// ---------------------------------------------- Dataset Selection -------------------------------------------------- //
 
-int num_adj_pars=29;			// number of adjustable parameters
+int dataset;
 
-double inner_parm;
-double inner_parm2;
-int pop;
-double log_pop;
+dataset = 1; //Metapop 1 with subpops
+
+dataset = 2; //Metapop 2 with subpops
+
+dataset = 3; //Metapop 3 with subpops
+
+dataset = 4; //Metapop 4 without subpops
+
+dataset = 5; //Metapop 5 without subpops
+
+dataset = 6; //Metapop 6 without subpops
+
+Params->j = dataset;
 
 // -----------------------------------------------LINE SEARCH------------------------------------------------------------------- //
 //setup
-Sreps = 1;
-reps = 200;
+int Sreps = 1;
+int reps = 200;
 int searches=10;
-int num_ltfparams=8;
-double ltf_params[8]={0};      
-double init_ltfparams[8]={0};
+int num_ltfparams=17;
+double ltf_params[17]={0};      
+double init_ltfparams[17]={0};
 
 for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter //SH where did you figure these random initials?
 //how can I set priors or bounds?
@@ -82,6 +94,15 @@ for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter //
     else if (i==5){ltf_params[i]=pow(10,randn-2.5);}
     else if (i==6){ltf_params[i]=pow(10,randn-3);}
     else if (i==7){ltf_params[i]=pow(10,randn-3);}
+	else if (i==8){ltf_params[i]=pow(10,randn-3);}
+	else if (i==9){ltf_params[i]=pow(10,randn-3);}
+	else if (i==10){ltf_params[i]=pow(10,randn-3);}
+	else if (i==11){ltf_params[i]=pow(10,randn-3);}
+	else if (i==12){ltf_params[i]=pow(10,randn-3);}
+	else if (i==13){ltf_params[i]=pow(10,randn-3);}
+	else if (i==14){ltf_params[i]=pow(10,randn-3);}
+	else if (i==15){ltf_params[i]=pow(10,randn-3);}
+	else if (i==16){ltf_params[i]=pow(10,randn-3);}
     init_ltfparams[i]=ltf_params[i]; //fill both 
     printf("%lf\t %lf\n",init_ltfparams[i],ltf_params[i]);
 }
@@ -90,15 +111,14 @@ for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter //
 double localmax_params[17]={0};         //Array to record param values for the local max likelihood in line search
 int a,b,c;
 double localmax_lhood;
-//double local_Smithood=0;
-//double local_longhood=0;
-//double local_fracvhood=0;
+int r;
+double maxlhood=0;
+
+double sum_lhood;
+
 for (c=0;c<num_ltfparams;c++){
     localmax_params[c]=ltf_params[c];
 }
-
-int r;
-
 
 //loop parameters
 while (a<num_ltfparams){           
@@ -276,63 +296,46 @@ for (b=0;b<searches;b++){ //difference between loop a and loop b?
     }
     }
 }
-    phifungus=ltf_params[0];
-    gammafungus=ltf_params[1];
-    VFSus=ltf_params[2];
-    alpha_gammafungus=ltf_params[3];
-    sigma=ltf_params[4];
-    RSPtime=21;
-    immi=1e-6;
+    //phifungus=ltf_params[0]; //SH Why are you doing this for just a few of the parameters?
+    //gammafungus=ltf_params[1];
+    //VFSus=ltf_params[2];
+    //alpha_gammafungus=ltf_params[3];
+    //sigma=ltf_params[4];
+    //RSPtime=21;
+    //immi=1e-6;
     //initial_nuF[0]=ltf_params[5];
 
     //printf("%e\n",immi);
 
 sum_lhood=0;
-//sum_Smitley=0;
-//sum_defo=0;
-//sum_fracv=0;
-for (i=0;i<100;i++){
-    specific_stoch[i]=gsl_ran_gaussian(r_seed,sigma);
-}
-for (i=0;i<99;i++){
-    for (j=0;j<99-i;j++){
-        if (specific_stoch[j]>specific_stoch[j+1]){
-            temp=specific_stoch[j];
-            specific_stoch[j]=specific_stoch[j+1];;
-            specific_stoch[j+1]=temp;
-        }
-    }
-}
-specific_stoch_95p=specific_stoch[94];
-
-r_seed=random_setup();
 
 
 
 //Params.th_id=0;
-// -------------------------------------------- MISER STUFF --------------------------------------------------------- //
+// -------------------------------------------- MISER --------------------------------------------------------- //
 inputdata(&Params);				// gets observation, experiment and weather data from inputdata.h
 //int calls=2;					//CK// turned down to run without stochasticity
 int calls=400;					// number of stochastic simulations for each parameter and IC set
 if (test==99)	calls=10;
 if (test==66)	calls=2; //CK// second test mode
 //if (test==66)	calls=5; //CK// second test mode
-size_t dim;
+size_t dim; 
 size_t dim2;
+
+
+
 // --------------------------------------- Name for Output Files ----------------------------------------------------- //
 char strFileName[99];					// from filenames.h
 GetString(pro,0,strFileName,98);	printf("file names:\t   %s\n",strFileName);		fflush(stdout);		//getc(stdin);
 FILE *fp_results;
-// ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
-gsl_rng *r_seed;
-r_seed=random_setup();
-//printf("Random Seed: %f\n", r_seed); getc(stdin);
+
 // -------------------- parameter high/low values and increments and fixed parameter values ------------------------- //
 global_fixed_parms(&Params);  // gets Params.PARS[i] for fixed parameters from bounds.h. Some of them will be further fixed later in this file.
 parm_range_inc(&Params,parm_inc,host_inc,initR_inc,num_adj_pars); // gets Params.parm_set,low,high,R_END from bounds.h
+
 // ------------------------------------ Declare Likelihood Quanitites ----------------------------------------------- //
-double pop_lhood, pop_lhood2, pop_err,post_hood;	// population lhood (and posterior lhood) calculated for each initS and initR
-double pop_best_lhood;					// likelihood and error for best initS and initR
+double meta_lhood, meta_lhood2, meta_err,post_hood;	// population lhood (and posterior lhood) calculated for each initS and initR
+double meta_best_lhood;					// likelihood and error for best initS and initR
 double total_lhood;						// sum of pop_best_lhood over all patches
 double best_post_hood;	double best_lhood=0;		// best post_hood and lhood
 double prior[num_adj_pars];
@@ -348,7 +351,7 @@ for (jj=0;jj<=dim;jj++)	{
 
 
 gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-						gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&pop_lhood,&pop_err);
+						gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&meta_lhood,&meta_err);
 						gsl_monte_miser_free(s);
 /*
 /////////////////////////////Begin reading in principal component analysis results//////////////////////
@@ -771,5 +774,7 @@ free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
 //free_i3tensor(Params.WDATA,0,DATA_SETS,0,MAX_WEEKS2,0,3);
 printf("DONE!!!\n");
 */
+}
 return 0;
 }
+

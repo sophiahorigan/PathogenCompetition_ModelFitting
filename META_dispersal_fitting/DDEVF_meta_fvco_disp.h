@@ -2,24 +2,10 @@
 
 double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
 
-{
+{ //SH can eventually remove pop structure after setting Colin's parameter values
 
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
-		//declarations of stuff for plotting
-//double PLOT=1.0;
-
-//double Fprob;
-//double p1,p2,p3;	        // simulation results (p_i is the probability of being in each of the three classes)
-//double Cpar, Cprob, Cprob2, Cprob3;					//CK//
-//double Opar, Oprob, Oprob2, Oprob3;					//CK//
-//double r1, r2, r3, c1, c2;	            //CK// simulation results (r1 is resting spore density, c1 is condidia density)
-//r1 = 0.0; r2=0.0; c1= 0.0; c2=0.0;
-
-//double cover_C = Params->PARS[17];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
-//double cover_R = Params->PARS[20];
-//double open_C = Params->PARS[24];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
-//double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
 
 int FlagDay=0;
 
@@ -36,7 +22,7 @@ int MAXT3=maxy_t;
 
 int num_sub;
 Params->j = dataset;
-int j = Params->j;
+int j = dataset;
 //printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
 
 if (j==1 || j==2 || j==3) { //epi data
@@ -115,14 +101,13 @@ double FIO_Or;
 double DD10=0;    //accumulated degree days about 10 degrees C
 
 
-// ----------------------------------- RANDOM NUMBERS -------------------------------------------- //
-for (i=0;i<=MAXT3;i++)	{
-	rand_nuR[i]=0;//0 means no stochasticity
-	rand_nuF[i]=0;
+// ----------------------------------- STOCHASTICITY  -------------------------------------------- //
+for (i=0;i<MAXT3;i++)	{        //JL: The stochasticity to change the transmission rates of conidia and resting spores vary every day.
+	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]);
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->PARS[12]);
 	//rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[12]);
-	//printf("i(%d)\t var1=%f\t var2=%f\t rand parts: nuR=%e\t nuF=%e\n",i,Params->PARS[11],Params->PARS[12],rand_nuR[i],rand_nuF[i]);
-}//getc(stdin);
-//stochasticity
+	//printf("i(%d)\t rand pass=%f\t var=%f\t rand parts: nuV=%e\t nuF=%e\n",i,RandNumsPass[i],Params->PARS[11],rand_nuV[i],rand_nuF[i]);
+}//ge
 
 
 
@@ -133,20 +118,26 @@ for (i=0;i<=MAXT3;i++)	{
 
 //Initial conditions
 if (j==1 || j==2 || j==3) { //epi data
-	Params->INITS[4] = {FITPARS[0], FITPARS[1], FITPARS[2], FITPARS[3]};			
-	//Params->INITV[4] = {FITPARS[4], FITPARS[5], FITPARS[6], FITPARS[7]};	//fitting V	
-	Params->INITR[4] = {FITPARS[8], FITPARS[9], FITPARS[10], FITPARS[11]};
+	Params->INITS[0] = FITPARS[0]; //fungus-only
+	Params->INITS[1] = FITPARS[1]; //virus-only
+	Params->INITS[2] = FITPARS[2]; //virus-only
+	Params->INITS[3] = FITPARS[3]; //control	
 
 	//setting V based on exp set up
 	Params->INITV[0] = 0; //fungus-only
 	Params->INITV[1] = 0.2; //virus-only
 	Params->INITV[2] = 0.2; //virus-only
 	Params->INITV[3] = 0; //control
-}
+
+	Params->INITR[0] = FITPARS[8]; //fungus-only
+	Params->INITR[1] = FITPARS[9]; //virus-only
+	Params->INITR[2] = FITPARS[10]; //virus-only
+	Params->INITR[3] = FITPARS[11]; //control	
+
 if (j==4 || j==5 || j==6) { // obs data
-	Params->INITS = FITPARS[0];		
-	Params->INITV = FITPARS[4];			
-	Params->INITR = FITPARS[8];
+	Params->INITS[0] = FITPARS[0];		
+	Params->INITV[0] = FITPARS[4];			
+	Params->INITR[0] = FITPARS[8];
 }
 
 //disperasl parameters
@@ -269,7 +260,7 @@ for(i=0; i<num_sub; i++){ //initial conditions
 
 double timing[6]={r_germ,R_end,MAXT3};
 
-// -------------------- MAIN LOOP!! (calculate populations as time is increased) -------------------------- //
+// -------------------- MAIN LOOP -------------------------- //
 
 while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of the experimental datasets?
 	
@@ -574,3 +565,4 @@ t_0=t_next;
 
 return 0;
 }
+

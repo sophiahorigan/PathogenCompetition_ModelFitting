@@ -31,7 +31,6 @@ char *strFileNameDate;
 #define NUM_METASUB 3			//number of metapopulations with subpopulations
 #define NUM_PARS 100		        // number of parameters to be passed from main to hood
 #define SIMU 64
-//#define DIM 15						// number of differential equations
 
 const double h = 0.01;		        // time step
 
@@ -40,17 +39,17 @@ double squareCVV=0.86*0.86;
 
 double exposetime = 16;
 double VFtime=10;
-//double VFPass;
+double VFPass;
 
 //JL: Long-term survival rates for the pathogens and fecundity
-double phivirus=40;
-double gammavirus=0.01;
-double phifungus=0.25;
-double gammafungus=0.95;
-double psifungus=0.95;
-double eta=100;
+//double phivirus=40;
+//double gammavirus=0.01;
+//double phifungus=0.25;
+//double gammafungus=0.95;
+//double psifungus=0.95;
+//double eta=100;
 //double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1};
-double fecundity=74.6;
+//double fecundity=74.6;
 
 //JL: Predation parameters
 double preda=0.967;           //Predation parameters, for host-pathogen-predator model
@@ -79,7 +78,6 @@ double InfFungusAdj=0;
 double InfVirusAdj=0;
 
 double VPass;          //variable to pass the value of initialV in each generation
-
 
 
 //SH global declaration of global file fp1 to print daily output into
@@ -185,3 +183,4 @@ typedef struct
 #include "prob_dists.h"
 #include "ode_fvco_disp.h"
 #include "DDEVF_meta_fvco_disp.h"
+#include "lhood_meta.h"

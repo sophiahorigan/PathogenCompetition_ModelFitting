@@ -337,6 +337,19 @@ double total_lhood;						// sum of pop_best_lhood over all patches
 double best_post_hood;	double best_lhood=0;		// best post_hood and lhood
 double prior[num_adj_pars];
 
+dim = 48; //length of epizootic 
+
+gsl_monte_function G = { &Hood_Pops, dim, &Params };	// declares function calling Hood_Pops.h
+double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
+for (jj=0;jj<=dim;jj++)	{
+	xl[jj]=0;
+	xu[jj]=1;
+}
+
+
+gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+						gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&pop_lhood,&pop_err);
+						gsl_monte_miser_free(s);
 /*
 /////////////////////////////Begin reading in principal component analysis results//////////////////////
 

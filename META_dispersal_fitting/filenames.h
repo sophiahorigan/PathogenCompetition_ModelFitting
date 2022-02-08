@@ -21,7 +21,7 @@ char Date[30];									// string to hold date and time
 strftime(Date, 30, "%m_%d_%H_%M_%S", ptr);		// adds to Date month, day, year, hour, minute, second from ptr
 // ---------------------------------- create paths and allocate memory ------------------------------------- //
 if	(j==0)	{										// MCMC
-	Path="/home/jiaweiliu/likelihood_calculation_full/mcmc_results/";
+	Path="/Users/sophiahorigan/Desktop/Fitting/likelihood_calculation_full/mcmc_results";
 	Prefix=mcmc_prefix;
 	if		(i==1)	{	Name = "parms_";											}
 	else if	(i==2)	{	Name = "pc_";												}
@@ -32,13 +32,13 @@ if	(j==0)	{										// MCMC
 }
 else if (j==1)	{									// Line Search MLE
 	Prefix=max_lhood_prefix;
-	if		(i==0)	{	Path="/home/jiaweiliu/likelihood_calculation_full/max_lhood/";			Name="max_lhood";			}
-	else if (i==4)	{	Path="/home/jiaweiliu/likelihood_calculation_full/max_lhood/";			Name="L_";				}
+	if		(i==0)	{	Path="/Users/sophiahorigan/Desktop/Fitting/likelihood_calculation_full/max_lhood";			Name="max_lhood";			}
+	else if (i==4)	{	Path="/Users/sophiahorigan/Desktop/Fitting/likelihood_calculation_full/max_lhood";			Name="L_";				}
 	else			{	printf("bad i value in filenames!!!\n");		getc(stdin);	}
 	FileName = (char*)calloc((strlen(Path)+strlen(Prefix)+strlen(Name) + strlen(Type)+1), sizeof(char));
 }
 else if (j>1)	{									// Profile Likelihoods
-	Path="/home/jiaweiliu/likelihood_calculation_full/profile_data/";
+	Path="/Users/sophiahorigan/Desktop/Fitting/likelihood_calculation_full/profile_data";
 	Prefix=profile_prefix;
 	sprintf(profile,"%d",j);
 	Name="pro_";

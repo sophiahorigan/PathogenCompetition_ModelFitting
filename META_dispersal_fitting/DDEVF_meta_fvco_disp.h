@@ -1,15 +1,29 @@
-// DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
-
-double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
-
-{ //SH can eventually remove pop structure after setting Colin's parameter values
+//double DDEVF(void *Paramstuff,gsl_rng *RandNumsPass,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset)
+//{
+double DDEVF(void *Paramstuff,double *RandNumsPass,size_t dim,int pop, double Rbloom, int dataset)
+//double DDEVF2(struct STRUCTURE *Params,int pop,double sim_results[1+Params->MAXT[pop]/7][5])
+{
 
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
-int FlagDay=0;
+//remove below
+double PLOT=1.0;
 
-int MAXT3=maxy_t;
+double Fprob;
+double p1,p2,p3;	        // simulation results (p_i is the probability of being in each of the three classes)
+double Cpar, Cprob, Cprob2, Cprob3;					//CK//
+double Opar, Oprob, Oprob2, Oprob3;					//CK//
+double r1, r2, r3, c1, c2;	            //CK// simulation results (r1 is resting spore density, c1 is condidia density)
+r1 = 0.0; r2=0.0; c1= 0.0; c2=0.0;
+
+double cover_C = Params->PARS[17];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+double cover_R = Params->PARS[20];
+double open_C = Params->PARS[24];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+double open_R = Params->PARS[25];		//CK// effect of cage.  Testing to see if EXP bugs had higher or lower infection than ferals
+
+
+int FlagDay=0;
 
 
 //-------------------------------------- METAPOPULATION STRUCTURE -------------------------------------------//
@@ -58,8 +72,8 @@ int n2=n-n1;                  //The number of the first group of exposed classes
 double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
 double epsilon = pow(10,-6);
 double y_ode[DIM]; //**SH** this holds 
-double rand_nuR[MAXT3];
-double rand_nuF[MAXT3];
+double rand_nuR[epi_length];
+double rand_nuF[epi_length];
 
 //move these from the PARS to FIXEDPARS
 double ave_R = Params->PARS[50+pop];
@@ -102,14 +116,22 @@ double DD10=0;    //accumulated degree days about 10 degrees C
 
 
 // ----------------------------------- STOCHASTICITY  -------------------------------------------- //
-for (i=0;i<MAXT3;i++)	{        //JL: The stochasticity to change the transmission rates of conidia and resting spores vary every day.
-	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]);
-	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->PARS[12]);
+
+for (i=0;i<epi_length;i++)	{        //JL: The stochasticity to change the transmission rates of conidia and resting spores vary every day.
+	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]); //mean, sigma
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+epi_length],Params->PARS[12]);
 	//rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[12]);
 	//printf("i(%d)\t rand pass=%f\t var=%f\t rand parts: nuV=%e\t nuF=%e\n",i,RandNumsPass[i],Params->PARS[11],rand_nuV[i],rand_nuF[i]);
 }//ge
-
-
+/*
+for (i=0;i<=MAXT3;i++)	{
+	rand_nuR[i]=0;//0 means no stochasticity
+	rand_nuF[i]=0;
+	//rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[12]);
+	//printf("i(%d)\t var1=%f\t var2=%f\t rand parts: nuR=%e\t nuF=%e\n",i,Params->PARS[11],Params->PARS[12],rand_nuR[i],rand_nuF[i]);
+}//getc(stdin);
+//stochasticity
+*/
 
 // ------------------------------------- FIT PARAMETERS ---------------------------------------------- //
 
@@ -133,7 +155,7 @@ if (j==1 || j==2 || j==3) { //epi data
 	Params->INITR[1] = FITPARS[9]; //virus-only
 	Params->INITR[2] = FITPARS[10]; //virus-only
 	Params->INITR[3] = FITPARS[11]; //control	
-
+}
 if (j==4 || j==5 || j==6) { // obs data
 	Params->INITS[0] = FITPARS[0];		
 	Params->INITV[0] = FITPARS[4];			
@@ -564,5 +586,7 @@ t_0=t_next;
 }
 
 return 0;
-}
 
+printf("made it into DDEVF");
+
+}

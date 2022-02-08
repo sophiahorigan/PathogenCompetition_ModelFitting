@@ -31,6 +31,7 @@ char *strFileNameDate;
 #define NUM_METASUB 3			//number of metapopulations with subpopulations
 #define NUM_PARS 100		        // number of parameters to be passed from main to hood
 #define SIMU 64
+#define epi_length 48
 
 const double h = 0.01;		        // time step
 
@@ -42,14 +43,14 @@ double VFtime=10;
 double VFPass;
 
 //JL: Long-term survival rates for the pathogens and fecundity
-//double phivirus=40;
-//double gammavirus=0.01;
-//double phifungus=0.25;
-//double gammafungus=0.95;
-//double psifungus=0.95;
-//double eta=100;
-//double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1};
-//double fecundity=74.6;
+double phivirus=40;
+double gammavirus=0.01;
+double phifungus=0.25;
+double gammafungus=0.95;
+double psifungus=0.95;
+double eta=100;
+double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1};
+double fecundity=74.6;
 
 //JL: Predation parameters
 double preda=0.967;           //Predation parameters, for host-pathogen-predator model
@@ -96,10 +97,10 @@ double FITPARS[NUM_PARS];
 
 struct dataset{  //  building the structure, to be declared later
 	int Date;
-	//int Tree;
-	//int Covered;
-	//double total;
-	//double fungus;
+	int Tree;
+	int Covered;
+	double total;
+	double fungus;
 };
 
 typedef struct

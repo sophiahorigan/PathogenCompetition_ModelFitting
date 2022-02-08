@@ -1,6 +1,5 @@
 #include "head_meta.h"
-
-gsl_rng *r;
+//gsl_rng *r;
 
 //////////////////Begin Dot Product////////////////////////////////////////
 
@@ -15,66 +14,48 @@ float DotProduct (int Length, double *Holder, double *PCA)
   return(answer);
 
 }
-
+  
 //////////////////Begin Main////////////////////////////////////////
 
-int main(void)
-{
-int test = 0; //CK// Second test mode.  Like the full program but less runs and less MISER calls
-//int test = 99;
-//int test = 66; //CK// Second test mode.  Like the full program but less runs and less MISER calls
+//int main(int argc, char *argv[]) //or should this be void?
+int main(void){
 
 
 STRUCTURE Params;
 
-int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is the i^th input)
-printf("Profile Parameter is %d\n",pro);	fflush(stdout);
-
-// ------------------------------------- Adustable accuracy vs. speed ------------------------------------------------ //
-int num_runs	 = 20;
-double parm_inc, host_inc, initR_inc;	//int inc_gamma_box= 1;
-
-//if (pro==1)	{	parm_inc=200.0;		host_inc=100.0;	initR_inc=100.0;	}
-if (pro==1)	{	parm_inc=32.0;		host_inc=10.0;	initR_inc=18.0;	}
-//if (pro==1)	{	parm_inc=34.0;		host_inc=18.0;	initR_inc=20.0;	}
-else		{	parm_inc=15.0;		host_inc=10.0;	initR_inc=10.0;	}
-
-//if (test==66)	{	printf("for checking CK MODE2!!!\n");        num_runs=5;} //CK// New test mode!
-
-if (test==66)	{	printf("for checking!!!\n");        num_runs=5;	parm_inc=16.0;	host_inc=8.0;	initR_inc=8.0;}
-
-//if (test==66)	{	printf("for checking!!!\n");        num_runs=5;	parm_inc=6.0;	host_inc=4.0;	initR_inc=4.0;	}
-printf("runs=%d\t incs: parm=%2.0f\t S_0=%2.0f\t R_0=%2.0f\n",num_runs,parm_inc,host_inc,initR_inc);
-
-
-//double initialR[8+1];      //Try to fit the resting spore density at each site as individual parameters.
+//int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is the i^th input)
+//printf("Profile Parameter is %d\n",pro);	fflush(stdout);
 
 // ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
-
+//printf("rightbefore rseed"); 	fflush(stdout);
 gsl_rng *r_seed;
 r_seed=random_setup();
-//printf("Random Seed: %f\n", r_seed); getc(stdin);
-
+printf("Random Seed: %f\n", r_seed); getc(stdin);
+//printf("right after rseed"); 	fflush(stdout);
 // ---------------------------------------------- Dataset Selection -------------------------------------------------- //
 
 int dataset;
 
 dataset = 1; //Metapop 1 with subpops
 
-dataset = 2; //Metapop 2 with subpops
+//dataset = 2; //Metapop 2 with subpops
 
-dataset = 3; //Metapop 3 with subpops
+//dataset = 3; //Metapop 3 with subpops
 
-dataset = 4; //Metapop 4 without subpops
+//dataset = 4; //Metapop 4 without subpops
 
-dataset = 5; //Metapop 5 without subpops
+//dataset = 5; //Metapop 5 without subpops
 
-dataset = 6; //Metapop 6 without subpops
+//dataset = 6; //Metapop 6 without subpops
 
-Params->j = dataset;
+Params.j = dataset;
+
+//printf("j = %i", Params.j); 	fflush(stdout);
 
 // -----------------------------------------------LINE SEARCH------------------------------------------------------------------- //
+/*
 //setup
+int i;
 int Sreps = 1;
 int reps = 200;
 int searches=10;
@@ -119,6 +100,17 @@ double sum_lhood;
 for (c=0;c<num_ltfparams;c++){
     localmax_params[c]=ltf_params[c];
 }
+
+FILE *fpl;
+char namel[50];
+int pid;
+pid=getpid();
+//sprintf(name,"pred_row_%d_col_%d.txt",row,col);
+sprintf(namel,"result0/line_search%d.txt",pid);
+//sprintf(name,"fv_bf_%f_row_%d_col_%d.txt",bfungus[bbf],row,col);
+
+fpl=fopen(namel,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
+
 
 //loop parameters
 while (a<num_ltfparams){           
@@ -309,54 +301,68 @@ for (b=0;b<searches;b++){ //difference between loop a and loop b?
 
 sum_lhood=0;
 
-
-
-//Params.th_id=0;
+a++;
+}
+*/
 // -------------------------------------------- MISER --------------------------------------------------------- //
+int i = 0;
+int j;int ii; int jj; int k;
+int run;	            int changer;	    double index, tot_index;
+
+int num_adj_pars=17;			// number of adjustable parameters
+
+double inner_parm;
+double inner_parm2;
+int pop;
+double log_pop;
+
 inputdata(&Params);				// gets observation, experiment and weather data from inputdata.h
 //int calls=2;					//CK// turned down to run without stochasticity
-int calls=400;					// number of stochastic simulations for each parameter and IC set
-if (test==99)	calls=10;
-if (test==66)	calls=2; //CK// second test mode
-//if (test==66)	calls=5; //CK// second test mode
-size_t dim; 
-size_t dim2;
+ 
 
 
 
 // --------------------------------------- Name for Output Files ----------------------------------------------------- //
-char strFileName[99];					// from filenames.h
-GetString(pro,0,strFileName,98);	printf("file names:\t   %s\n",strFileName);		fflush(stdout);		//getc(stdin);
-FILE *fp_results;
+//char strFileName[99];					// from filenames.h
+//GetString(pro,0,strFileName,98);	printf("file names:\t   %s\n",strFileName);		fflush(stdout);		//getc(stdin);
+//FILE *fp_results;
 
 // -------------------- parameter high/low values and increments and fixed parameter values ------------------------- //
-global_fixed_parms(&Params);  // gets Params.PARS[i] for fixed parameters from bounds.h. Some of them will be further fixed later in this file.
-parm_range_inc(&Params,parm_inc,host_inc,initR_inc,num_adj_pars); // gets Params.parm_set,low,high,R_END from bounds.h
+//global_fixed_parms(&Params);  // gets Params.PARS[i] for fixed parameters from bounds.h. Some of them will be further fixed later in this file.
+//parm_range_inc(&Params,parm_inc,host_inc,initR_inc,num_adj_pars); // gets Params.parm_set,low,high,R_END from bounds.h
 
 // ------------------------------------ Declare Likelihood Quanitites ----------------------------------------------- //
-double meta_lhood, meta_lhood2, meta_err,post_hood;	// population lhood (and posterior lhood) calculated for each initS and initR
+double meta_lhood, meta_err,post_hood;	// population lhood (and posterior lhood) calculated for each initS and initR
 double meta_best_lhood;					// likelihood and error for best initS and initR
 double total_lhood;						// sum of pop_best_lhood over all patches
 double best_post_hood;	double best_lhood=0;		// best post_hood and lhood
 double prior[num_adj_pars];
 
-dim = 48; //length of epizootic 
-
+int calls=10;					// number of stochastic simulations for each parameter and IC set
+size_t dim;
+dim = 2*epi_length; //to hold random values for both nuR and nuF concatenated
+//printf("dim=%i", dim); 	fflush(stdout);
 gsl_monte_function G = { &Hood_Pops, dim, &Params };	// declares function calling Hood_Pops.h
 double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
 for (jj=0;jj<=dim;jj++)	{
 	xl[jj]=0;
 	xu[jj]=1;
-}
-
+} 
+//printf("right before miser 2"); 	fflush(stdout);
 
 gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-						gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&meta_lhood,&meta_err);
-						gsl_monte_miser_free(s);
+gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&meta_lhood,&meta_err);
+gsl_monte_miser_free(s);
+
+//printf("for dataset = %i, calls =  %i, lhood_meta = %lf, meta_err = %lf", j, calls, meta_lhood, meta_err); 	fflush(stdout);
+
+
+//meta_lhood = log(meta_lhood)-700.0;
+
 /*
 /////////////////////////////Begin reading in principal component analysis results//////////////////////
 
-	int NumberOfParams=28;			// 28 parameters
+	int NumberOfParams=17;			// 17 parameters
 
 	int Realizations=25000;         //JL: Number of realizations in the MCMC step
 
@@ -417,7 +423,7 @@ gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
 
 	FILE *file;
 
-	file=fopen("PCAsdCK2.txt", "r");          //Reading in the standard deviations of PCA.
+	file=fopen("PCAsdSH.txt", "r");          //Reading in the standard deviations of PCA.
 	for (a=0; a<(NumberOfParams); a++)
 	{
 		fscanf(file, "%lf\n", &SDpca[a]);
@@ -426,7 +432,7 @@ gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
 	fclose(file);
 
 
-	file=fopen("PCArotationsCK2.txt", "r");   //Reading in the rotations (coefficients between PC's and parameters)
+	file=fopen("PCArotationsSH.txt", "r");   //Reading in the rotations (coefficients between PC's and parameters)
 	for (a=0; a<(NumberOfParams*NumberOfParams); a++)
 	{
 		fscanf(file, "%lf\n", &Coefficients[a]);
@@ -434,7 +440,7 @@ gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
 	}
 	fclose(file);
 
-	file=fopen("PCAscaleCK2.txt", "r");        //Reading in the scales to reconstruct parameter values from PC's.
+	file=fopen("PCAscaleSH.txt", "r");        //Reading in the scales to reconstruct parameter values from PC's.
 	for (a=0; a<NumberOfParams; a++)
 	{
 		fscanf(file, "%lf\n", &Scale[a]);
@@ -442,7 +448,7 @@ gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
 	}
 	fclose(file);
 
-	file=fopen("PCAcenterCK2.txt", "r");       //Reading in the centers of parameters. Used in the reconstruction of parameters.
+	file=fopen("PCAcenterSH.txt", "r");       //Reading in the centers of parameters. Used in the reconstruction of parameters.
 
 	for (a=0; a<NumberOfParams; a++)
 	{
@@ -564,6 +570,7 @@ while (LoopNumber<=Realizations) {     //CK// BOUND LOOP START!!!!
 				total_lhood=0;
 
 				// ----------------------- loop over patch numbers -------------------------------------------- //
+				
 				for (Params.pop=1;Params.pop<=DATA_SETS;Params.pop++)	{
 					pop=Params.pop;
 					pop_best_lhood = -1e9;
@@ -618,6 +625,7 @@ while (LoopNumber<=Realizations) {     //CK// BOUND LOOP START!!!!
 
 
 		//---------------------LINE UP THE OLD Params WITH THE CURRENT ORDER OF PARAMS --------------------------//
+		
 		//SH don't need
 		ticker=0;
 
@@ -765,6 +773,7 @@ while (LoopNumber<=Realizations) {     //CK// BOUND LOOP START!!!!
 
 }   //end of the infinite while loop
 
+
 index=(Params.PARS[pro]-Params.parm_low[pro])/Params.parm_step[pro];
 tot_index=(Params.parm_high[pro]-Params.parm_low[pro])/Params.parm_step[pro];
 printf("INDEX:%3.0f of %3.0f\t VALUE:%f\t LHOOD:%f\n",index+1,tot_index,Params.PARS[pro],LogOldPosterior);
@@ -774,7 +783,7 @@ free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
 //free_i3tensor(Params.WDATA,0,DATA_SETS,0,MAX_WEEKS2,0,3);
 printf("DONE!!!\n");
 */
-}
+
+printf("DONE!!!\n");
 return 0;
 }
-

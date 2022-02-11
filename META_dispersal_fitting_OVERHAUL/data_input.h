@@ -1,11 +1,11 @@
-int inputdata(void *Paramstruct)
+int inputdata(void *Paramstuff)
 {
 #define MAX_WEEKS 100	// larger than the number of weeks in any data set
 #define MAX_WEEKS2 1000	// larger than the number of weeks in any data set
 
 
 STRUCTURE* Params;
-Params = (STRUCTURE*) Paramstruct;
+Params = (STRUCTURE*) Paramstuff;
 
 // loads the data into a matrix and finds the number of weeks in the data set
 int Sdata[MAX_WEEKS]; int Vdata[MAX_WEEKS]; int Fdata[MAX_WEEKS]; int FVdata[MAX_WEEKS]; int Ddata[MAX_WEEKS]; int Cdata[MAX_WEEKS]; int D2data[MAX_WEEKS];
@@ -72,7 +72,7 @@ for(j=1;j<=NUM_METASUB;j++){ //Three Blocks with distance data
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 
 	while (fscanf(ftp_data,"%lf %lf %lf %lf \n",&dp1[i],&dp2[i],&dp3[i],&dp4[i])!= EOF)			{
-		//printf("%i, I am here!!\n", j);
+		//printf("%i, DISPROB\n", j); 
 		Params->DISPROB[j][i][0]=dp1[i]; Params->DISPROB[j][i][1]=dp2[i]; Params->DISPROB[j][i][2]=dp3[i]; Params->DISPROB[j][i][3]=dp4[i];  
 		//printf("%i\t %e\t %e\t %e\t %e\n",j, Params->DISPROB[j][i][0],Params->DISPROB[j][i][1], Params->DISPROB[j][i][2], Params->DISPROB[j][i][3]);
 	
@@ -106,7 +106,7 @@ for(j=1;j<=NUM_METASUB;j++){ //Three Blocks with distance data
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 
 	while (fscanf(ftp_data,"%i %i %i %i \n",&d1[i],&d2[i],&d3[i],&d4[i])!= EOF)			{
-		//printf("%i, I am here!!\n", j);
+		//printf("%i, DISTANCE!!\n", j);
 		Params->DISTANCE[j][i][0]=d1[i]; Params->DISTANCE[j][i][1]=d2[i]; Params->DISTANCE[j][i][2]=d3[i]; Params->DISTANCE[j][i][3]=d4[i];  
 		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->DISTANCE[j][i][0],Params->DISTANCE[j][i][1], Params->DISTANCE[j][i][2], Params->DISTANCE[j][i][3]);
 	
@@ -142,7 +142,7 @@ for (j=1;j<=DATA_SETS;j++)	{
 
 	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
 	//block one
-		//printf("%i, I am here!!", j);
+		//printf("%i, DATA", j);
 		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=FVdata[i];  
 		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->DATA[j][i][0],Params->DATA[j][i][1], Params->DATA[j][i][2], Params->DATA[j][i][3]);
 

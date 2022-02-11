@@ -1,4 +1,5 @@
 #include "head_meta.h"
+gsl_rng *r;
 
 float DotProduct (int Length, double *Holder, double *PCA)
 {
@@ -14,81 +15,17 @@ float DotProduct (int Length, double *Holder, double *PCA)
 
 int main(void)
 {
+  //printf("I'm here line 18!\n"); fflush(stdout);
 
 STRUCTURE Params;
+
 // ---------------------------------------- Random Number Seed ------------------------------------------------------ //
+  //printf("I'm here line 23!\n"); fflush(stdout);
 
 gsl_rng *r_seed;
 r_seed=random_setup();
 //printf("Random Seed: %f\n", r_seed); getc(stdin);
-
-// ---------------------------------------------- Dataset Selection -------------------------------------------------- //
-
-int dataset;
-
-dataset = 1; //see dataset details in ReadMe.h
-
-Params.j = dataset;
-
-//printf("j = %i", Params.j); 	fflush(stdout);
-
-// ---------------------------------------------- Testing Parameter Set -------------------------------------------------- //
-//metapopulation one
-//init S
-Params.FITINIT[1][0] = 100; Params.FITINIT[1][1] = 100; Params.FITINIT[1][2] = 100; Params.FITINIT[1][3] = 100;
-//init V
-Params.FITINIT[1][4] = 0; Params.FITINIT[1][5] = 0.2; Params.FITINIT[1][6] = 0.2; Params.FITINIT[1][7] = 0.2;
-//init R
-Params.FITINIT[1][8] = 0.0236; Params.FITINIT[1][9] = 0.0236; Params.FITINIT[1][10] = 0.0236; Params.FITINIT[1][11] = 0.0236;
-
-//metapopulation two
-//init S
-Params.FITINIT[2][0] = 100; Params.FITINIT[2][1] = 100; Params.FITINIT[2][2] = 100; Params.FITINIT[2][3] = 100;
-//init V
-Params.FITINIT[2][4] = 0; Params.FITINIT[2][5] = 0.2; Params.FITINIT[2][6] = 0.2; Params.FITINIT[2][7] = 0.2;
-//init R
-Params.FITINIT[2][8] = 0.0236; Params.FITINIT[2][9] = 0.0236; Params.FITINIT[2][10] = 0.0236; Params.FITINIT[2][11] = 0.0236;
-
-//metapopulation three
-//init S
-Params.FITINIT[3][0] = 100; Params.FITINIT[3][1] = 100; Params.FITINIT[3][2] = 100; Params.FITINIT[3][3] = 100;
-//init V
-Params.FITINIT[3][4] = 0; Params.FITINIT[3][5] = 0.2; Params.FITINIT[3][6] = 0.2; Params.FITINIT[3][7] = 0.2;
-//init R
-Params.FITINIT[3][8] = 0.0236; Params.FITINIT[3][9] = 0.0236; Params.FITINIT[3][10] = 0.0236; Params.FITINIT[3][11] = 0.0236;
-
-//metapopulation four
-//init S
-Params.FITINIT[4][0] = 100;
-//init V
-Params.FITINIT[4][4] = 0;
-//init R
-Params.FITINIT[4][8] = 0.0236;
-
-//metapopulation five
-//init S
-Params.FITINIT[5][0] = 100;
-//init V
-Params.FITINIT[5][4] = 0;
-//init R
-Params.FITINIT[5][8] = 0.0236;
-
-//metapopulation four
-//init S
-Params.FITINIT[6][0] = 100;
-//init V
-Params.FITINIT[6][4] = 0;
-//init R
-Params.FITINIT[6][8] = 0.0236;
-
-//dispersal parameters
-Params.con_mrg = 0.05;
-Params.a = 0.1;
-Params.lar_disp = 0.05;
-
-//coifection parameters
-Params.coinf_V = 0.5;
-Params.VFSus = 50;
+ //printf("I'm here line 28!\n"); fflush(stdout);
 
 //-------------------------------------------------- Fitting Specifications -----------------------------------------//
 
@@ -97,6 +34,9 @@ int num_fit_params = 50;
 // -------------------------------------------- MISER --------------------------------------------------------- //
 
 // -------------------------------------------- Set-up --------------------------------------------------------- //
+
+inputdata(&Params);				//gets Params.DATA from inputdata.h
+
 //local variables
 double meta_lhood, meta_err;
 int jj;
@@ -122,15 +62,17 @@ gsl_rng_env_setup();
 
 T = gsl_rng_default;
 r = gsl_rng_alloc (T);
-
 // -------------------------------------------- Integration --------------------------------------------------------- //
+
 {
 gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+printf("I'm here line 136!\n"); fflush(stdout); getc(stdin);
 gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&meta_lhood,&meta_err);
+printf("I'm here line 138!\n"); fflush(stdout); getc(stdin);
 gsl_monte_miser_free (s);
 }
-
-printf("for dataset = %i, calls =  %i, lhood_meta = %lf, meta_err = %lf", Params.j, calls, meta_lhood, meta_err); 	fflush(stdout);
+printf("I'm here line 138!\n"); fflush(stdout); getc(stdin);
+//printf("for dataset = %i, calls =  %i, lhood_meta = %lf, meta_err = %lf", Params.j, calls, meta_lhood, meta_err); 	fflush(stdout);
 
 meta_lhood = log(meta_lhood)-700.0;
 

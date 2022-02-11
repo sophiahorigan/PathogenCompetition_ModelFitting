@@ -1,18 +1,37 @@
-int fast_odes(double t, const double y[], double dydt[],void *Paramstruct)
+int fast_odes(double t, const double y[], double dydt[],void *Paramstuff)
 {
 // --------------------------------- Set Up -------------------------------------//
 STRUCTURE* Params;
-Params = (STRUCTURE*) Paramstruct;
+Params = (STRUCTURE*) Paramstuff;
 
 //local variales
 int num_sub = Params->numsub;
 int i;								//indexing
 int j = Params->j; 					//dataset
 double Cdisp[4] = {0, 0, 0, 0}; 	//net conidia dispersal
+double exposetime = 16;
+int n = 27;
+int m = 50;
+int max_class = m+n+7+m;
+double lambdaF = 0.119701349994476;
 double lambdaV = 1/exposetime;
 int n1 = ((exposetime-1/lambdaF)/exposetime)*n;    //early virus infection
 int n2 = n-n1;                  //late virus infection
-double size_C=1;				//?
+double size_C = 1;				//?
+double nuR;
+double nuF = 0.000241071699421562;
+double muF = 0.00962435749864498;
+double muV = 0.4102453;
+double nuV = 0.4607038;
+int indexR = 0;
+int indexV = 0;
+double squareCVV = 0.86*0.86;
+
+
+double con_mgr = Params->con_mrg;
+double a = Params->a;
+double coinf_V = Params->coinf_V;
+double VFSus = Params->VFSus;
 
 //subpopulation structure
 int sub;
@@ -31,10 +50,12 @@ double netdisp[4] = {0, 0, 0, 0};
 //------------------------------------- Parameters to Fit ---------------------------------------------------//
 
 //Initial conditions
-double S0[4] = {Params->FITINIT[j][1], Params->FITINIT[j][2], Params->FITINIT[j][3]}; //SH all have same inital population size
-double R[4]  = {Params->FITINIT[j][8], Params->FITINIT[j][9], Params->FITINIT[j][10], Params->FITINIT[j][11]}; //different R for each subpop
+double S0[4] = {Params->FITINIT[0], Params->FITINIT[1], Params->FITINIT[2], Params->FITINIT[3]}; //SH all have same inital population size
+//printf("j = %i, S0: %lf\t, %lf\t, %lf\t, %lf\n", j, Params->FITINIT[0], Params->FITINIT[1], Params->FITINIT[2],Params->FITINIT[3]);
+double R[4]  = {Params->FITINIT[8], Params->FITINIT[9], Params->FITINIT[10], Params->FITINIT[11]}; //different R for each subpop
 
 //migration parameters
+/*
 Params->con_mrg = Params->FITMETA[0];
 Params->a = Params->FITMETA[1];
 double con_mgr = Params->con_mrg;
@@ -45,7 +66,7 @@ Params->coinf_V = Params->FITMETA[4];
 Params->VFSus = Params->FITMETA[3];
 double coinf_V = Params->coinf_V;
 double VFSus = Params->VFSus;
-
+*/
 //-------------------------------------- Conidia Dispersal -------------------------------------------//
 if(coni_dispersal_on == 1){ 
 	if (j==1 || j==2 || j==3) { 
@@ -68,6 +89,7 @@ if(coni_dispersal_on == 1){
 
 for(sub=0; sub<num_sub; sub++){
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
+	//printf("%lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", y[0+sub_index[sub]], nuF, y[m+n+1+sub_index[sub]], Cdisp[sub], nuR, R[sub], y[0+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]], pow((y[0+sub_index[sub]]/S0[sub]),squareCVV));
 	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R[sub]*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]];
 	for(i=2; i <= m; i++){
 		dydt[i+sub_index[sub]]=m*lambdaF*(y[i-1+sub_index[sub]] -y[i+sub_index[sub]]);
@@ -84,6 +106,7 @@ for(sub=0; sub<num_sub; sub++){
 		dydt[m+n1+i+sub_index[sub]]=n*lambdaV*(y[m+n1+i-1+sub_index[sub]]-y[m+n1+i+sub_index[sub]]);
 	}
 	dydt[m+n+1+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C - muF*y[m+n+1+sub_index[sub]];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
+	printf("%lf\t %i\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", dydt[m+n+1+sub_index[sub]], m, lambdaF,y[m+sub_index[sub]], coinf_V, y[m+n+6+m+sub_index[sub]], size_C, muF, y[m+n+1+sub_index[sub]]);
 	dydt[m+n+2+sub_index[sub]] = indexR*m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
 	dydt[m+n+3+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V-muV*y[m+n+3+sub_index[sub]];  //Class of cadavers infected by virus
 	dydt[m+n+4+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V;
@@ -104,14 +127,17 @@ return GSL_SUCCESS;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-double ODE_Solver(double t_ode,double t_end,void *Paramstruct,double *y_ode)
+double ODE_Solver(double t_ode,double t_end,void *Paramstuff,double *y_ode)
 {
 // --------------------------------- Set Up -------------------------------------//
 STRUCTURE* Params;
-Params = (STRUCTURE*) Paramstruct;
-
+Params = (STRUCTURE*) Paramstuff;
+//printf("I'm in ODE SOLVER\n");
 //local variables
 int i;					//indexing
+int m = 50;
+int n = 27;
+int max_class = m+n+7+m;
 int status_ode;
 double h_init = 1.0e-5;
 int sub;
@@ -121,8 +147,10 @@ int j = Params->j; 					//dataset
 
 //set up ode solver
 const gsl_odeiv_step_type *solver_ode	= gsl_odeiv_step_rkf45; // Runge-Kutta Fehlberg (4, 5)
+
 gsl_odeiv_step *step_ode	= gsl_odeiv_step_alloc(solver_ode, DIM);
 gsl_odeiv_control *tol_ode	= gsl_odeiv_control_standard_new(1.0e-10, 1.0e-5, 1.0, 0.2);
+
 gsl_odeiv_evolve *evol_ode	= gsl_odeiv_evolve_alloc(DIM);
 gsl_odeiv_system sys_ode;
 sys_ode.function  = fast_odes;
@@ -142,13 +170,12 @@ while (t_ode<t_end)	{
 			}
 		}
 	}
-
-}*/
+*/
+}
 // -------------------------------------- Clear Memory ----------------------------------------- //
 gsl_odeiv_evolve_free(evol_ode);
 gsl_odeiv_control_free(tol_ode);
 gsl_odeiv_step_free(step_ode);
 
 return (t_end);
-}
 }

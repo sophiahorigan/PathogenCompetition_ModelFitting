@@ -8,6 +8,7 @@ Params = (STRUCTURE*) Paramstuff;
 //local variables
 double lhood_sub = 0;		//log likehood of subpopulation
 double lhood_meta = 0;		//log likelihood of metapopulation
+int epi_length = 48;
 
 //dataset selection
 int j = 1; 			//metapop number

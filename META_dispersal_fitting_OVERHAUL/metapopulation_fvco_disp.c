@@ -38,6 +38,7 @@ int num_fit_params = 50;
 inputdata(&Params);				//gets Params.DATA from inputdata.h
 
 //local variables
+double epi_length = 48;
 double meta_lhood, meta_err;
 int jj;
 size_t dim;

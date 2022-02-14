@@ -106,7 +106,7 @@ for(sub=0; sub<num_sub; sub++){
 		dydt[m+n1+i+sub_index[sub]]=n*lambdaV*(y[m+n1+i-1+sub_index[sub]]-y[m+n1+i+sub_index[sub]]);
 	}
 	dydt[m+n+1+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C - muF*y[m+n+1+sub_index[sub]];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
-	printf("%lf\t %i\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", dydt[m+n+1+sub_index[sub]], m, lambdaF,y[m+sub_index[sub]], coinf_V, y[m+n+6+m+sub_index[sub]], size_C, muF, y[m+n+1+sub_index[sub]]);
+	//printf("%lf\t %i\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", dydt[m+n+1+sub_index[sub]], m, lambdaF,y[m+sub_index[sub]], coinf_V, y[m+n+6+m+sub_index[sub]], size_C, muF, y[m+n+1+sub_index[sub]]);
 	dydt[m+n+2+sub_index[sub]] = indexR*m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
 	dydt[m+n+3+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V-muV*y[m+n+3+sub_index[sub]];  //Class of cadavers infected by virus
 	dydt[m+n+4+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V;
@@ -144,6 +144,9 @@ int sub;
 int num_sub = Params->numsub;
 int DIM = num_sub*max_class;
 int j = Params->j; 					//dataset
+
+//printf("IN ODE t = %lf, t_next= %lf\n", t_ode, t_end);
+
 
 //set up ode solver
 const gsl_odeiv_step_type *solver_ode	= gsl_odeiv_step_rkf45; // Runge-Kutta Fehlberg (4, 5)

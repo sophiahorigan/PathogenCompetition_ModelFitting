@@ -40,13 +40,15 @@ double scale_R1 = 3.80285399989692;
 double scale_R2 = 3.54725448752468;
 double scale_R3 = 0.166585199947054;
 
+double epi_length = 48;
+
 //indexing local variables
 Params->j = dataset;
 int j = Params->j; 		//metapopulation number
 
 int num_sub;					//number of subpopulations within a metapopulation		
-double rand_nuR[epi_length];	//hold stochastic value for each day impacting resting spore transmssion
-double rand_nuF[epi_length];	//hold stochastic value for each day impacting conidia transmission
+double rand_nuR[48];	//hold stochastic value for each day impacting resting spore transmssion
+double rand_nuF[48];	//hold stochastic value for each day impacting conidia transmission
 int R_start=0;
 int R_end=100;
 int num_day =  R_start;  //CK// Starting day number
@@ -54,7 +56,8 @@ line_ticker = num_day;
 line_ticker=line_ticker-1;
 double timing[6]={R_start,R_end,epi_length};
 int day_index[4] = {0, 47, 95, 143}; //to append 48 day epizootics 
-double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index //why is h 0.1?? shouldn't it be 1?
+int t=0; int i;	int ii;			// time loop and index //why is h 0.1?? shouldn't it be 1?
+int t_next = t+1;
 
 Params->FITINIT[0] = 100; Params->FITINIT[1] = 100; Params->FITINIT[2] = 100; Params->FITINIT[3] = 100;
 //printf("DEFINTION FItINIT[1][0] = %lf\n",Params->FITINIT[1][0]);
@@ -73,7 +76,7 @@ if (j==4 || j==5 || j==6) {
 	Params->numsub=1;
 	num_sub = Params->numsub;
 }
-printf("J in DDEVF = %i\n NUMSUB = %i", j, num_sub);
+//printf("J in DDEVF = %i\n NUMSUB = %i\n", j, num_sub);
 
 int sub;
 int sub_index[num_sub];
@@ -93,9 +96,9 @@ double E_V[num_sub][n2+1]; double E_F[num_sub][m+1]; double E_VF[num_sub][n1+1];
 int larvae_dispersal_on = 1; 	//set to 0 for no dispersal
 
 //stochasticity
-for (i=0;i<epi_length;i++)	{        
+for (i=0;i<48;i++)	{        
 	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],sdR); //mean, sigma
-	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+epi_length],sdC);
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+48],sdC);
 	//printf("randnum in DDEVF,%lf, %lf\n", rand_nuR[i],rand_nuF[i]);
 }
 
@@ -154,7 +157,7 @@ for(i=0; i<num_sub; i++){
 	S[i] = Params->FITINIT[0]; 
 	//printf("S[%i]= %lf\n", i ,S[i]);
 	V[i] = Params->FITINIT[4]; 
-	printf("V[%i]=%lf\n", i, V[i]);
+	//printf("V[%i]=%lf\n", i, V[i]);
 	C[i] = initC;
 	//printf("C[%i]=%lf\n", i, C[i]);
 	R[i] = Params->FITINIT[8];
@@ -188,8 +191,10 @@ for(i=0; i<num_sub; i++){ //initial conditions
 
 // ----------------------------------------- Begin Epizootic Loop ------------------------------------------- //
 
-while (t_0<epi_length+h)	{  //for each day...
+while (t<49)	{  //for each day...
+//printf("t = %i\n", t);
 
+	/*
 	// ------------------------------- Resting Spore Blooming ----------------------------------------------- //
 	// --------------------- end of day -------------------- //
 	if (day+1<timing[0] && day+1<timing[1])	{
@@ -230,33 +235,31 @@ while (t_0<epi_length+h)	{  //for each day...
 		printf("RESTING SPORE BLOOM ERROR\n");
 		getc(stdin);
 	}
-
+	*/
 	//-------------------------------------- Update State Variables -------------------------------------------//
 
-	while (t<t_next)	{
 
-		for(sub=0; sub<num_sub; sub++){ //for each treatment
-			y_ode[0+sub_index[sub]]=S[sub];	y_ode[m+n+1+sub_index[sub]]=C[sub];
-			//printf("y_ode = %lf\n", y_ode[0+sub_index[sub]]);
-			y_ode[m+n+3+sub_index[sub]]=V[sub];
-			//printf("y_ode = %lf\n", y_ode[m+n+3+sub_index[sub]]);
-			for (i=1;i<=m;i++)	{
-				y_ode[i+sub_index[sub]]=E_F[sub][i];
-			}
-			for (i=1;i<=n1;i++)	{
-				y_ode[m+i+sub_index[sub]]=E_VF[sub][i];
-			}
-			for (i=1;i<=n2;i++)	{
-				y_ode[m+n1+i+sub_index[sub]]=E_V[sub][i];
-			}
-			y_ode[m+n+2+sub_index[sub]]=Fnext[sub];
-			y_ode[m+n+4+sub_index[sub]]=Vkill[sub];
-			y_ode[m+n+5+sub_index[sub]]=Fkill[sub];
-			y_ode[m+n+6+sub_index[sub]]=Vnext[sub];
+	for(sub=0; sub<num_sub; sub++){ //for each treatment
+		y_ode[0+sub_index[sub]]=S[sub];	y_ode[m+n+1+sub_index[sub]]=C[sub];
+		//printf("PRE ODE Ssub =%lf\n", S[sub]);
+		y_ode[m+n+3+sub_index[sub]]=V[sub];
+		//printf("y_ode = %lf\n", y_ode[m+n+3+sub_index[sub]]);
+		for (i=1;i<=m;i++)	{
+			y_ode[i+sub_index[sub]]=E_F[sub][i];
+		}
+		for (i=1;i<=n1;i++)	{
+			y_ode[m+i+sub_index[sub]]=E_VF[sub][i];
+		}
+		for (i=1;i<=n2;i++)	{
+			y_ode[m+n1+i+sub_index[sub]]=E_V[sub][i];
+		}
+		y_ode[m+n+2+sub_index[sub]]=Fnext[sub];
+		y_ode[m+n+4+sub_index[sub]]=Vkill[sub];
+		y_ode[m+n+5+sub_index[sub]]=Fkill[sub];
+		y_ode[m+n+6+sub_index[sub]]=Vnext[sub];
 
-			for (i=1;i<=m;i++)	{
-				y_ode[m+n+6+i+sub_index[sub]]=E_FV[sub][i]; 
-			}
+		for (i=1;i<=m;i++)	{
+			y_ode[m+n+6+i+sub_index[sub]]=E_FV[sub][i]; 
 		}
 
 
@@ -327,7 +330,7 @@ while (t_0<epi_length+h)	{  //for each day...
 	//-------------------------------------- ODE Solver -------------------------------------------//
 
 	//*****************************************************************************//
-	
+		//printf("IN DDEVF t = %i, t_next= %i\n", t, t_next);
 		t=ODE_Solver(t,t_next,Params,y_ode);
 	
 	//*******************************************************************************//
@@ -336,7 +339,7 @@ while (t_0<epi_length+h)	{  //for each day...
 
 		for(sub=0; sub<num_sub; sub++){
 			S[sub]=y_ode[0+sub_index[sub]]; 
-			//printf("Ssub =%lf\n", S[sub]);
+			printf("POST ODE Ssub =%lf\n", y_ode[0+sub_index[sub]]);
 			C[sub]=y_ode[m+n+1+sub_index[sub]]; 
 			//printf("Csub =%lf\n", C[sub]);
 			V[sub]=y_ode[m+n+3+sub_index[sub]];
@@ -373,21 +376,23 @@ while (t_0<epi_length+h)	{  //for each day...
 			}
 			//printf("EFVsub =%lf\n", E_FV[sub]);
 		}
-
+		
 //-------------------------------------- Save Daily Output Into Array -------------------------------------------//
 	
 		for(sub=0; sub<num_sub; sub++){	
 
-			Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction uninfected S 
-			Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected V 
-			Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected F
-			Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction coinfected 
-			//printf("MODEL: %i\t %i\t S=%lf\t V=%lf\t F=%lf\t FV=%lf\n", j, day, S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]), IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]), IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]), IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]));
+			Params->MODEL[j][t+day_index[sub]][0] = S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction uninfected S 
+			Params->MODEL[j][t+day_index[sub]][1] = IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected V 
+			Params->MODEL[j][t+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected F
+			Params->MODEL[j][t+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction coinfected 
+			//printf("MODEL: %i\t %i\t S=%lf\t V=%lf\t F=%lf\t FV=%lf\n", j, t, S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]), IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]), IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]), IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]));
+			printf("MODEL: %i\t initS=%lf\t IV=%lf\t IF=%lf\t IFV=%lf\n", t, y_ode[0+sub_index[sub]], IV[sub], IF[sub], IVF[sub]);
+
 		}
 
 	}
 
-t_0=t_next;
+t=t_next;
 
 }
 

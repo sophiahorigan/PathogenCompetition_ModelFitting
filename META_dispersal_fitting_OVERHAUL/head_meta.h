@@ -33,7 +33,7 @@ char *strFileNameDate;
 #define DATA_SETS_WEATHER 1		// number of weather data sets
 #define NUM_METASUB 3			// number of metapopulations with subpopulations
 #define NUM_PARS 50		    // number of parameters to be passed from main to hood
-#define epi_length 48			// length of epizootic (days)
+//#define epi_length 48			// length of epizootic (days)
 
 //------------------------------------ Param Structure -------------------------------------//
 const double h = 0.01;		    // time step

@@ -5,7 +5,6 @@ STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
 //variables constant across treatments, priors from CK 
-//make all these fixed global params out of PARS and get rid ofParams->INITS[0]
 double nuV		= Params->PARS[2]; //virus transmission
 double nuF		= Params->nuF;	//conidia transmission	//Params->PARS[3];
 double nuR		= Params->nuR;	//resting spore transmission
@@ -25,43 +24,30 @@ int n = Params->PARS[8];  //virus
 int n1=(VFPass/exposetime)*Params->PARS[8];    //virus exposed that can be taken over by fungus
 int n2=n-n1;                //The number of the first group of exposed classes to virus
 
+//state variables
+double S0[7] = {Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0], Params->INITS[0]}; //SH NEED TO CHANGE
+//double C = y[m+n+1];
+double R  = Params->POPS[3];
+
 //indexing
 int i;
 int num_sub = Params->numsub;
 //printf("fast ode num_sub = %i\n", num_sub);
 int sub;
+
+//dispersal
+int coni_dispersal_on = 1; //set to 0 for no dispersal
+int j = Params->j; //dataset
+double Cdisp[4] = {0, 0, 0, 0}; //net conidia dispersal
+//printf("Did I find j from params? j = %i\n", j);
+// ------------------------------------------ ODEs -------------------------------------------- //
+
 int sub_index[num_sub];
 int max_class = m+n+7+m;
 sub_index[0] = 0; //treatment 1 index addition is zero
 for(sub=1; sub<num_sub; sub++){	//createsub array 
 	sub_index[sub] = sub_index[sub-1]+ max_class; //SH can maybe multiply 
 }
-
-//dispersal
-int coni_dispersal_on = 1; //set to 0 for no dispersal
-int j = Params->j; //dataset
-double Cdisp[4] = {0, 0, 0, 0}; //net conidia dispersal
-
-//------------------------------------- FIT PARAMS---------------------------------------------------//
-
-//Initial conditions
-double S0[4] = {FITPARS[0], FITPARS[1], FITPARS[2], FITPARS[3]}; //SH all have same inital population size
-double R[4]  = {FITPARS[8], FITPARS[9], FITPARS[10], FITPARS[11]}; //different R for each subpop
-//double R[4]	 = {FITPARS[8], FITPARS[8], FITPARS[8], FITPARS[8]} //same R across each subpop
-
-//coinfection parameters
-Params->coinf_V = FITPARS[12];
-Params->VFSus = FITPARS[13];
-double coinf_V = Params->coinf_V;
-double VFSus = Params->VFSus;
-
-//migration parameters
-Params->con_mrg = FITPARS[14];
-Params->a = FITPARS[15];
-double con_mgr = Params->con_mrg;
-double a = Params->a;
-
-
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
 if(coni_dispersal_on == 1){ //turn off at declaration at top of script
@@ -72,6 +58,11 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 		int subin; //indexing
 		double con_disp; //frac dispersing from subout to subin
 		double netdisp[4] = {0, 0, 0, 0};
+
+		double con_mgr = 0.0001;
+		double a = 5;
+		//Params->con_mrg = 0.01; //migration parameter, FIT
+		//Params->a = 5; //migration parameter, FIT 
 		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			for(subin = 0; subin < num_sub; subin++){
@@ -93,26 +84,26 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 }
 
 
-// ------------------------------------------ ODEs -------------------------------------------- //
+// MOVE CONIDIA DISPERSAL IN HERE
 
 for(sub=0; sub<num_sub; sub++){
-	printf("GREETINGS from line 54 in DDEVF\n");
-	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
+	//printf("GREETINGS from line 54 in DDEVF\n");
+	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R)-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
 	//printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]); //SH GREG CHECK; THIS ALWAYS = 0...
 	//getc(stdin);
 	//printf("%e\t %e\t %e\t %e\t %e\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub]);
-	printf("%e\t %e\t %e\t %e\n", nuF, y[m+n+1+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]]);
+	//printf("%e\t %e\t %e\t %e\n", nuF, y[m+n+1+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]]);
 	
 	//getc(stdin);
-	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R[sub]*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]];
+	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]];
 	for(i=2; i <= m; i++){
 		dydt[i+sub_index[sub]]=m*lambdaF*(y[i-1+sub_index[sub]] -y[i+sub_index[sub]]);
 	}
 
 	//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
-	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
+	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R)*VFSus;
 	for (i=2;i<=n1;i++){
-		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
+		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R)*VFSus;
 	}
 
 	//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
@@ -128,9 +119,9 @@ for(sub=0; sub<num_sub; sub++){
 	dydt[m+n+6+sub_index[sub]] = indexV*(n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V);
 
 	//Recording the hosts already infected with virus and taken over by the fungus
-	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
+	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R)*y[m+1+sub_index[sub]]*VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
 	for (i=2;i<=n1;i++){
-		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*VFSus;
+		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R)*y[m+i+sub_index[sub]]*VFSus;
 	}
 	for(i=2; i <= m; i++){
 		dydt[m+n+6+i+sub_index[sub]]=m*lambdaF*(y[m+n+6+i-1+sub_index[sub]] -y[m+n+6+i+sub_index[sub]]);

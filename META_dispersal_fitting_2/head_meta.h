@@ -31,7 +31,7 @@ char *strFileNameDate;
 #define NUM_METASUB 3			//number of metapopulations with subpopulations
 #define NUM_PARS 100		        // number of parameters to be passed from main to hood
 #define SIMU 64
-#define epi_length 48
+//#define DIM 15						// number of differential equations
 
 const double h = 0.01;		        // time step
 
@@ -57,7 +57,10 @@ double preda=0.967;           //Predation parameters, for host-pathogen-predator
 double predb=0.14*0.39/0.64;
 
 //Enhanced susceptibility and coinfection parameters
-//double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
+double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
+double VFSus;
+double coinf_V=0.1; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
+
 
 //JL: Recording the status at the end of an epizootic
 double SusEnd;
@@ -81,19 +84,20 @@ double InfVirusAdj=0;
 double VPass;          //variable to pass the value of initialV in each generation
 
 
+
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
 
 
-
+//double vinfected; //SH to hold daily fraction infected
+//double finfected; //SH add coinfected eventually
+//double survivors; //SH = IF/IV etc divided by initial host density
+//double total;
 
 
 double FakeWDATA[SIMU][5];
 int days[47]={365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 366, 365, 365, 364}; //1973-2019
 //CK Structure for experimental data!!!
-
-double FITPARS[NUM_PARS];
-
 
 struct dataset{  //  building the structure, to be declared later
 	int Date;
@@ -107,16 +111,6 @@ typedef struct
 {
 	double PARS[NUM_PARS];
 
-	double INITS[4];
-	double INITV[4];
-	double INITR[4];
-
-	double con_mrg;
-	double a;
-	double lar_disp;
-	double coinf_V;
-	double VFSus;
-
 	double nuV;
 	double nuF;
 	double nuR;
@@ -126,6 +120,7 @@ typedef struct
 	double indexV;
 
 	double R_END[DATA_SETS+1];
+	double INITS[DATA_SETS+1];
 	double POPS[4];
 	double EV[400];
 	double EF[400];
@@ -146,6 +141,11 @@ typedef struct
 
 	//indexing and dispersal params
 	int numsub;
+	double con_mrg;
+	double a;
+	double lar_disp;
+	double poptotal;
+
 	int j; //dataset number
 
 	//SH Epizootic Data
@@ -184,4 +184,3 @@ typedef struct
 #include "prob_dists.h"
 #include "ode_fvco_disp.h"
 #include "DDEVF_meta_fvco_disp.h"
-#include "lhood_meta.h"

@@ -1,5 +1,3 @@
-//SH Where are Colin's final parameters?
-
 // ---------------------------------------------------------------------------------------------------------------- //
 double bound(int i,int j)				// bounds on parameters for parhood line search
 {
@@ -431,7 +429,6 @@ return;
 }
 
 // ------------------------------------------------------------------------------------------- //
-//SH need to move colin's fitted params in here. but how do I figure out what their value is?
 void global_fixed_parms(void *Paramstuff)
 {
 STRUCTURE* Params;

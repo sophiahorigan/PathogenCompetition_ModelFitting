@@ -42,7 +42,7 @@ double epi_length = 48;
 double meta_lhood, meta_err;
 int jj;
 size_t dim;
-dim = 2*epi_length; 			//to hold random values for both nuR and nuF concatenated
+dim = 2*epi_length; 			//need to make larger
 double xl[dim];	double xu[dim];	//set stochastic values
 for (jj=0;jj<=dim;jj++)	{
 	xl[jj]=0;

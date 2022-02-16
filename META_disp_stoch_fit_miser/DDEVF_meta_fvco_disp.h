@@ -31,7 +31,7 @@ int MAXT3=48;
 int num_sub;
 Params->j = dataset;
 int j = Params->j;
-//printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
+printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
 
 // SUBS
 // SUB 1 (0) = FUNGUS-ONLY
@@ -118,7 +118,7 @@ double R_seed = 0.05;
 for (i=0;i<=MAXT3;i++)	{
 	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]);
 	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->PARS[12]);
-	//printf("randon nuR = %lf, random nuF = %lf", rand_nuR[i], rand_nuF[i]);
+	//printf("randon nuR = %lf\t, random nuF = %lf\n", rand_nuR[i], rand_nuF[i]);
 }//getc(stdin);
 
 
@@ -205,16 +205,33 @@ double Vstart = ratio*initV;						// viral cadavers after infected neonates die 
 double r_germ = R_start;		//CK// nixing r_time because I made all germ dates start at beginning of the collections
 if (r_germ<0)	r_germ=0;
 
+double INITS[4];
+double INITV[4];
+double INITR[4];
+
+if (j==1 || j==2 || j==3){
+	for(i=0; i<num_sub; i++){
+		INITS[i] = Params->FITINIT[j][i];
+		INITV[i] = Params->FITINIT[j][i+num_sub];
+		INITR[i] = Params->FITINIT[j][i+num_sub+num_sub];
+	}
+}
+if (j==4 || j==5 || j==6){
+	INITS[0] = Params->FITINIT[j][0];
+	INITV[0] = Params->FITINIT[j][4];
+	INITR[0] = Params->FITINIT[j][8];
+}
+
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
 
 //single epizootic state params
 //printf("numsub = %i\n", num_sub);
 for(i=0; i<num_sub; i++){ 
-	S[i] = initS;
-	//printf()
-	V[i] = 0.2; //need to link with main.c eventually
-	C[i] = 0.0236;
-	R[i] = 0;
+	S[i] = INITS[i];
+	V[i] = INITV[i]; //need to link with main.c eventually
+	C[i] = 0;
+	R[i] = INITR[i];
+	//printf("J = %i\t, Numsub = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
 
 	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
 		E_V[i][ii]=0;

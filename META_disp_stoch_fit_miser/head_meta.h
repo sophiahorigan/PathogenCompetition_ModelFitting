@@ -141,9 +141,6 @@ typedef struct
 
 	//indexing and dispersal params
 	int numsub;
-	double con_mrg;
-	double a;
-	double lar_disp;
 	double poptotal;
 
 	int j; //dataset number
@@ -169,9 +166,19 @@ typedef struct
 	int th_id;
 	int pop;
 
-	// ****** DISPERSAL PARAMETERS *********
+	//Sophia fitting
+	//parameter array
+	double FITINIT[DATA_SETS][NUM_PARS]; 	//initial conditions across subpopulations
+	double FITMETA[NUM_PARS];	//dispersal and coinfection parameters fit across all datasets
 
-	
+	//dispersal
+	double con_mrg; //0
+	double a;		//1
+	double lar_disp;//2
+
+	//coinfection
+	double coinf_V;	//3
+	double VFSus;	//4
 
 
 }STRUCTURE;

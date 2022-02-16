@@ -1,4 +1,4 @@
-double LHood_Meta(double RandNumsPass[] ,size_t dim ,void *Paramstuff)
+double LHood_Meta(double *RandNumsPass ,size_t dim ,void *Paramstuff)
 {
 // calls DDEVF, uses results from DDEVF to calculate and return 'hood'
 STRUCTURE* Params;
@@ -16,10 +16,10 @@ double initialS[8] = {1, 3, 5, 10, 25, 50, 75, 100};
 double initialV=1;
 double initial_nuF[8] = {5.0e-6, 5.0e-3, 5.0e-3, 5.0e-3, 5.0e-3, 5.0e-3, 5.0e-3, 5.0e-3};
 
-double distance_array[6] = {5, 5, 5, 5, 5, 5};
+
 
 // ------------------------------------------------------------------------------------------------------------------ //
-int i=0; int j;int ii; int jj; int k; int l;
+int i=0;int ii; int jj; int k; int l;
 int num_adj_pars=29;			// number of adjustable parameters
 int pop;
 int epi_length = 48;
@@ -67,12 +67,15 @@ for (k=0;k<=num_adj_pars;k++)	{
 reps = 1;
 
 int year;
+//double sdensity;
+//double fdensity;
+//double vdensity;
+
+
+
 double sdensity;
 double fdensity;
 double vdensity;
-
-//INITIAL CONDITIONS
-VFSus=0.01; //SH random pick 
 sdensity=100; //SH random pick 
 fdensity=0.026; //SH from literature
 vdensity=0.01; //SH guesstimate
@@ -81,42 +84,43 @@ Params->PARS[30+pop]=sdensity;
 VPass=vdensity;
 Params->PARS[50+pop]=fdensity;
 
+int dataset;
+dataset = Params->j;
 
-for (j=1;j<=DATA_SETS;j++)	{
-//for (j=1;j<2;j++)	{
+printf("dataset in lhood meta = %i\n", Params->j);
 
-	//printf("THIS IS J IN MAIN LOOP = %i\n", j);
 
-DDEVF(Params,RandNumsPass,dim,pop,48,0,year,j);
+DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
 
-int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0;
-	if (j==1 || j==2 || j==3) { //three block sites with subpopulations
-		while (m < epi_length*4){
-			for (n = 0; n < epi_length; n++){
-				if(Params->DATA[j][m][0] != -1){
-					lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, Params->MODEL[j][m], Params->DATA[j][m]);
-					printf("%lf\n", lhood_sub);
-				} 
-				m++;
-			}
-			printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
-			lhood_meta = lhood_meta + lhood_sub;
-			n = 0;
-			lhood_sub = 0;
-				
-		}
-		printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
-		}
-	if (j==4 || j==5 || j==6) { //three observational sites with no subpopulations
+int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0; double lhood_meta2;
+if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopulations
+	while (m < epi_length*4){
 		for (n = 0; n < epi_length; n++){
-			if(Params->DATA[j][n][0] != -1){
-				lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, Params->MODEL[j][n], Params->DATA[j][n]);
-				printf("%lf\n", lhood_meta);
-			}
+			if(Params->DATA[dataset][m][0] != -1){
+				lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
+				//printf("%lf\n", lhood_sub);
+			} 
+			m++;
 		}
-	printf("Likelihood for metapop %i = %lf\n", j, lhood_meta);
+		printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
+		lhood_meta = lhood_meta + lhood_sub;
+		n = 0;
+		lhood_sub = 0;
+			
 	}
+	printf("Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
+	}
+if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with no subpopulations
+	for (n = 0; n < epi_length; n++){
+		if(Params->DATA[dataset][n][0] != -1){
+			lhood_meta = lhood_meta + gsl_ran_multinomial_lnpdf(4, Params->MODEL[dataset][n], Params->DATA[dataset][n]);
+			printf("%lf\n", lhood_meta);
+		}
+	}
+	printf("Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 }
+
+lhood_meta2 = lhood_meta + 700;
 
 
 /*char name1[50];
@@ -135,30 +139,6 @@ for(loop3 = 0; loop3 < 192; loop3++){
 	}	
 }
 */
-
-//**************SH prints output at end of week****************//
-   // FILE *fp;
-   // char name[50];
-    // sprintf(name,"typethree_Vall_Cthreeweek_fut_immi_VFSus_alt_%lf_1.txt",VFSusF[bbf]);
-    //sprintf(name,"fv_bf_%f_row_%d_col_%d.txt",bfungus[bbf],row,col);
-	//sprintf(name, "JHN_KBS1daily_15_10000_0.026_0.2"); //SH attempt at naming output based on above lines
-
-   // fp=fopen(name,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
-
-
-
-	// INFECTED = 1.0 - (Params.survivors/Params.total); //SH need to modify to add two infection classes (V/F)
-
-	//printf("%lf\t %lf\t %lf\t %lf\t %lf\n", Params.PARS[30+pop], Params.PARS[50+pop], INFECTED, Params.survivors, Params.total);
-	// fprintf(fp,"%d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",year,Params.PARS[30+pop],Params.PARS[50+pop],VPass,InfFungusNext,InfFungusEnd,InfVirusNext,InfVirusEnd); //After dispersal
-	//year, initial s, initial f, initial v, end f to next epi, f at end, v to next epi, v at end
-
-    //printf("After an epizootic: %e\t %e\t %e\n",SusEnd,InfFungusEnd,InfVirusEnd); //getc(stdin);
-    //printf("SusEnd=%e, N*(1-if-iv)=%e\n",SusEnd,sdensity-InfFungusEnd-InfVirusEnd);
-    //double stoch=exp(gsl_ran_gaussian(r_seed,0.25));
-    //double tempor=sdensity;
-    //printf("%f\n",SusEnd);
-    //sdensity=fecundity*SusEnd*(1-(2*preda*predb*sdensity)/(predb*predb+sdensity*sdensity))+1e-5;
     
-return 0;
+return lhood_meta2;
 }

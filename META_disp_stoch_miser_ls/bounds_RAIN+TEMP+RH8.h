@@ -4,74 +4,77 @@ double bound(int i,int j)				// bounds on parameters for parhood line search
 double low;
 double high;
 
-//if (i==2)		{	low = -6.1;			high = .1;	}		//nuBAR	(log10)
-if (i==2)		{	low = -4.0;			high = -0.5;	}		//nuV	(log10)
-else if (i==3)	{	low = -7.50;			high = -3.50;	}		//nuF
-//else if (i==4)	{	low = 0.001;			high = 3.0;	}		//k
-else if (i==4)	{	low = 0.1;			high = 4.0;	}		//k
-else if (i==5)	{	low = -1.0;			high = 0.2;}		//muV	(log10)
-else if (i==6)	{	low = -6.50;			high = -3.00;}		//muF	(log10)
+//metapopulation one
+if (i==1)		{	low = 20;			high = 200;		}		//initS fungus-only
+else if (i==2)		{	low = 20;			high = 200;		}	//initS virus-only
+else if (i==3)		{	low = 20;			high = 200;		}	//initS fungus-virus
+else if (i==4)		{	low = 20;			high = 200;		}	//initS control
 
-else if (i==7)	{	low = 1.01;			high = 9.01;}		//CK//  beta = the size of accumulated rainfall window
+else if (i==5)		{	low = 0;			high = 0.5;		}	//initV fungus-only
+else if (i==6)		{	low = 0;			high = 0.5;		}	//initV virus-only
+else if (i==7)		{	low = 0;			high = 0.5;		}	//initV fungus-virus
+else if (i==8)		{	low = 0;			high = 0.5;		}	//initV control
 
-else if (i==8)	{	low = 5;			high = 50;	}		//gam_stepsV
-else if (i==9)	{	low = 10;			high = 200;	}		//gam_stepsF
-else if (i==10)	{	low = -4.0;			high = -1.0;}		//ratio	(log10)
-//else if (i==11)	{	low = -4.0;			high = -0.300;	}		//sdr
-//else if (i==12)	{	low = -4.0;			high = -0.500;	}		//sdf
-else if (i==11)	{	low = 0.000001;			high = 0.600;	}		//sdr
-else if (i==12)	{	low = 0.000001;			high = 0.300;	}		//sdC
+else if (i==9)		{	low = 0;			high = 0.5;		}	//initR fungus-only
+else if (i==10)		{	low = 0;			high = 0.5;		}	//initR virus-only
+else if (i==11)		{	low = 0;			high = 0.5;		}	//initR fungus-virus
+else if (i==12)		{	low = 0;			high = 0.5;		}	//initR control
 
-else if (i==13)	{	low = -4.0;			high = 1.00;	}		//gamma
-//else if (i==13)	{	low = -4.0;			high = 0.5;	}		//CK// Average R(0) for all populations
-//else if (i==13)	{	low = .50;			high = 3.5;	}		//CK// cover_C
-//else if (i==13)	{	low = .50;			high = 4.5;	}		//CK// Now it is the COVERED CAGE scaling parameter 
-												//CK// theta = delay for when to start accumulating rainfall
+//metapopulation two
+else if (i==13)		{	low = 20;			high = 200;		}	//initS fungus-only
+else if (i==14)		{	low = 20;			high = 200;		}	//initS virus-only
+else if (i==15)		{	low = 20;			high = 200;		}	//initS fungus-virus
+else if (i==16)		{	low = 20;			high = 200;		}	//initS control
 
-else if (i==14)	{	low = -4.0;			high = 1.00;	}		//gamma
+else if (i==17)		{	low = 0;			high = 0.5;		}	//initV fungus-only
+else if (i==18)		{	low = 0;			high = 0.5;		}	//initV virus-only
+else if (i==19)		{	low = 0;			high = 0.5;		}	//initV fungus-virus
+else if (i==20)		{	low = 0;			high = 0.5;		}	//initV control
 
-else if (i==15)	{	low = 1.0;			high = 14.1;}		//neonates_v
-//else if (i==16)	{	low = 0.51;			high = 5.1;	}		//r_time
-//else if (i==16)	{	low = 38.0;			high = 52.0;	}		//CK// STOP1
-else if (i==16)	{	low = 350.0;			high = 650.0;	}		//CK// C end	
-//CK//  I'm changing param 16 from influencing when spores start blooming to when spores stop blooming 
-//else if (i==17)	{	low = .005;			high = 3.0;	}		//lambdaV
-else if (i==17)	{	low = 4.0;			high = 17.0;	}		//Covered_C
-else if (i==18)	{	low = .066667;			high = 0.25;	}		//lambdaF
+else if (i==21)		{	low = 0;			high = 0.5;		}	//initR fungus-only
+else if (i==22)		{	low = 0;			high = 0.5;		}	//initR virus-only
+else if (i==23)		{	low = 0;			high = 0.5;		}	//initR fungus-virus
+else if (i==24)		{	low = 0;			high = 0.5;		}	//initR control
 
-//else if (i==19)	{	low = -2.0;			high = -0.4;	}		//CK// 
-else if (i==19)	{	low = 160.0;			high = 500.0;	}		//CK// stop2 R_end.  time when resting spores stop blooming
+//metapopulation three
+else if (i==25)		{	low = 20;			high = 200;		}	//initS fungus-only
+else if (i==26)		{	low = 20;			high = 200;		}	//initS virus-only
+else if (i==27)		{	low = 20;			high = 200;		}	//initS fungus-virus
+else if (i==28)		{	low = 20;			high = 200;		}	//initS control
 
-else if (i==20)	{	low = 4.0;			high = 20.50;	}		//CK// Covered_R
-//else if (i==20)	{	low = 0.5;			high = 4.50;	}		//CK// CAGE scaling parameter
-//else if (i==20)	{	low = 1E-5;			high = 0.1;	}		//CK// rain scaling parameter
+else if (i==29)		{	low = 0;			high = 0.5;		}	//initV fungus-only
+else if (i==30)		{	low = 0;			high = 0.5;		}	//initV virus-only
+else if (i==31)		{	low = 0;			high = 0.5;		}	//initV fungus-virus
+else if (i==32)		{	low = 0;			high = 0.5;		}	//initV control
 
-//else if (i==21)	{	low = 0.01;			high = 20.0;	}		//CK// Rain scaling parameter func 3 and 4
-else if (i==21)	{	low = -2.0;			high = 1.50;	}		//CK// Rain scaling parameter func 2
-//else if (i==21)	{	low = 0.0000001;			high = 0.2;	}		//CK// temp scaling parameter
+else if (i==33)		{	low = 0;			high = 0.5;		}	//initR fungus-only
+else if (i==34)		{	low = 0;			high = 0.5;		}	//initR virus-only
+else if (i==35)		{	low = 0;			high = 0.5;		}	//initR fungus-virus
+else if (i==36)		{	low = 0;			high = 0.5;		}	//initR control
 
-else if (i==22)	{	low = -1.75;			high = -0.70;	}		//CK// RH scaling parameter
+//metapopulation four
+else if (i==37)		{	low = 20;			high = 200		} 	//initS
+else if (i==38)		{	low = 0;			high = 0.5		} 	//initV
+else if (i==39)		{	low = 0;			high = 0.5		} 	//initR
 
-else if (i==23)	{	low = -0.600;			high = -0.10;	}		//CK// temp scaling parameter for muF
-//else if (i==23)	{	low = 0.0001;			high = 0.2;	}		//CK// stop2 R_end.  time when resting spores stop blooming
+//metapopulation five
+else if (i==40)		{	low = 20;			high = 200		} 	//initS
+else if (i==41)		{	low = 0;			high = 0.5		} 	//initV
+else if (i==42)		{	low = 0;			high = 0.5		} 	//initR
 
-else if (i==24)	{	low = 2.50;			high = 18.00;	}		//CK// open_C
+//metapopulation six
+else if (i==43)		{	low = 20;			high = 200		} 	//initS
+else if (i==44)		{	low = 0;			high = 0.5		} 	//initV
+else if (i==45)		{	low = 0;			high = 0.5		} 	//initR
 
-else if (i==25)	{	low = 4.1;			high = 18.50;	}		//CK// open_R
+//dispersal
+else if (i==46)		{	low = 0;			high = 0.5		} 	//con_mrg //frac of conidia that disperse
+else if (i==47)		{	low = 0;			high = 1		}	//a //distance dispersal parameter
+else if (i==48)		{	low = 0;			high = 1		}	//lar_disp //prob of dispersal
 
-else if (i==26)	{	low = -0.750;			high = 3.50;	}		// rain_P2
-
-else if (i==27)	{	low = 60.0;			high = 130.0;	}		//CK// R_start.  time when resting spores start blooming
-//else if (i==27)	{	low = -4.0;			high = -0.7;	}		//CK// stop2 R_end.  time when resting spores stop blooming
-//else if (i==26)	{	low = 1E-4;			high = 0.1;	}		//CK// scaler for TEMP affect of muF func 2
-//else if (i==26)	{	low = 0.001;			high = 4.0;	}		//CK// scaler for TEMP affect of muF func 3 and 4
-
-//else if (i==28)	{	low = 0.015;			high = 0.07;	}		//CK// size_S. effect of size on susceptibility.
-else if (i==28)	{	low = 230.0;			high = 370.0;	}		//CK// size_S. effect of size on susceptibility.
-
-else if (i==29)	{	low = -2.50;			high = 0.50;	}		//CK// rain_P3
-
-else			{	low = 1;			high = 1;	}
+//coifection
+else if (i==49) 	{	low = 0;			high = 1		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==50) 	{	low = 0;			high = 1000		}	//VFSus //enhanced susceptibility 
 
 if		(j==1)	return low;
 else if (j==2)	return high;

@@ -403,18 +403,16 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			
 				int subout; //indexing
 				int subin; //indexing
+				double poptotal;
 				double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
 				double netSdisp[4] = {0, 0, 0, 0};
 				double fracV; //fracS = 1-fracV //early in epi, only S and V around
 				
 				double lar_disp = Params->lar_disp; //prob of migrating out //TO FIT
-				double poptotal = Params->poptotal; //pop total, to fit
-				lar_disp = 0.01;
-
 				
 				for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 					for(subin = 0; subin < num_sub; subin++){
-							poptotal = S[subout]+V[subout]+C[subout]; //?????????????????????? fitting just initial S or entire total pop
+							poptotal = S[subout]+V[subout]+C[subout];
 							fracV = V[subout]/poptotal; //what frac are virus
 							//EVENT 1: RANDOM INSECTS LEAVE, FRAC ARE V FRAC ARE S
 							netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; //frac of virus infected insects that leave

@@ -59,15 +59,15 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 		double con_disp; //frac dispersing from subout to subin
 		double netdisp[4] = {0, 0, 0, 0};
 
-		double con_mgr = 0.0001;
-		double a = 5;
+		//double con_mgr = 0.0001;
+		//double a = 5;
 		//Params->con_mrg = 0.01; //migration parameter, FIT
 		//Params->a = 5; //migration parameter, FIT 
 		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			for(subin = 0; subin < num_sub; subin++){
 				if(subout != subin){
-					con_disp = con_mgr*exp(-a*Params->DISTANCE[j][subout][subin]);
+					con_disp = Params->con_mrg*exp(-Params->a*Params->DISTANCE[j][subout][subin]);
 					//con_disp = 0;
 					netdisp[subout] = netdisp[subout] - con_disp*y[m+n+1+sub_index[subout]]; 
 					netdisp[subin] = netdisp[subin] + con_disp*y[m+n+1+sub_index[subout]]; 
@@ -177,11 +177,11 @@ while (t_ode<t_end)	{
 
 		}
 		else{
-		if (y_ode[i]>Params->INITS[0])	{
-			printf("y(%d) TOO LARGE!!\n",i);
+		//if (y_ode[i]>Params->INITS[Params->numsub])	{
+		//	printf("y(%d) TOO LARGE!!\n",i);
 			//printf("TOO LARGE y_ode[%i]=%e\n", i, y_ode[i]);	
-			y_ode[i]=Params->INITS[0];
-		}
+		//	y_ode[i]=Params->INITS[0];
+		//}
 		}
 	}
 

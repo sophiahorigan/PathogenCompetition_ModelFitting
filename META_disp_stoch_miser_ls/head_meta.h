@@ -33,6 +33,8 @@ char *strFileNameDate;
 #define SIMU 64
 //#define DIM 15						// number of differential equations
 
+int lhood_adj = 700;		//adjustment for likelihood in and out of log scale
+
 const double h = 0.01;		        // time step
 
 double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
@@ -49,7 +51,7 @@ double phifungus=0.25;
 double gammafungus=0.95;
 double psifungus=0.95;
 double eta=100;
-double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1};
+//double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1}; //make sure not redundant
 double fecundity=74.6;
 
 //JL: Predation parameters
@@ -87,7 +89,7 @@ double VPass;          //variable to pass the value of initialV in each generati
 
 //SH global declaration of global file fp1 to print daily output into
 FILE *fp1;
-
+FILE *fpl;
 
 //double vinfected; //SH to hold daily fraction infected
 //double finfected; //SH add coinfected eventually

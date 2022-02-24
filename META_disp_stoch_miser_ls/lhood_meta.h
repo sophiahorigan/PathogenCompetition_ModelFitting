@@ -87,7 +87,7 @@ Params->PARS[50+pop]=fdensity;
 int dataset;
 dataset = Params->j;
 
-printf("dataset in lhood meta = %i\n", Params->j);
+//printf("dataset in lhood meta = %i\n", Params->j);
 
 
 DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
@@ -102,13 +102,13 @@ if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopula
 			} 
 			m++;
 		}
-		printf("END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
+		fprintf(fpl, "END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
 		lhood_meta = lhood_meta + lhood_sub;
 		n = 0;
 		lhood_sub = 0;
 			
 	}
-	printf("Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
+	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 	}
 if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with no subpopulations
 	for (n = 0; n < epi_length; n++){
@@ -117,28 +117,12 @@ if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with n
 			printf("%lf\n", lhood_meta);
 		}
 	}
-	printf("Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
+	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 }
+//convert out of log for MISER
+lhood_meta2 = lhood_meta + lhood_adj;
+lhood_meta2 = exp(lhood_meta2);
 
-lhood_meta2 = lhood_meta + 700;
-
-
-/*char name1[50];
-sprintf(name1, "sim_output_");
-fp1=fopen(name1,"a+"); //or a+, not sure which
-DDEVF(&Params,r_seed,dim,pop,48,0,year);
-fclose(fp1);*/
-
-
-//**************SH prints content of sim_output******************//
-/*
-int loop3, loop4;
-for(loop3 = 0; loop3 < 192; loop3++){
-	for (loop4 = 0; loop4 < 4; loop4++){
-		printf("sim_output[%i][%i] = %e\n", loop3, loop4, sim_output[loop3][loop4]);
-	}	
-}
-*/
     
 return lhood_meta2;
 }

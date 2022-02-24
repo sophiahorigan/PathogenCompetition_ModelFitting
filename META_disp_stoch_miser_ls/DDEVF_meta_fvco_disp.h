@@ -31,7 +31,7 @@ int MAXT3=48;
 int num_sub;
 Params->j = dataset;
 int j = Params->j;
-printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
+//printf("j in DDEVF = %i, PARAMS j = %i, j = %i\n", dataset, Params->j, j);
 
 // SUBS
 // SUB 1 (0) = FUNGUS-ONLY
@@ -231,7 +231,7 @@ for(i=0; i<num_sub; i++){
 	V[i] = INITV[i]; //need to link with main.c eventually
 	C[i] = 0;
 	R[i] = INITR[i];
-	//printf("J = %i\t, Numsub = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
+	//fprintf(fpl, "J = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
 
 	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
 		E_V[i][ii]=0;

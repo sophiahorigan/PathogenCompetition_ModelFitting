@@ -53,28 +53,28 @@ else if (i==35)		{	low = 0;			high = 0.5;		}	//initR fungus-virus
 else if (i==36)		{	low = 0;			high = 0.5;		}	//initR control
 
 //metapopulation four
-else if (i==37)		{	low = 20;			high = 200		} 	//initS
-else if (i==38)		{	low = 0;			high = 0.5		} 	//initV
-else if (i==39)		{	low = 0;			high = 0.5		} 	//initR
+else if (i==37)		{	low = 20;			high = 200;		} 	//initS
+else if (i==38)		{	low = 0;			high = 0.5;		} 	//initV
+else if (i==39)		{	low = 0;			high = 0.5;		} 	//initR
 
 //metapopulation five
-else if (i==40)		{	low = 20;			high = 200		} 	//initS
-else if (i==41)		{	low = 0;			high = 0.5		} 	//initV
-else if (i==42)		{	low = 0;			high = 0.5		} 	//initR
+else if (i==40)		{	low = 20;			high = 200;		} 	//initS
+else if (i==41)		{	low = 0;			high = 0.5;		} 	//initV
+else if (i==42)		{	low = 0;			high = 0.5;		} 	//initR
 
 //metapopulation six
-else if (i==43)		{	low = 20;			high = 200		} 	//initS
-else if (i==44)		{	low = 0;			high = 0.5		} 	//initV
-else if (i==45)		{	low = 0;			high = 0.5		} 	//initR
+else if (i==43)		{	low = 20;			high = 200;		} 	//initS
+else if (i==44)		{	low = 0;			high = 0.5;		} 	//initV
+else if (i==45)		{	low = 0;			high = 0.5;		} 	//initR
 
 //dispersal
-else if (i==46)		{	low = 0;			high = 0.5		} 	//con_mrg //frac of conidia that disperse
-else if (i==47)		{	low = 0;			high = 1		}	//a //distance dispersal parameter
-else if (i==48)		{	low = 0;			high = 1		}	//lar_disp //prob of dispersal
+else if (i==46)		{	low = 0;			high = 0.5;		} 	//con_mrg //frac of conidia that disperse
+else if (i==47)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter
+else if (i==48)		{	low = 0;			high = 1;		}	//lar_disp //prob of dispersal
 
 //coifection
-else if (i==49) 	{	low = 0;			high = 1		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==50) 	{	low = 0;			high = 1000		}	//VFSus //enhanced susceptibility 
+else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==50) 	{	low = 0;			high = 1000;	}	//VFSus //enhanced susceptibility 
 
 if		(j==1)	return low;
 else if (j==2)	return high;

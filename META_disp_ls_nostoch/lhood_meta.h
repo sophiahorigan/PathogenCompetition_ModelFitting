@@ -110,7 +110,8 @@ if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopula
 		//fprintf(fpl, "END OF SUBPOP. Likelihood sum for subpop = %lf\n", lhood_sub);
 		lhood_meta = lhood_meta + lhood_sub;
 		n = 0;
-		lhood_sub = 0;	
+		lhood_sub = 0;
+			
 	}
 	//printf("likelikhood for metapop %i = %lf\n", dataset, lhood_meta);
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
@@ -127,9 +128,8 @@ if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with n
 	}
 	//printf("likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
+	//Params->lhood_adjust[dataset] = lhood_meta*-1;
 }
-Params->lhood_adjust[dataset] = lhood_meta*-1;
-
 printf("lhood_meta = %lf\n", lhood_meta);
 lhood_meta2 = lhood_meta + 7000;
 printf("post_adj lhoodmeta = %lf\n", lhood_meta2);

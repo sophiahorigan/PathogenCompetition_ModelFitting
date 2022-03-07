@@ -1,4 +1,4 @@
-double LHood_Meta(double *RandNumsPass ,size_t dim ,void *Paramstuff)
+double LHood_Meta(void *Paramstuff)
 {
 // calls DDEVF, uses results from DDEVF to calculate and return 'hood'
 STRUCTURE* Params;
@@ -90,11 +90,11 @@ dataset = Params->j;
 //printf("dataset in lhood meta = %i\n", Params->j);
 //printf("PRE DDEVF DATA S = %i\n", Params->DATA[6][15][0]);
 
-DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
+DDEVF(Params,pop,48,0,year,dataset);
 
 //printf("POST DDEVF DATA S = %i\n", Params->DATA[6][15][0]);
 
-int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0; double lhood_meta2;
+int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0;
 if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopulations
 	while (m < epi_length*4){
 		for (n = 0; n < epi_length; n++){
@@ -115,7 +115,6 @@ if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopula
 	}
 	//printf("likelikhood for metapop %i = %lf\n", dataset, lhood_meta);
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
-	Params->lhood_adjust[dataset] = lhood_meta*-1;
 }
 if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with no subpopulations
 	for (n = 0; n < epi_length; n++){
@@ -130,12 +129,7 @@ if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with n
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 	//Params->lhood_adjust[dataset] = lhood_meta*-1;
 }
-printf("lhood_meta = %lf\n", lhood_meta);
-lhood_meta2 = lhood_meta + 7000;
-printf("post_adj lhoodmeta = %lf\n", lhood_meta2);
-//lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
-lhood_meta2 = exp(lhood_meta2);
-printf("exp lhood = %lf\n", lhood_meta2);
-
-return lhood_meta2;
+Params->lhood_meta = lhood_meta;
+//printf("lhood DDEVF = %lf\n", lhood_meta);
+return lhood_meta;
 }

@@ -186,6 +186,9 @@ typedef struct
 	//lhood_adjust
 	double lhood_adjust[DATA_SETS];
 
+	//likelihood
+	double lhood_meta;
+
 
 }STRUCTURE;
 

@@ -1,6 +1,6 @@
 // DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
 
-double DDEVF(void *Paramstuff, double *RandNumsPass ,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
+double DDEVF(void *Paramstuff,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
 
 {
 
@@ -52,7 +52,7 @@ if (j==4 || j==5 || j==6) { // obs data
 	//printf("In loop two num_sub = %i\n", num_sub);
 }
 
-int larvae_dispersal_on = 1; //set to 0 for no dispersal
+int larvae_dispersal_on = 0; //set to 0 for no dispersal
 
 //printf("numsub = %i", num_sub);
 
@@ -114,10 +114,12 @@ double FIO_Or;
 double DD10=0;    //accumulated degree days about 10 degrees C
 double R_seed = 0.05;
 
-// ----------------------------------- RANDOM NUMBERS -------------------------------------------- //
+// ----------------------------------- STOCHASTICITY -------------------------------------------- //
 for (i=0;i<=MAXT3;i++)	{
-	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]);
-	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->PARS[12]);
+	//rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]);
+	//rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->PARS[12]);
+	rand_nuR[i]=0;//0 means no stochasticity
+	rand_nuF[i]=0;
 	//printf("randon nuR = %lf\t, random nuF = %lf\n", rand_nuR[i], rand_nuF[i]);
 }//getc(stdin);
 

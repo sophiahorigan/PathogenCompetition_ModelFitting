@@ -51,7 +51,7 @@ if (j==4 || j==5 || j==6){
 
 
 //dispersal
-int coni_dispersal_on = 1; //set to 0 for no dispersal
+int coni_dispersal_on = 0; //set to 0 for no dispersal
 double Cdisp[4] = {0, 0, 0, 0}; //net conidia dispersal
 //printf("VFSus = %lf\n",Params->VFSus);
 

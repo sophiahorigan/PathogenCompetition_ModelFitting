@@ -52,7 +52,7 @@ if (j==4 || j==5 || j==6) { // obs data
 	//printf("In loop two num_sub = %i\n", num_sub);
 }
 
-int larvae_dispersal_on = 0; //set to 0 for no dispersal
+int larvae_dispersal_on = 1; //set to 0 for no dispersal
 
 //printf("numsub = %i", num_sub);
 

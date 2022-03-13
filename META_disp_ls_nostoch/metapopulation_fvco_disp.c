@@ -150,9 +150,9 @@ fclose(fp1);
 */
 //----------------------------------Set-Up Line Search------------------------//
 
-int searches = 10; //number of iterations for each specific parameter
+int searches = 5; //number of iterations for each specific parameter
 int round;
-int numround = 50; //why do we have rounds?
+int numround = 3; //why do we have rounds?
 
 int num_ltfparams = 50;	//number of parameters to fit
 double ltf_params[50] = {0};      //arrays to hold different parameter values
@@ -161,61 +161,65 @@ double init_ltfparams[50]={0};
 for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter
     double randn=gsl_rng_uniform_pos(r_seed); //random creates multuple starting points within bounds
     //printf("%lf\n",randn);
-    if (i==0){ltf_params[i]=1+randn*19;} 			//initS 	1 - 20
-    else if (i==1){ltf_params[i]=1+randn*19;}   	//initS 	1 - 20
-    else if (i==2){ltf_params[i]=1+randn*19;} 		//initS		1 - 20
-    else if (i==3){ltf_params[i]=1+randn*19;} 		//initS		1 - 20
-    else if (i==4){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==5){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==6){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==7){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	//meta1
+    if (i==0){ltf_params[i]=1+randn*99;} 			//initS 	1 - 20
+    else if (i==1){ltf_params[i]=1+randn*99;}   	//initS 	1 - 20
+    else if (i==2){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
+    else if (i==3){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
+    else if (i==4){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==5){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==6){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==7){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
     else if (i==8){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
     else if (i==9){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==10){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==11){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
+	//meta2
 	else if (i==12){ltf_params[i]=1+randn*99;} 	//initS 	1 - 100
 	else if (i==13){ltf_params[i]=1+randn*99;} 	//initS 	1 - 100
 	else if (i==14){ltf_params[i]=1+randn*99;} 	//initS 	1 - 100
 	else if (i==15){ltf_params[i]=1+randn*99;} 	//initS 	1 - 100
-	else if (i==16){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-	else if (i==17){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-	else if (i==18){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-	else if (i==19){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	else if (i==16){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==17){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==18){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==19){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
 	else if (i==20){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==21){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==22){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==23){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-	else if (i==24){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==25){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==26){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==27){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==28){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
-	else if (i==29){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
-	else if (i==30){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
-	else if (i==31){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
+	//meta3
+	else if (i==24){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==25){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==26){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==27){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==28){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==29){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==30){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==31){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
 	else if (i==32){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==33){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==34){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==35){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-
-	else if (i==36){ltf_params[i]=1+randn*19;} 	//initS		1 - 100
-	else if (i==37){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	//meta4
+	else if (i==36){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
+	else if (i==37){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
 	else if (i==38){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-
-	else if (i==39){ltf_params[i]=1+randn*200;} 	//initS		1 - 100
-	else if (i==40){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
+	//meta5
+	else if (i==39){ltf_params[i]=1+randn*19;} 	//initS		1 - 100
+	else if (i==40){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.5
 	else if (i==41){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.1
-
+	//meta6
 	else if (i==42){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
 	else if (i==43){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.3
 	else if (i==44){ltf_params[i]=0+randn*0.01;}		//initR		0 - 0.01
-
+	//dispersal
 	else if (i==45){ltf_params[i]=0+randn*1;}		//con_mrg	0 - 1
 	else if (i==46){ltf_params[i]=0+randn*1;}		//a			0 - 1
 	else if (i==47){ltf_params[i]=0+randn*1;}		//lar_disp	0 - 1
+	//coinfection
 	else if (i==48){ltf_params[i]=0+randn*1;}		//coinf_V	0 - 1
 	else if (i==49){ltf_params[i]=0+randn*500;}		//VFSus		0 - 500
-    init_ltfparams[i]=ltf_params[i]; //fill both 
+    //init_ltfparams[i]=ltf_params[i]; //fill both 
     //printf("%lf\t %lf\n",init_ltfparams[i],ltf_params[i]);
 	//printf("i = %i\t, lft_params = %lf\n %lf\n",i, init_ltfparams[i]);
 }
@@ -241,23 +245,27 @@ pid=getpid();
 //fprintf(fpl, "hello, world!");
 
 char namev[50];
-sprintf(namev, "meta6_s%i_r%i_%d", searches, numround, pid);
+sprintf(namev, "allmeta_s%i_r%i_%d", searches, numround, pid);
 fpv=fopen(namev, "a+");
 
 
 //---------------------------------------------- Line-Search -------------------------------------------------------//
 //specify parameter bounds and increments
-int paramfit[5] = {42, 43, 44, 48, 49}; //array of params to fit
-int len_paramfit = 5; //length of fit array - 1
+//all but dispersal
+//int paramfit[46] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 48, 49}; //array of params to fit
+//int paramfit[5] = {36, 37, 38, 48, 49};
+//int paramfit[17] = {12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 45, 46, 47, 48, 49};
+//int len_paramfit = 17; //length of fit array - 1
 
 //make x loop of length paramfit, assign a value 
 
 for (round=0;round<numround;round++){ //starts the searches again at a new value (if better likelihood)
-	localmax_lhood=-9999;
+	localmax_lhood=-999999999999;
 	a=0;
 	int x=0;
-	while (x<len_paramfit){
-		a=paramfit[x];
+	while (a<num_ltfparams){  
+	//while (x<len_paramfit){
+		//a=paramfit[x];
 		//printf("a= %i\n", a);
 		if (round>0){					//this loop to help bounds if likelihood is horrible
 		if (maxlhood==-9999 && a==0){		//if likelihood is super bad, in next round change some of parameter values //optional
@@ -408,20 +416,20 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				ltf_params[a]=ltf_params[a]-0.0005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
-			else if (a==36){     //initS
+			else if (a==36){     //initS //meta4
 				ltf_params[a]=ltf_params[a]-5*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==37){     //initV
 				ltf_params[a]=ltf_params[a]-0.05*searches;
-				if (ltf_params[a]>1){ltf_params[a]=1;}
+				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==38){     //initR
 				ltf_params[a]=ltf_params[a]-0.0005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
-			else if (a==39){     //initS
-				ltf_params[a]=ltf_params[a]-5*searches;
+			else if (a==39){     //initS //meta5
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==40){     //initV
@@ -432,8 +440,8 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				ltf_params[a]=ltf_params[a]-0.0005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
-			else if (a==42){     //initS
-				ltf_params[a]=ltf_params[a]-5*searches;
+			else if (a==42){     //initS //meta6
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==43){     //initV
@@ -461,7 +469,7 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==49){     //VFSus
-				ltf_params[a]=ltf_params[a]-10*searches;
+				ltf_params[a]=ltf_params[a]-5*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			//if (ltf_params[a]<init_ltfparams[a]){
@@ -603,8 +611,8 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				ltf_params[a]=ltf_params[a]+0.0005;
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
-			else if (a==36){     //initS
-				ltf_params[a]=ltf_params[a]+5; 
+			else if (a==36){     //initS //meta4
+				ltf_params[a]=ltf_params[a]+1; 
 			}
 			else if (a==37){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
@@ -614,8 +622,8 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				ltf_params[a]=ltf_params[a]+0.0005;
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
-			else if (a==39){     //initS
-				ltf_params[a]=ltf_params[a]+5; 
+			else if (a==39){     //initS //meta5
+				ltf_params[a]=ltf_params[a]+1; 
 			}
 			else if (a==40){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
@@ -625,8 +633,8 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				ltf_params[a]=ltf_params[a]+0.0005;
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
-			else if (a==42){     //initS
-				ltf_params[a]=ltf_params[a]+5; 
+			else if (a==42){     //initS //meta6
+				ltf_params[a]=ltf_params[a]+1; 
 			}
 			else if (a==43){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
@@ -653,11 +661,10 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 				if (ltf_params[a]>1){ltf_params[a]=1;}
 			}
 			else if (a==49){     //VFSus
-				ltf_params[a]=ltf_params[a]+10; 
+				ltf_params[a]=ltf_params[a]+5; 
 			}
 		}
 			//Send new parameter values into code
-			/*
 			//metapopulation one
 			Params.FITINIT[1][0] = ltf_params[0]; //initS
 			Params.FITINIT[1][1] = ltf_params[1]; //initS
@@ -716,24 +723,24 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 			Params.FITINIT[4][4] = ltf_params[37]; //initV
 			//Params.FITINIT[4][8] = ltf_params[8]; //initR
 			Params.FITINIT[4][8] = ltf_params[38]; //initR
-
+			
 			//metapopultion five
 			Params.FITINIT[5][0] = ltf_params[39]; //initS
 			Params.FITINIT[5][4] = ltf_params[40]; //initV
 			//Params.FITINIT[5][8] = ltf_params[8]; //initR
 			Params.FITINIT[5][8] = ltf_params[41]; //initR
-			*/
+			
 			//metapopultion six
 			Params.FITINIT[6][0] = ltf_params[42]; //initS
 			Params.FITINIT[6][4] = ltf_params[43]; //initV
 			//Params.FITINIT[6][8] = ltf_params[8]; //initR
 			Params.FITINIT[6][8] = ltf_params[44]; //initR
-			/*
+		
 			//dispersal parameters
 			Params.con_mrg 		= ltf_params[45];
 			Params.a 			= ltf_params[46];
 			Params.lar_disp 	= ltf_params[47];
-			*/
+
 			//coinfection parameters
 			Params.coinf_V		= ltf_params[48];
 			Params.VFSus		= ltf_params[49];
@@ -745,8 +752,8 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		//for(j=1; j<=DATA_SETS; j++){
-		for(j=6; j<7; j++){
+		for(j=1; j<=DATA_SETS; j++){
+		//for(j=3; j<4; j++){
 			
 			Params.j = j;
 		
@@ -773,11 +780,15 @@ for (round=0;round<numround;round++){ //starts the searches again at a new value
 	}
 	maxlhood=localmax_lhood;
 	printf("maxlhood = %lf\n", maxlhood);
-	x++; //move to next parameter
+	a++;
+	//x++; //move to next parameter
 	} //x
 	//fprintf(fpv, "%lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", maxlhood, ltf_params[42], ltf_params[43], ltf_params[44], ltf_params[48], ltf_params[49]);
 }
-fprintf(fpv, "%lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", maxlhood, ltf_params[42], ltf_params[43], ltf_params[44], ltf_params[48], ltf_params[49]);
+//all
+fprintf(fpv, "%lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", maxlhood, ltf_params[1], ltf_params[2], ltf_params[3], ltf_params[4], ltf_params[5], ltf_params[6], ltf_params[7], ltf_params[8], ltf_params[9], ltf_params[10], ltf_params[11], ltf_params[12], ltf_params[13], ltf_params[14], ltf_params[15], ltf_params[16], ltf_params[17], ltf_params[18], ltf_params[19], ltf_params[20], ltf_params[21], ltf_params[22], ltf_params[23], ltf_params[24], ltf_params[25], ltf_params[26], ltf_params[27], ltf_params[28], ltf_params[29], ltf_params[30], ltf_params[31], ltf_params[32], ltf_params[33], ltf_params[34], ltf_params[35], ltf_params[36], ltf_params[37], ltf_params[38], ltf_params[39], ltf_params[40], ltf_params[41], ltf_params[42], ltf_params[43], ltf_params[44], ltf_params[45], ltf_params[46], ltf_params[47],ltf_params[48], ltf_params[49]);
+
+//fprintf(fpv, "%lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", maxlhood, ltf_params[12], ltf_params[13],ltf_params[14],ltf_params[15],ltf_params[16],ltf_params[17],ltf_params[18],ltf_params[19],ltf_params[20],ltf_params[21],ltf_params[22],ltf_params[23], ltf_params[45], ltf_params[46], ltf_params[47], ltf_params[48], ltf_params[49]);
 //fclose(fpl);
 fclose(fpv);
 //free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);

@@ -50,7 +50,8 @@ FILE *fp_results;
 //fp1=fopen(named, "a+");
 // ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
 gsl_rng *r_seed;
-r_seed=random_setup();
+//r_seed=random_setup();
+r_seed = -1;
 //printf("Random Seed: %f\n", r_seed); //getc(stdin);
 
 // ---------------------------------------------- Hand Fit Initial Conditions -------------------------------------------------- //
@@ -150,9 +151,9 @@ fclose(fp1);
 */
 //----------------------------------Set-Up Line Search------------------------//
 
-int searches = 10; //number of iterations for each specific parameter
+int searches = 100; //number of iterations for each specific parameter
 int round;
-int numround = 10;
+int numround = 50;
 
 int num_ltfparams = 50;	//number of parameters to fit
 double ltf_params[50] = {0};      //arrays to hold different parameter values
@@ -161,51 +162,51 @@ double init_ltfparams[50]={0};
 for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter
     double randn=gsl_rng_uniform_pos(r_seed); //random creates multuple starting points within bounds
     //printf("%lf\n",randn);
-    if (i==0){ltf_params[i]=1+randn*19;} 			//initS 	1 - 20
-    else if (i==1){ltf_params[i]=1+randn*19;}   	//initS 	1 - 20
-    else if (i==2){ltf_params[i]=1+randn*19;} 		//initS		1 - 20
+    if (i==0){ltf_params[i]=1+randn*99;} 			//initS 	1 - 20
+    else if (i==1){ltf_params[i]=1+randn*99;}   	//initS 	1 - 20
+    else if (i==2){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
     else if (i==3){ltf_params[i]=1+randn*19;} 		//initS		1 - 20
-    else if (i==4){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==5){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==6){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==7){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+    else if (i==4){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==5){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==6){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==7){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
     else if (i==8){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
     else if (i==9){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==10){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==11){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-	else if (i==12){ltf_params[i]=1+randn*19;} 	//initS 	1 - 20
-	else if (i==13){ltf_params[i]=1+randn*19;} 	//initS 	1 - 20
-	else if (i==14){ltf_params[i]=1+randn*19;} 	//initS 	1 - 20
-	else if (i==15){ltf_params[i]=1+randn*19;} 	//initS 	1 - 20
-	else if (i==16){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-	else if (i==17){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-	else if (i==18){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-	else if (i==19){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	else if (i==12){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
+	else if (i==13){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
+	else if (i==14){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
+	else if (i==15){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
+	else if (i==16){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==17){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==18){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==19){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
 	else if (i==20){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==21){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==22){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==23){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-	else if (i==24){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==25){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==26){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==27){ltf_params[i]=1+randn*19;} 	//initS		1 - 20
-	else if (i==28){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
-	else if (i==29){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
-	else if (i==30){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
-	else if (i==31){ltf_params[i]=0+randn*1;}		//initV		0 - 0.2
+	else if (i==24){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==25){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==26){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==27){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
+	else if (i==28){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==29){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==30){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==31){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
 	else if (i==32){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==33){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==34){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==35){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==36){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
 	else if (i==37){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
-	else if (i==38){ltf_params[i]=0+randn*.1;}		//initR		0 - 0.1
+	else if (i==38){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.1
 	else if (i==39){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
 	else if (i==40){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
-	else if (i==41){ltf_params[i]=0+randn*.1;}		//initR		0 - 0.1
+	else if (i==41){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.1
 	else if (i==42){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
 	else if (i==43){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
-	else if (i==44){ltf_params[i]=0+randn*0.1;}		//initR		0 - 0.1
+	else if (i==44){ltf_params[i]=0+randn*0.01;}		//initR		0 - 0.1
 	else if (i==45){ltf_params[i]=0+randn*1;}		//con_mrg	0 - 1
 	else if (i==46){ltf_params[i]=0+randn*1;}		//a			0 - 1
 	else if (i==47){ltf_params[i]=0+randn*1;}		//lar_disp	0 - 1
@@ -237,7 +238,7 @@ pid=getpid();
 //fprintf(fpl, "hello, world!");
 
 char namev[50];
-sprintf(namev, "meta2_line_search_params_%d", pid);
+sprintf(namev, "allmeta_line_search_params_%d", pid);
 fpv=fopen(namev, "a+");
 
 
@@ -399,7 +400,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==36){     //initS
-				ltf_params[a]=ltf_params[a]-5*searches;
+				ltf_params[a]=ltf_params[a]-2*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==37){     //initV
@@ -411,7 +412,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==39){     //initS
-				ltf_params[a]=ltf_params[a]-5*searches;
+				ltf_params[a]=ltf_params[a]-2*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==40){     //initV
@@ -423,7 +424,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==42){     //initS
-				ltf_params[a]=ltf_params[a]-5*searches;
+				ltf_params[a]=ltf_params[a]-2*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==43){     //initV
@@ -451,7 +452,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==49){     //VFSus
-				ltf_params[a]=ltf_params[a]-10*searches;
+				ltf_params[a]=ltf_params[a]-5*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			if (ltf_params[a]<init_ltfparams[a]){
@@ -616,7 +617,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==42){     //initS
-				ltf_params[a]=ltf_params[a]+5; 
+				ltf_params[a]=ltf_params[a]+1; 
 			}
 			else if (a==43){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
@@ -643,7 +644,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>1){ltf_params[a]=1;}
 			}
 			else if (a==49){     //VFSus
-				ltf_params[a]=ltf_params[a]+10; 
+				ltf_params[a]=ltf_params[a]+5; 
 			}
 		} 
 

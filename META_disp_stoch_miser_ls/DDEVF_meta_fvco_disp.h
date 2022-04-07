@@ -114,10 +114,16 @@ double FIO_Or;
 double DD10=0;    //accumulated degree days about 10 degrees C
 double R_seed = 0.05;
 
-// ----------------------------------- RANDOM NUMBERS -------------------------------------------- //
+// --------------------------------------- STOCHASTICITY -------------------------------------------- //
 for (i=0;i<=MAXT3;i++)	{
-	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->PARS[11]);
-	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->PARS[12]);
+	if (j==1 || j==2 || j==3){
+	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->Rsd_exp);
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->Fsd_exp);
+	}
+	if (j==4 || j==5 || j==6){
+	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->Rsd_obs);
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->Fsd_obs);	
+	}
 	//printf("randon nuR = %lf\t, random nuF = %lf\n", rand_nuR[i], rand_nuF[i]);
 }//getc(stdin);
 
@@ -231,7 +237,7 @@ for(i=0; i<num_sub; i++){
 	V[i] = INITV[i]; //need to link with main.c eventually
 	C[i] = 0;
 	R[i] = INITR[i];
-	//fprintf(fpl, "J = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
+	//printf("J = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
 
 	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
 		E_V[i][ii]=0;
@@ -361,7 +367,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		
 		for(sub=0; sub<num_sub; sub++){ //for each treatment
 			y_ode[0+sub_index[sub]]=S[sub];	y_ode[m+n+1+sub_index[sub]]=C[sub];	Params->POPS[3]=R[sub];
-			//printf("PreODES[%i] = %e\n", sub, C[sub]);
+			//printf("PreODES[%i] = %e\n", sub, S[sub]);
 			//printf("y_ode[%i] = %e\n", sub_index[sub], y_ode[0+sub_index[sub]]);
 			y_ode[m+n+3+sub_index[sub]]=V[sub];
 			
@@ -383,6 +389,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			for (i=1;i<=gstepsF;i++)	{
 				y_ode[m+n+6+i+sub_index[sub]]=E_FV[sub][i]; //end of fill for each treatment
 			}
+			//printf("sub = %i\t C = %lf\t V = %lf\n", sub, C[sub], V[sub]);
 		}
 		
 		/*
@@ -483,9 +490,10 @@ for(k=0; k<DIM; k++){
 //update state variables
 	for(sub=0; sub<num_sub; sub++){
 		S[sub]=y_ode[0+sub_index[sub]]; //SH ASK GREG: FOR OBS SITE, THIS ISN'T GETTING UPDATED
-		//printf("POSTODES[%i] = %e\n", sub, C[sub]);
+		//printf("POSTODES[%i] = %e\n", sub, S[sub]);
 		C[sub]=y_ode[m+n+1+sub_index[sub]]; 
 		V[sub]=y_ode[m+n+3+sub_index[sub]];
+		//printf("sub = %i\t V = %lf\n",sub, V[sub]);
 		Fnext[sub]=y_ode[m+n+2+sub_index[sub]];			
 		Vkill[sub]=y_ode[m+n+4+sub_index[sub]];
 		Fkill[sub]=y_ode[m+n+5+sub_index[sub]];			
@@ -510,7 +518,7 @@ for(k=0; k<DIM; k++){
 			IF[sub] += E_F[sub][i];
 		}
 
-		for (i=1;i<=n1;i++)	{
+		for (i=1;i<=n1;i++)	{ //early virus infections which can be coinfected
 			E_VF[sub][i]=y_ode[gstepsF+i+sub_index[sub]];
 			IVF[sub] += E_VF[sub][i];
 		}
@@ -518,18 +526,18 @@ for(k=0; k<DIM; k++){
 		for (i=1;i<=n2;i++)	{
 			E_V[sub][i]=y_ode[gstepsF+n1+i+sub_index[sub]];
 			IV[sub] += E_V[sub][i];
+			//printf("E_V = %lf\t IV = %lf\n", E_V[sub][i], IV[sub]);
 		}
 
-		for (i=1;i<=gstepsF;i++)	{
+		for (i=1;i<=gstepsF;i++)	{ //coinfected
 			E_FV[sub][i]=y_ode[gstepsF+gstepsV+6+i+sub_index[sub]];
+			//printf("j = %i\t sub = %i\t E_FV = %lf\n", j, sub, E_FV[sub]);
 			IFV[sub] += E_FV[sub][i];
-			IF[sub] += (1-coinf_V)*E_FV[i][sub]; 
-			IV[sub] += coinf_V*E_FV[i][sub];
-			//printf("IVF = %lf\n",IFV[sub]);
+			//printf("j = %i\t sub = %i\t IF = %lf\t IV = %lf\t IVF = %lf\n",j, sub, IF[sub], IV[sub], IFV[sub]);
 		}
 
 	}
-
+	//printf("day = %i\t j = %i\t sub = %i\t IF = %lf\t IV = %lf\t IVF = %lf\n",day, j, sub, IF[sub], IV[sub], IFV[sub]);
 //*************************SH below line prints daily output to global file fp1 **************/
 //fprintf(fp1, "%d\t %d\t %d\n", S/initS, IV/initS, IF/initS);
 //fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
@@ -546,12 +554,15 @@ for(sub=0; sub<num_sub; sub++){
 	
 	for(sub=0; sub<num_sub; sub++){	
 
-		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction uninfected S 
-		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected V 
-		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction infected F
-		Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]); //Saving daily fraction coinfected 
+		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction uninfected S 
+		//printf("DAY = %i\t j = %i\t sub = %i\t S = %lf\t yode = %lf\t IV = %lf\t IF = %lf\t IVF = %lf\n", day-1, j, sub, S[sub], y_ode[0+sub_index[sub]], IV[sub], IF[sub], IVF[sub]);
+		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected V 
+		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected F
+		Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction coinfected 
 
-		//fprintf(fp1, "%i\t %e\t %e\t %e\t %e\n", day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
+		//fprintf(fp1, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
+		//printf("%i\t %i\t %i\t %lf\t %lf\t %lf\t %lf\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
+
 	}
 
 	//SH need to fix print statement

@@ -183,6 +183,12 @@ typedef struct
 	double coinf_V;	//3
 	double VFSus;	//4
 
+	//stochasticity
+	double Rsd_exp;
+	double Fsd_exp;
+	double Rsd_obs;
+	double Fsd_obs;
+
 	//lhood_adjust
 	double lhood_adjust[DATA_SETS];
 

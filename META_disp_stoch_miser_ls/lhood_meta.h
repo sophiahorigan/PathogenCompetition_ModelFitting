@@ -100,8 +100,8 @@ if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopula
 		for (n = 0; n < epi_length; n++){
 			if(Params->DATA[dataset][m][0] != -1){
 				lhood_sub = lhood_sub + gsl_ran_multinomial_lnpdf(4, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
-				//printf("MODEL S=%lf\t V=%lf\t F=%lf\t FV=%lf\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2], Params->MODEL[dataset][m][3]);
-				//printf("DATA S=%i\t V=%i\t F=%i\t FV=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2], Params->DATA[dataset][m][3]);
+				//printf("SUB = %i\t MODEL S=%lf\t V=%lf\t F=%lf\t FV=%lf\n", dataset, Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2], Params->MODEL[dataset][m][3]);
+				//printf("SUB = %i\t DATA S=%i\t V=%i\t F=%i\t FV=%i\n", dataset, Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2], Params->DATA[dataset][m][3]);
 				//printf("%lf\n", lhood_sub);
 			} 
 			m++;
@@ -114,7 +114,6 @@ if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopula
 	}
 	//printf("likelikhood for metapop %i = %lf\n", dataset, lhood_meta);
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
-	Params->lhood_adjust[dataset] = lhood_meta*-1;
 }
 if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with no subpopulations
 	for (n = 0; n < epi_length; n++){
@@ -128,14 +127,25 @@ if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with n
 	//printf("likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 }
-Params->lhood_adjust[dataset] = lhood_meta*-1;
+printf("dataset = %i\t, lhood=%lf\n", dataset, lhood_meta);
+//remove super bad likelihood scores
+if (lhood_meta < -7500){
+	lhood_meta = 0;
+}
+//printf("was it bad?=%lf\n", lhood_meta);
 
-printf("lhood_meta = %lf\n", lhood_meta);
-lhood_meta2 = lhood_meta + 7000;
-printf("post_adj lhoodmeta = %lf\n", lhood_meta2);
-//lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
+//adjust and exponentiate
+lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
+//printf("adj = %lf\t, lhood post adj=%lf\n", Params->lhood_adjust[dataset], lhood_meta2);
+
 lhood_meta2 = exp(lhood_meta2);
-printf("exp lhood = %lf\n", lhood_meta2);
+
+//if nan, replace with zero
+if(isnan(lhood_meta2) || isinf(lhood_meta2)){
+	lhood_meta2 = 0;
+}
+
+//printf("exp lhood = %lf\n", lhood_meta2);
 
 return lhood_meta2;
 }

@@ -29,7 +29,7 @@ if (test==66)	{      num_runs=5;	parm_inc=12.0;	host_inc=6.0;	initR_inc=8.0;}
 //printf("runs=%d\t incs: parm=%2.0f\t S_0=%2.0f\t R_0=%2.0f\n",num_runs,parm_inc,host_inc,initR_inc);
 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
-int i=0; int j;int ii; int jj; int k; int l;
+int i=0; int j;int ii; int jj; int k; int l; 
 int num_adj_pars = 50;			// number of adjustable parameters
 int epi_length = 48;
 
@@ -50,8 +50,7 @@ FILE *fp_results;
 //fp1=fopen(named, "a+");
 // ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
 gsl_rng *r_seed;
-//r_seed=random_setup();
-r_seed = -1;
+r_seed=random_setup();
 //printf("Random Seed: %f\n", r_seed); //getc(stdin);
 
 // ---------------------------------------------- Hand Fit Initial Conditions -------------------------------------------------- //
@@ -151,13 +150,21 @@ fclose(fp1);
 */
 //----------------------------------Set-Up Line Search------------------------//
 
-int searches = 100; //number of iterations for each specific parameter
-int round;
-int numround = 50;
+//set initial likelihood adjustment values
+Params.lhood_adjust[1] = 1600;
+Params.lhood_adjust[2] = 4000;
+Params.lhood_adjust[3] = 3000;
+Params.lhood_adjust[4] = 800;
+Params.lhood_adjust[5] = 1100;
+Params.lhood_adjust[6] = 600;
 
-int num_ltfparams = 50;	//number of parameters to fit
-double ltf_params[50] = {0};      //arrays to hold different parameter values
-double init_ltfparams[50]={0};
+int searches = 5; //number of iterations for each specific parameter
+int round;
+int numround = 25;
+
+int num_ltfparams = 54;	//number of parameters to fit
+double ltf_params[54] = {0};      //arrays to hold different parameter values
+double init_ltfparams[54]={0};
 
 for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter
     double randn=gsl_rng_uniform_pos(r_seed); //random creates multuple starting points within bounds
@@ -166,58 +173,62 @@ for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter
     else if (i==1){ltf_params[i]=1+randn*99;}   	//initS 	1 - 20
     else if (i==2){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
     else if (i==3){ltf_params[i]=1+randn*19;} 		//initS		1 - 20
-    else if (i==4){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-    else if (i==5){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-    else if (i==6){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-    else if (i==7){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+    else if (i==4){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //fonly
+    else if (i==5){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+    else if (i==6){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+    else if (i==7){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //control
     else if (i==8){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
     else if (i==9){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==10){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==11){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-	else if (i==12){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
-	else if (i==13){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
-	else if (i==14){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
-	else if (i==15){ltf_params[i]=1+randn*99;} 	//initS 	1 - 20
-	else if (i==16){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-	else if (i==17){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-	else if (i==18){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-	else if (i==19){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==12){ltf_params[i]=1+randn*99;} 		//initS 	1 - 20
+	else if (i==13){ltf_params[i]=1+randn*99;} 		//initS 	1 - 20
+	else if (i==14){ltf_params[i]=1+randn*99;} 		//initS 	1 - 20
+	else if (i==15){ltf_params[i]=1+randn*99;} 		//initS 	1 - 20
+	else if (i==16){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //fonly
+	else if (i==17){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	else if (i==18){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	else if (i==19){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //control
 	else if (i==20){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==21){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==22){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==23){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-	else if (i==24){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
-	else if (i==25){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
-	else if (i==26){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
-	else if (i==27){ltf_params[i]=1+randn*99;} 	//initS		1 - 20
-	else if (i==28){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-	else if (i==29){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-	else if (i==30){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
-	else if (i==31){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.2
+	else if (i==24){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
+	else if (i==25){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
+	else if (i==26){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
+	else if (i==27){ltf_params[i]=1+randn*99;} 		//initS		1 - 20
+	else if (i==28){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //fonly
+	else if (i==29){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	else if (i==30){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
+	else if (i==31){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //control
 	else if (i==32){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==33){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==34){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==35){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
-	else if (i==36){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
+	else if (i==36){ltf_params[i]=1+randn*99;} 		//initS		1 - 100
 	else if (i==37){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
 	else if (i==38){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.1
-	else if (i==39){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
+	else if (i==39){ltf_params[i]=1+randn*99;} 		//initS		1 - 100
 	else if (i==40){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
 	else if (i==41){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.1
-	else if (i==42){ltf_params[i]=1+randn*99;} 	//initS		1 - 100
+	else if (i==42){ltf_params[i]=1+randn*99;} 		//initS		1 - 100
 	else if (i==43){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
-	else if (i==44){ltf_params[i]=0+randn*0.01;}		//initR		0 - 0.1
+	else if (i==44){ltf_params[i]=0+randn*0.01;}	//initR		0 - 0.1
 	else if (i==45){ltf_params[i]=0+randn*1;}		//con_mrg	0 - 1
 	else if (i==46){ltf_params[i]=0+randn*1;}		//a			0 - 1
-	else if (i==47){ltf_params[i]=0+randn*1;}		//lar_disp	0 - 1
+	else if (i==47){ltf_params[i]=0+randn*0.5;}		//lar_disp	0 - 1
 	else if (i==48){ltf_params[i]=0+randn*1;}		//coinf_V	0 - 1
 	else if (i==49){ltf_params[i]=0+randn*500;}		//VFSus		0 - 500
+	else if (i==50){ltf_params[i]=0+randn*2;}		//Rsd_exp	0 - 1
+	else if (i==51){ltf_params[i]=0+randn*2;}		//Fsd_exp	0 - 1
+	else if (i==52){ltf_params[i]=0+randn*2;}		//Rsd_obs	0 - 1
+	else if (i==53){ltf_params[i]=0+randn*2;}		//Fsd_obs	0 - 1
     init_ltfparams[i]=ltf_params[i]; //fill both 
     //printf("%lf\t %lf\n",init_ltfparams[i],ltf_params[i]);
 	//printf("i = %i\t, lft_params = %lf\n %lf\n",i, init_ltfparams[i]);
 }
-
-double localmax_params[50]={0};         //Array to record param values for the local max likelihood in line search
+//CHECK
+double localmax_params[54]={0};         //Array to record param values for the local max likelihood in line search
 int a,b,c;								//indexing loops
 double localmax_lhood; double maxlhood;
 for (c=0;c<num_ltfparams;c++){			//initial parameters begin as 'best' parameters
@@ -228,28 +239,36 @@ int r;
 
 
 //----------------------------------------------------Print Output to File-------------------------------------------//
-
-char namel[50];
 int pid;
 pid=getpid();
-//sprintf(namel,"~/line_search%d.txt",pid);
-//sprintf(namel,"line_search_likelihood_%d", pid);
-//fpl=fopen(namel,"a+");    //a+ for reading and appending! Could only get the output of the last year with w+.
-//fprintf(fpl, "hello, world!");
 
 char namev[50];
-sprintf(namev, "allmeta_line_search_params_%d", pid);
+sprintf(namev, "allmeta_s%i_r%i_%d", searches, numround, pid);
 fpv=fopen(namev, "a+");
 
+char name1[50];
+sprintf(name1, "model_realizations");
+fp1=fopen(name1, "a+");
 
+char namel[50];
+sprintf(namel, "lhood_s%i_r%i_%d", searches, numround, pid);
+fpl=fopen(namel, "a+");
 
 //---------------------------------------------- Line-Search -------------------------------------------------------//
 //specify parameter bounds and increments
+//all but dispersal
+//int paramfit[46] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 48, 49}; //array of params to fit
+//int paramfit[5] = {36, 37, 38, 48, 49};
+//int paramfit[17] = {12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 45, 46, 47, 48, 49};
+//int len_paramfit = 17; //length of fit array - 1
 
 for (round=0;round<numround;round++){
-	localmax_lhood=-9999;
+	localmax_lhood=-999999999999;
 	a=0;
+	int x=0;
 	while (a<num_ltfparams){            //Start line search, loop over parameters
+	//while (x<len_paramfit){
+		//a=paramfit[x];
 		if (round>0){					//this loop to help bounds if likelihood is horrible
 		if (maxlhood==-9999 && a==0){		//if likelihood is super bad, in next round change some of parameter values //optional
 		//lft_params[0] = lft_params[0] - 10;
@@ -271,8 +290,8 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-2*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
-			else if (a==4){		//initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+			else if (a==4){		//initV //fonly
+				ltf_params[a]=ltf_params[a]-0.001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==5){     //initV
@@ -283,8 +302,8 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
-			else if (a==7){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+			else if (a==7){     //initV //control
+				ltf_params[a]=ltf_params[a]-0.001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==8){     //initR
@@ -319,8 +338,8 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-2*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
-			else if (a==16){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+			else if (a==16){     //initV //fonly
+				ltf_params[a]=ltf_params[a]-0.001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==17){     //initV
@@ -331,8 +350,8 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
-			else if (a==19){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+			else if (a==19){     //initV //control
+				ltf_params[a]=ltf_params[a]-0.001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==20){     //initR
@@ -367,8 +386,8 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-2*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
-			else if (a==28){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+			else if (a==28){     //initV //fonly
+				ltf_params[a]=ltf_params[a]-0.001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==29){     //initV
@@ -379,8 +398,8 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
-			else if (a==31){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+			else if (a==31){     //initV //control
+				ltf_params[a]=ltf_params[a]-0.001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==32){     //initR
@@ -455,6 +474,22 @@ for (round=0;round<numround;round++){
 				ltf_params[a]=ltf_params[a]-5*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
+			else if (a==50){     //Rsd_exp
+				ltf_params[a]=ltf_params[a]-0.1*searches;
+				if (ltf_params[a]<0){ltf_params[a]=0;}
+			}
+			else if (a==51){     //Fsd_exp
+				ltf_params[a]=ltf_params[a]-0.1*searches;
+				if (ltf_params[a]<0){ltf_params[a]=0;}
+			}
+			else if (a==52){     //Rsd_obs
+				ltf_params[a]=ltf_params[a]-0.1*searches;
+				if (ltf_params[a]<0){ltf_params[a]=0;}
+			}
+			else if (a==53){     //Fsd_obs
+				ltf_params[a]=ltf_params[a]-0.1*searches;
+				if (ltf_params[a]<0){ltf_params[a]=0;}
+			}
 			if (ltf_params[a]<init_ltfparams[a]){
 				ltf_params[a]=init_ltfparams[a];  //initial values are lowest bound
 			}
@@ -474,21 +509,21 @@ for (round=0;round<numround;round++){
 			else if (a==3){     //initS
 				ltf_params[a]=ltf_params[a]+2; 
 			}
-			else if (a==4){		//initV
-				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}		//upper bound //this is unnecessary so long as the step size is congruent
+			else if (a==4){		//initV //fonly
+				ltf_params[a]=ltf_params[a]+0.001;
+				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==5){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==6){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
-			else if (a==7){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>1){ltf_params[a]=0.5;}
+			else if (a==7){     //initV //control
+				ltf_params[a]=ltf_params[a]+0.001;
+				if (ltf_params[a]>.01){ltf_params[a]=0.01;}
 			}
 			else if (a==8){     //initR
 				ltf_params[a]=ltf_params[a]+0.0005;
@@ -518,21 +553,21 @@ for (round=0;round<numround;round++){
 			else if (a==15){     //initS
 				ltf_params[a]=ltf_params[a]+2; 
 			}
-			else if (a==16){		//initV
-				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}		//upper bound
+			else if (a==16){		//initV //fonly
+				ltf_params[a]=ltf_params[a]+0.001;
+				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==17){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==18){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
-			else if (a==19){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+			else if (a==19){     //initV //control
+				ltf_params[a]=ltf_params[a]+0.001;
+				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==20){     //initR
 				ltf_params[a]=ltf_params[a]+0.0005;
@@ -562,21 +597,21 @@ for (round=0;round<numround;round++){
 			else if (a==27){     //initS
 				ltf_params[a]=ltf_params[a]+2; 
 			}
-			else if (a==28){		//initV
-				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}		//upper bound
+			else if (a==28){		//initV //fonly
+				ltf_params[a]=ltf_params[a]+0.001;
+				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==29){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==30){     //initV
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
-			else if (a==31){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
+			else if (a==31){     //initV //control
+				ltf_params[a]=ltf_params[a]+0.001;
+				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==32){     //initR
 				ltf_params[a]=ltf_params[a]+0.0005;
@@ -637,7 +672,7 @@ for (round=0;round<numround;round++){
 			}
 			else if (a==47){     //lar_disp
 				ltf_params[a]=ltf_params[a]+0.05;
-				if (ltf_params[a]>1){ltf_params[a]=1;}
+				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
 			}
 			else if (a==48){     //coinf_V
 				ltf_params[a]=ltf_params[a]+0.05;
@@ -645,6 +680,22 @@ for (round=0;round<numround;round++){
 			}
 			else if (a==49){     //VFSus
 				ltf_params[a]=ltf_params[a]+5; 
+			}
+			else if (a==50){     //Rsd_exp
+				ltf_params[a]=ltf_params[a]+0.1;
+				if (ltf_params[a]>2){ltf_params[a]=2;}
+			}
+			else if (a==51){     //Fsd_exp
+				ltf_params[a]=ltf_params[a]+0.1;
+				if (ltf_params[a]>2){ltf_params[a]=2;}
+			}
+			else if (a==52){     //Rsd_obs
+				ltf_params[a]=ltf_params[a]+0.1;
+				if (ltf_params[a]>2){ltf_params[a]=2;}
+			}
+			else if (a==53){     //Fsd_obs
+				ltf_params[a]=ltf_params[a]+0.1;
+				if (ltf_params[a]>2){ltf_params[a]=2;}
 			}
 		} 
 
@@ -654,10 +705,10 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[1][1] = ltf_params[1]; //initS
 			Params.FITINIT[1][2] = ltf_params[2]; //initS
 			Params.FITINIT[1][3] = ltf_params[3]; //initS
-			Params.FITINIT[1][4] = ltf_params[4]; //initV
+			Params.FITINIT[1][4] = ltf_params[4]; 				//initV //fonly
 			Params.FITINIT[1][5] = ltf_params[5]; //initV
 			Params.FITINIT[1][6] = ltf_params[6]; //initV
-			Params.FITINIT[1][7] = ltf_params[7]; //initV
+			Params.FITINIT[1][7] = ltf_params[7]; 				//initV //control
 			Params.FITINIT[1][8] = ltf_params[8]; //initR
 			//Params.FITINIT[1][9] = ltf_params[8]; //initR //same R across all sites
 			//Params.FITINIT[1][10] = ltf_params[8]; //initR
@@ -671,10 +722,10 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[2][1] = ltf_params[13]; //initS
 			Params.FITINIT[2][2] = ltf_params[14]; //initS
 			Params.FITINIT[2][3] = ltf_params[15]; //initS
-			Params.FITINIT[2][4] = ltf_params[16]; //initV
+			Params.FITINIT[2][4] = ltf_params[16]; 				//initV //fonly
 			Params.FITINIT[2][5] = ltf_params[17]; //initV
 			Params.FITINIT[2][6] = ltf_params[18]; //initV
-			Params.FITINIT[2][7] = ltf_params[19]; //initV
+			Params.FITINIT[2][7] = ltf_params[19]; 				//initV //control
 			//Params.FITINIT[2][8] = ltf_params[8]; //initR //same R across all sites
 			//Params.FITINIT[2][9] = ltf_params[8]; //initR
 			//Params.FITINIT[2][10] = ltf_params[8]; //initR
@@ -689,10 +740,10 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[3][1] = ltf_params[25]; //initS
 			Params.FITINIT[3][2] = ltf_params[26]; //initS
 			Params.FITINIT[3][3] = ltf_params[27]; //initS
-			Params.FITINIT[3][4] = ltf_params[28]; //initV
+			Params.FITINIT[3][4] = ltf_params[28]; 				//initV //f only
 			Params.FITINIT[3][5] = ltf_params[29]; //initV
 			Params.FITINIT[3][6] = ltf_params[30]; //initV
-			Params.FITINIT[3][7] = ltf_params[31]; //initV
+			Params.FITINIT[3][7] = ltf_params[31];				 //initV //control
 			//Params.FITINIT[3][8] = ltf_params[8]; //initR
 			//Params.FITINIT[3][9] = ltf_params[8]; //initR
 			//Params.FITINIT[3][10] = ltf_params[8]; //initR
@@ -727,6 +778,12 @@ for (round=0;round<numround;round++){
 			//coinfection parameters
 			Params.coinf_V		= ltf_params[48];
 			Params.VFSus		= ltf_params[49];
+			//stochasticity parameters
+			Params.Rsd_exp 		= ltf_params[50];
+			Params.Fsd_exp		= ltf_params[51];
+			Params.Rsd_obs		= ltf_params[52];
+			Params.Fsd_exp		= ltf_params[53];
+		
 			
 			//-------------------MISER CALCULATE LIKELIHOOD------------------------------//
 		double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -734,15 +791,15 @@ for (round=0;round<numround;round++){
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		int calls=10;					// number of stochastic simulations for each parameter and IC set
+		int calls=50;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		size_t dim;
 
-		//for(j=1; j<=DATA_SETS; j++){
-		for(j=2; j<3; j++){
+		for(j=1; j<=DATA_SETS; j++){
+		//for(j=1; j<2; j++){
 			Params.j = j;
 
-			dim = 48*2; //eventually need dim to be bigger
+			dim = 48*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -759,13 +816,20 @@ for (round=0;round<numround;round++){
 			//fprintf(fpl, "For dataset %i, lhood = %lf\t, err = %lf\n", j, lhood_meta, meta_err);
 			//fprintf(fpl, "For dataset %i, lhood = %lf\n", j, lhood_meta);
 			//printf("lhood post MISER = %lf\n", lhood_meta);
-			log_lhood_meta = log(lhood_meta) - 5000;
-			//-Params.lhood_adjust[j]; //convert back to log likelihood
-			printf("log_lhood_meta = %lf\n", log_lhood_meta);
+			
+			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
+			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
+				log_lhood_meta = 0;
+			}
+			else{
+				Params.lhood_adjust[j] = -1*log_lhood_meta; //update lhood adj based on average so it is dynamic
+				//printf("ELSE adj = %lf\n", Params.lhood_adjust[j]);
+			}
+			//printf("MADE IT OUT: log_lhood_meta = %lf\n", log_lhood_meta);
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
-			printf("total = %lf\n", total_loghood_metas);
+			//printf("total = %lf\n", total_loghood_metas);
 		}//j 
-		printf("local max = %lf\n", localmax_lhood);
+		//printf("local max = %lf\n", localmax_lhood);
 		if (total_loghood_metas>localmax_lhood){ //compare likelihood //sum - one you just generated //local max - best you've seen
 			localmax_lhood=total_loghood_metas;
 			//fprintf(fpl, "Local max lhood = %lf\n", localmax_lhood);
@@ -776,15 +840,23 @@ for (round=0;round<numround;round++){
 	}  //best param set from within searches
 	for (c=0;c<num_ltfparams;c++){
 		ltf_params[c]=localmax_params[c];
-		fprintf(fpv, "param %i\t %lf\t %lf\n", c, ltf_params[c], localmax_lhood);
+		//fprintf(fpv, "param %i\t %lf\t %lf\n", c, ltf_params[c], localmax_lhood);
 	}
 	maxlhood=localmax_lhood;
 	//printf("maxlhood = %lf\n", maxlhood);
 	a++; //move to next parameter
 	} //a
 }
+//print all param values to file
+for(ii=0; ii<num_ltfparams; ii++){
+	fprintf(fpv, "%lf\t", ltf_params[ii]);
+}
+fprintf(fpv, "\n");
+fprintf(fpl, "maxlhood = %lf\n", maxlhood); //print just final likelihood value
 //fclose(fpl);
-fclose(fpv);
+fclose(fpv); //parameter values
+fclose(fp1); //model realizations
+fclose(fpl); //likelihood scores
 //free_i3tensor(Params.EXPDATA,0,DATA_SETS,0,MAX_WEEKS,0,3);
 return 0;
 }

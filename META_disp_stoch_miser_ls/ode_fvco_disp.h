@@ -99,9 +99,6 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 	} 
 }
 
-
-// MOVE CONIDIA DISPERSAL IN HERE
-
 for(sub=0; sub<num_sub; sub++){
 	//printf("GREETINGS from line 54 in DDEVF\n");
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
@@ -136,6 +133,7 @@ for(sub=0; sub<num_sub; sub++){
 
 	//Recording the hosts already infected with virus and taken over by the fungus //coinfections
 	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*Params->VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
+	//printf("sub = %i\t nuf = %lf\t C = %lf\t nuR = %lf\t R = %lf\t V = %lf\t VFSUS = %lf\n", sub, nuF, y[m+n+1+sub_index[sub]], nuR, R[sub], y[m+1+sub_index[sub]], Params->VFSus);
 	for (i=2;i<=n1;i++){
 		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*Params->VFSus;
 	}

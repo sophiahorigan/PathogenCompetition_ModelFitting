@@ -173,10 +173,10 @@ for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter
     else if (i==1){ltf_params[i]=70+randn*70;}   	//initS 	70 - 140
     else if (i==2){ltf_params[i]=70+randn*70;} 		//initS		70 - 140
     else if (i==3){ltf_params[i]=70+randn*70;} 		//initS		70 - 140
-    else if (i==4){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //fonly
+    else if (i==4){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.01 //fonly
     else if (i==5){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
     else if (i==6){ltf_params[i]=0+randn*0.2;}		//initV		0 - 0.2
-    else if (i==7){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.2 //control
+    else if (i==7){ltf_params[i]=0+randn*0.01;}		//initV		0 - 0.01 //control
     else if (i==8){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
     else if (i==9){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
 	else if (i==10){ltf_params[i]=0+randn*.01;}		//initR		0 - 0.01
@@ -275,19 +275,19 @@ for (round=0;round<numround;round++){
 		}
 		else { 	//fix low bound of parameter, based on searches
 			if (a==0){          //initS //10 is step increment //searches: number of param values testing
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==1){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==2){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==3){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==4){		//initV //fonly
@@ -295,11 +295,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==5){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==6){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==7){     //initV //control
@@ -323,35 +323,35 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==12){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==13){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==14){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==15){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==16){     //initV //fonly
-				ltf_params[a]=ltf_params[a]-0.001*searches;
+				ltf_params[a]=ltf_params[a]-0.0001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==17){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==18){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==19){     //initV //control
-				ltf_params[a]=ltf_params[a]-0.001*searches;
+				ltf_params[a]=ltf_params[a]-0.0001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==20){     //initR
@@ -371,35 +371,35 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==24){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==25){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==26){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==27){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=70){ltf_params[a]=70;}
 			}
 			else if (a==28){     //initV //fonly
-				ltf_params[a]=ltf_params[a]-0.001*searches;
+				ltf_params[a]=ltf_params[a]-0.0001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==29){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==30){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==31){     //initV //control
-				ltf_params[a]=ltf_params[a]-0.001*searches;
+				ltf_params[a]=ltf_params[a]-0.0001*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==32){     //initR
@@ -419,11 +419,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==36){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==37){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]>1){ltf_params[a]=1;}
 			}
 			else if (a==38){     //initR
@@ -431,11 +431,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==39){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==40){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==41){     //initR
@@ -443,11 +443,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==42){     //initS
-				ltf_params[a]=ltf_params[a]-2*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<=0){ltf_params[a]=1;}
 			}
 			else if (a==43){     //initV
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.005*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==44){     //initR
@@ -455,19 +455,19 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==45){     //con_mgr
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.01*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==46){     //a
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.01*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==47){     //lar_disp
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.01*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==48){     //coinf_V
-				ltf_params[a]=ltf_params[a]-0.05*searches;
+				ltf_params[a]=ltf_params[a]-0.01*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==49){     //VFSus
@@ -475,19 +475,19 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==50){     //Rsd_exp
-				ltf_params[a]=ltf_params[a]-0.1*searches;
+				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==51){     //Fsd_exp
-				ltf_params[a]=ltf_params[a]-0.1*searches;
+				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==52){     //Rsd_obs
-				ltf_params[a]=ltf_params[a]-0.1*searches;
+				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==53){     //Fsd_obs
-				ltf_params[a]=ltf_params[a]-0.1*searches;
+				ltf_params[a]=ltf_params[a]-0.05*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			if (ltf_params[a]<init_ltfparams[a]){
@@ -498,35 +498,35 @@ for (round=0;round<numround;round++){
 		for (b=0;b<searches;b++){ //step though increments back up to initial proposed value
 		if (b>0){
 			if (a==0){          //initS
-				ltf_params[a]=ltf_params[a]+2;  // 10 is step size, same as in a loop
+				ltf_params[a]=ltf_params[a]+1;  // 10 is step size, same as in a loop
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==1){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==2){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==3){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==4){		//initV //fonly
-				ltf_params[a]=ltf_params[a]+0.001;
+				ltf_params[a]=ltf_params[a]+0.0001;
 				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==5){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==6){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==7){     //initV //control
-				ltf_params[a]=ltf_params[a]+0.001;
+				ltf_params[a]=ltf_params[a]+0.0001;
 				if (ltf_params[a]>.01){ltf_params[a]=0.01;}
 			}
 			else if (a==8){     //initR
@@ -546,35 +546,35 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==12){          //initS
-				ltf_params[a]=ltf_params[a]+2;  
+				ltf_params[a]=ltf_params[a]+1;  
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==13){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==14){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==15){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==16){		//initV //fonly
-				ltf_params[a]=ltf_params[a]+0.001;
+				ltf_params[a]=ltf_params[a]+0.0001;
 				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==17){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==18){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==19){     //initV //control
-				ltf_params[a]=ltf_params[a]+0.001;
+				ltf_params[a]=ltf_params[a]+0.0001;
 				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==20){     //initR
@@ -594,35 +594,35 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==24){          //initS
-				ltf_params[a]=ltf_params[a]+2;  
+				ltf_params[a]=ltf_params[a]+1;  
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==25){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==26){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==27){     //initS
-				ltf_params[a]=ltf_params[a]+2; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>140){ltf_params[a]=140;}
 			}
 			else if (a==28){		//initV //fonly
-				ltf_params[a]=ltf_params[a]+0.001;
+				ltf_params[a]=ltf_params[a]+0.0001;
 				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==29){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==30){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.2){ltf_params[a]=0.2;}
 			}
 			else if (a==31){     //initV //control
-				ltf_params[a]=ltf_params[a]+0.001;
+				ltf_params[a]=ltf_params[a]+0.0001;
 				if (ltf_params[a]>0.01){ltf_params[a]=0.01;}
 			}
 			else if (a==32){     //initR
@@ -642,11 +642,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==36){     //initS
-				ltf_params[a]=ltf_params[a]+5;
+				ltf_params[a]=ltf_params[a]+1;
 				if (ltf_params[a]>200){ltf_params[a]=200;} 
 			}
 			else if (a==37){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
 			}
 			else if (a==38){     //initR
@@ -654,11 +654,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==39){     //initS
-				ltf_params[a]=ltf_params[a]+5; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>200){ltf_params[a]=200;} 
 			}
 			else if (a==40){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
 			}
 			else if (a==41){     //initR
@@ -666,11 +666,11 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==42){     //initS
-				ltf_params[a]=ltf_params[a]+5; 
+				ltf_params[a]=ltf_params[a]+1; 
 				if (ltf_params[a]>200){ltf_params[a]=200;} 
 			}
 			else if (a==43){     //initV
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.005;
 				if (ltf_params[a]>0.5){ltf_params[a]=0.5;}
 			}
 			else if (a==44){     //initR
@@ -678,38 +678,38 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==45){     //con_mrg
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.01;
 				if (ltf_params[a]>1){ltf_params[a]=1;}
 			}
 			else if (a==46){     //a
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.01;
 				if (ltf_params[a]>1){ltf_params[a]=1;}
 			}
 			else if (a==47){     //lar_disp
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.01;
 				if (ltf_params[a]>0.5){ltf_params[a]=1;}
 			}
 			else if (a==48){     //coinf_V
-				ltf_params[a]=ltf_params[a]+0.05;
+				ltf_params[a]=ltf_params[a]+0.01;
 				if (ltf_params[a]>1){ltf_params[a]=1;}
 			}
 			else if (a==49){     //VFSus
 				ltf_params[a]=ltf_params[a]+5; 
 			}
 			else if (a==50){     //Rsd_exp
-				ltf_params[a]=ltf_params[a]+0.1;
+				ltf_params[a]=ltf_params[a]+0.05;
 				if (ltf_params[a]>2){ltf_params[a]=2;}
 			}
 			else if (a==51){     //Fsd_exp
-				ltf_params[a]=ltf_params[a]+0.1;
+				ltf_params[a]=ltf_params[a]+0.05;
 				if (ltf_params[a]>2){ltf_params[a]=2;}
 			}
 			else if (a==52){     //Rsd_obs
-				ltf_params[a]=ltf_params[a]+0.1;
+				ltf_params[a]=ltf_params[a]+0.05;
 				if (ltf_params[a]>2){ltf_params[a]=2;}
 			}
 			else if (a==53){     //Fsd_obs
-				ltf_params[a]=ltf_params[a]+0.1;
+				ltf_params[a]=ltf_params[a]+0.05;
 				if (ltf_params[a]>2){ltf_params[a]=2;}
 			}
 		} 

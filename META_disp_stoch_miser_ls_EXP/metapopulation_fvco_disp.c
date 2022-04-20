@@ -155,12 +155,12 @@ Params.lhood_adjust[1] = 6000;
 Params.lhood_adjust[2] = 6000;
 Params.lhood_adjust[3] = 6000;
 Params.lhood_adjust[4] = 2000;
-Params.lhood_adjust[5] = 900;
-Params.lhood_adjust[6] = 800;
+Params.lhood_adjust[5] = 2000;
+Params.lhood_adjust[6] = 1000;
 
 int searches = 5; //number of iterations for each specific parameter
 int round;
-int numround = 25;
+int numround = 10;
 
 int num_ltfparams = 54;	//number of parameters to fit
 double ltf_params[54] = {0};      //arrays to hold different parameter values
@@ -214,7 +214,7 @@ for (i=0;i<num_ltfparams;i++){ //give random initial value for each parameter
 	else if (i==42){ltf_params[i]=1+randn*199;} 		//initS		1 - 200
 	else if (i==43){ltf_params[i]=0+randn*0.5;}		//initV		0 - 0.5
 	else if (i==44){ltf_params[i]=0+randn*0.01;}	//initR		0 - 0.1
-	else if (i==45){ltf_params[i]=0+randn*1;}		//con_mrg	0 - 1
+	else if (i==45){ltf_params[i]=0+randn*100;}		//con_mrg	0 - 100
 	else if (i==46){ltf_params[i]=0+randn*1;}		//a			0 - 1
 	else if (i==47){ltf_params[i]=0+randn*1;}		//lar_disp	0 - 1
 	else if (i==48){ltf_params[i]=0+randn*1;}		//coinf_V	0 - 1
@@ -455,7 +455,7 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==45){     //con_mgr
-				ltf_params[a]=ltf_params[a]-0.01*searches;
+				ltf_params[a]=ltf_params[a]-1*searches;
 				if (ltf_params[a]<0){ltf_params[a]=0;}
 			}
 			else if (a==46){     //a
@@ -678,8 +678,8 @@ for (round=0;round<numround;round++){
 				if (ltf_params[a]>0.1){ltf_params[a]=0.1;}
 			}
 			else if (a==45){     //con_mrg
-				ltf_params[a]=ltf_params[a]+0.01;
-				if (ltf_params[a]>1){ltf_params[a]=1;}
+				ltf_params[a]=ltf_params[a]+1;
+				if (ltf_params[a]>100){ltf_params[a]=100;}
 			}
 			else if (a==46){     //a
 				ltf_params[a]=ltf_params[a]+0.01;
@@ -806,7 +806,7 @@ for (round=0;round<numround;round++){
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		int calls=50;					//number of stochastic simulations for each parameter and IC set //100-300
+		int calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		size_t dim;
 

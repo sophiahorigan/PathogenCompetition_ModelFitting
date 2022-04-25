@@ -1,4 +1,4 @@
-double bound(int i,int j)				// bounds on parameters for parhood line search
+double ls_bound(int i,int j)				// bounds on parameters for parhood line search
 {
 double low;
 double high;
@@ -171,6 +171,98 @@ else if (1==53)		{	step_size = .05;	}	//Fsd_obs
 return step_size;
 }
 // ------------------------------------------------------------------------------------ //
+double prior_bound(int i,int j)				// bounds on parameters for parhood line search
+{
+double low;
+double high;
+
+//metapopulation one
+if (i==0)			{	low = 0;			high = 5000;	}	//initS fungus-only
+else if (i==1)		{	low = 0;			high = 5000;	}	//initS virus-only
+else if (i==2)		{	low = 0;			high = 5000;	}	//initS fungus-virus
+else if (i==3)		{	low = 0;			high = 5000;	}	//initS control
+
+else if (i==4)		{	low = 0;			high = 1;		}	//initV fungus-only
+else if (i==5)		{	low = 0;			high = 1;		}	//initV virus-only
+else if (i==6)		{	low = 0;			high = 1;		}	//initV fungus-virus
+else if (i==7)		{	low = 0;			high = 1;		}	//initV control
+
+else if (i==8)		{	low = 0;			high = 1;		}	//initR fungus-only
+else if (i==9)		{	low = 0;			high = 1;		}	//initR virus-only
+else if (i==10)		{	low = 0;			high = 1;		}	//initR fungus-virus
+else if (i==11)		{	low = 0;			high = 1;		}	//initR control
+
+//metapopulation two
+else if (i==12)		{	low = 0;			high = 5000;	}	//initS fungus-only
+else if (i==13)		{	low = 0;			high = 5000;	}	//initS virus-only
+else if (i==14)		{	low = 0;			high = 5000;	}	//initS fungus-virus
+else if (i==15)		{	low = 0;			high = 5000;	}	//initS control
+
+else if (i==16)		{	low = 0;			high = 1;		}	//initV fungus-only
+else if (i==17)		{	low = 0;			high = 1;		}	//initV virus-only
+else if (i==18)		{	low = 0;			high = 1;		}	//initV fungus-virus
+else if (i==19)		{	low = 0;			high = 1;		}	//initV control
+
+else if (i==20)		{	low = 0;			high = 1;		}	//initR fungus-only
+else if (i==21)		{	low = 0;			high = 1;		}	//initR virus-only
+else if (i==22)		{	low = 0;			high = 1;		}	//initR fungus-virus
+else if (i==23)		{	low = 0;			high = 1;		}	//initR control
+
+//metapopulation three
+else if (i==24)		{	low = 0;			high = 5000;	}	//initS fungus-only
+else if (i==25)		{	low = 0;			high = 5000;	}	//initS virus-only
+else if (i==26)		{	low = 0;			high = 5000;	}	//initS fungus-virus
+else if (i==27)		{	low = 0;			high = 5000;	}	//initS control
+
+else if (i==28)		{	low = 0;			high = 1;		}	//initV fungus-only
+else if (i==29)		{	low = 0;			high = 1;		}	//initV virus-only
+else if (i==30)		{	low = 0;			high = 1;		}	//initV fungus-virus
+else if (i==31)		{	low = 0;			high = 1;		}	//initV control
+
+else if (i==32)		{	low = 0;			high = 1;		}	//initR fungus-only
+else if (i==33)		{	low = 0;			high = 1;		}	//initR virus-only
+else if (i==34)		{	low = 0;			high = 1;		}	//initR fungus-virus
+else if (i==35)		{	low = 0;			high = 1;		}	//initR control
+
+//metapopulation four
+else if (i==36)		{	low = 0;			high = 5000;	} 	//initS
+else if (i==37)		{	low = 0;			high = 1;		} 	//initV
+else if (i==38)		{	low = 0;			high = 1;		} 	//initR
+
+//metapopulation five
+else if (i==39)		{	low = 0;			high = 5000;	}	//initS
+else if (i==40)		{	low = 0;			high = 1;		} 	//initV
+else if (i==41)		{	low = 0;			high = 1;		} 	//initR
+
+//metapopulation six
+else if (i==42)		{	low = 0;			high = 5000;	} 	//initS
+else if (i==43)		{	low = 0;			high = 1;		} 	//initV
+else if (i==44)		{	low = 0;			high = 1;		} 	//initR
+
+//dispersal
+else if (i==45)		{	low = 0;			high = 10000;	} 	//con_mrg //rate of conidia dispersal
+else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter
+else if (i==47)		{	low = 0;			high = 1;		}	//lar_disp //prob of dispersal
+
+//coifection
+else if (i==48) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==49) 	{	low = 0;			high = 10000;	}	//VFSus //enhanced susceptibility 
+
+//stochasticity
+else if (i==50)		{	low = 0;			high = 10;		}	//Rsd_exp
+else if (i==51)		{	low = 0;			high = 10;		}	//Fsd_exp
+else if (i==52)		{	low = 0;			high = 10;		}	//Rsd_obs
+else if (i==53)		{	low = 0;			high = 10;		}	//Fsd_obs
+
+if		(j==1)	return low;
+else if (j==2)	return high;
+else { printf("PROBLEM WITH BOUNDS ON PRIORS!!\n");	return 0;	}
+}
+
+//-----------------------------------------------------------------------------------------------//
+
+
+
 double patch_bound(int i,int j)			// bounds on S(0) and R(0) for parhood line search
 {
 double Slow;	double Shigh;	double Rlow;	double Rhigh;
@@ -196,95 +288,6 @@ else if (i==13)	{Slow = 1.2;				Shigh = 4.0;					Rlow = eps;		Rhigh = 0.08;	}
 else if (i==14)	{Slow = 1.5;				Shigh = 4.0;					Rlow = 0.0;		Rhigh = 1.0;	}
 else if (i==15)	{Slow = 1.3;				Shigh = 4.0;					Rlow = 0.0;		Rhigh = 1.0;	}
 else if (i==16)	{Slow = 1.3;				Shigh = 4.0;					Rlow = 0.0;		Rhigh = 1.0;	}
-
-else			{Slow = 0;				Shigh = 0;				Rlow = 0;		Rhigh = 0;	}
-
-if		(j==1)	return Slow;
-else if (j==2)	return Shigh;
-else if (j==3)	return Rlow;
-else if (j==4)	return Rhigh;
-else { printf("PROBLEM WITH BOUNDS ON S(0) or R(0)!!\n");	return 0;	}
-}
-// --------------------------------------------------------------------------------------- //
-double prior_bound(int i,int j)
-{
-double low;
-double high;
-
-if (i==2)		{	low = 0.00001;		high = .2;	}		//nuBAR
-else if (i==3)	{	low = 0.00001;			high = 0.01;	}		//nuF
-else if (i==4)	{	low = 0.01;			high = .4;	}		//k
-else if (i==5)	{	low = .1666;		high = .9;	}		//muV
-else if (i==6)	{	low = .01;			high = 11;	}		//muF
-
-else if (i==7)	{	low = 0.01;			high = 20.01;}		//CK//  beta = the size of accumulated rainfall window
-
-else if (i==8)	{	low = 16;			high = 36;	}		//gam_stepsV
-else if (i==9)	{	low = 12;			high = 36;	}		//gam_stepsF
-else if (i==10)	{	low = .001;			high = .05;	}		//ratio
-else if (i==11)	{	low = 0;			high = .7;	}		//sdv
-else if (i==12)	{	low = 0;			high = .7;	}		//sdf
-
-else if (i==13)	{	low = 0.01;			high = 4.01;	}		//CK// theta = delay for when to start accumulating rainfall
-
-else if (i==14)	{	low = 1.9;			high = 3.5;	}		//gamma
-else if (i==15)	{	low = 1;			high = 14;	}		//neonates_v
-//else if (i==16)	{	low = 0;			high = 10;	}		//r_time
-else if (i==16)	{	low = 0.1;			high = 20.0;	}		//r_time  //CK// changed!		//CK// to change!
-else if (i==17)	{	low = .1;			high = 9.0;	}		//lambdaV
-else if (i==18)	{	low = .1;			high = 9.0;	}		//lambdaF
-
-else if (i==19)	{	low = .01;			high = 0.4;	}		//CK// dummy param for testing!!!
-
-else if (i==20)	{	low = 0.1;			high = 5.4;	}		//CK// covered cage scaling parameter
-//else if (i==20)	{	low = 0.00001;			high = 0.4;	}		//CK// rain scaling parameter
-
-else if (i==21)	{	low = 0.00001;			high = 0.4;	}		//CK// temp scaling parameter
-
-else if (i==22)	{	low = 0.00001;			high = 0.4;	}		//CK// RH scaling parameter
-
-else if (i==23)	{	low = 0.0000001;			high = 0.5;	}		//CK// Average R(0) for all populations
-
-else if (i==24)	{	low = 0.1;			high = 3.5;	}		//CK// open_R
-
-else if (i==25)	{	low = 0.5;			high = 4.5;	}		//CK// cover_R
-
-//else if (i==26)	{	low = 1E-6;			high = 0.5;	}		//CK// scaler for TEMP affect of muF func 2
-else if (i==26)	{	low = 0.01;			high = 20.0;	}		//CK// scaler for TEMP affect of muF func 3 and 4
-else if (i==27)	{	low = 1E-6;			high = 0.5;	}		//CK// scaler for TEMP affect of muF func 2
-
-else if (i==28)	{	low = 0.02;			high = 0.05;	}		//CK// open_R
-
-else if (i==29)	{	low = 0.02;			high = 0.05;	}		//CK// cover_R
-
-
-else			{	low = 1;			high = 1;	}
-
-if		(j==1)	return low;
-else if (j==2)	return high;
-else { printf("PROBLEM WITH BOUNDS ON PARAMETERS!!\n");	return 0;	}
-}
-// --------------------------------------------------------------------------------------- //
-double prior_patch_bound(int i,int j)
-{
-double Slow;	double Shigh;	double Rlow;	double Rhigh;
-
-if (i==1)		{Slow = .1;				Shigh = 1;			Rlow = 0;		Rhigh = 60; }
-else if (i==2)	{Slow = .1;				Shigh = 1;			Rlow = 0;		Rhigh = 40; }
-else if (i==3)	{Slow = .1;				Shigh = 1;			Rlow = 0;		Rhigh = 1;	}
-else if (i==4)	{Slow = .1;				Shigh = 1;			Rlow = 0;		Rhigh = .25;	}
-else if (i==5)	{Slow = .1;				Shigh = 1;			Rlow = 0;		Rhigh = .1;	}
-else if (i==6)	{Slow = .1;				Shigh = 1;			Rlow = 0;		Rhigh = .04;}
-else if (i==7)	{Slow = .7*(35148/30);	Shigh = 1.3*(35148/30);	Rlow = 0;		Rhigh = .06;}
-else if (i==8)	{Slow = 9;				Shigh = 1500;			Rlow = 0;		Rhigh = .03;	}
-else if (i==9)	{Slow = 10;				Shigh = 9966;			Rlow = 0;		Rhigh = .07;	}
-else if (i==10)	{Slow = 100;			Shigh = 12900;			Rlow = 0;		Rhigh = .04;}
-else if (i==11)	{Slow = 200;			Shigh = 19900;			Rlow = 0;		Rhigh = .15;	}
-else if (i==12)	{Slow = 200;			Shigh = 49900;			Rlow = 0;		Rhigh = .1;}
-else if (i==13)	{Slow = 50;				Shigh = 1290;			Rlow = 0;		Rhigh = .16;	}
-else if (i==14)	{Slow = 10;				Shigh = 1990;			Rlow = 0;		Rhigh = 1;	}
-else if (i==15)	{Slow = 100;			Shigh = 49400;			Rlow = 0;		Rhigh = 1;	}
-else if (i==16)	{Slow = 100;			Shigh = 69440;			Rlow = 0;		Rhigh = 1;	}
 
 else			{Slow = 0;				Shigh = 0;				Rlow = 0;		Rhigh = 0;	}
 
@@ -543,44 +546,8 @@ Params->PARS[8] = 5;			Params->PARS[9] = 5;			// gamma steps
 
 }
 // ---------------------------------------------------------------------------------------------------------------- //
-void parm_range_inc(void *Paramstuff,double parm_inc,double host_inc,double initR_inc,int num_adj_pars)
-{
-STRUCTURE* Params;
-Params = (STRUCTURE*) Paramstuff;
 
-int i;
 
-Params->parm_step[1]=1;
-Params->parm_step[7]=1;
-
-if (num_adj_pars>0)	{
-	for (i=1;i<=num_adj_pars;i++)	{
-		Params->parm_low[i]  = bound(i,1);	Params->parm_high[i] = bound(i,2);
-		if (i==2||i==3||i==4||i==5||i==6||i==9||i==10||i==11||i==12||i==13||i==14||i==15||i==16||i==17||i==18||i==19||i==20||i==21||i==22||i==23||i==24||i==25||i==26||i==27||i==28||i==29)	{
-			Params->parm_step[i]=(Params->parm_high[i]-Params->parm_low[i])/parm_inc;
-		}
-		//if (i==14)	{
-		//	Params->parm_step[i]=(Params->parm_high[i]-Params->parm_low[i])/(parm_inc/2);
-		//}
-		//printf("parm:%d\t low=%f high=%f step=%f\n",i,Params->parm_low[i],Params->parm_high[i],Params->parm_step[i]);	
-	}	//getc(stdin);
-}
-
-// ----------------------------- host/initR increments and end of spore germination -------------------------------- //
-for (i=0;i<=DATA_SETS;i++){
-	//Params->parm_low[30+i]  = patch_bound(i,1);		Params->parm_high[30+i]= patch_bound(i,2);	// S(0)
-	Params->parm_low[40+i]  = patch_bound(i,1);		Params->parm_high[40+i]= patch_bound(i,2);	//CK// Site-Specific muF
-	Params->parm_low[50+i]  = patch_bound(i,3);		Params->parm_high[50+i]= patch_bound(i,4);	// R(0)
-	//Params->parm_step[30+i] = (Params->parm_high[30+i]-Params->parm_low[30+i])/host_inc;
-	Params->parm_step[40+i] = (Params->parm_high[40+i]-Params->parm_low[40+i])/host_inc;   //CK// muF
-	Params->parm_step[50+i] = (Params->parm_high[50+i]-Params->parm_low[50+i])/initR_inc;
-	Params->R_END[i]	= r_end(i);	                                                // fungus stops blooming
-}
-// -------------------------------------- fixed parameter values -------------------------------------------------- //
-//Params->parm_step[30+4]=1.8;	Params->parm_step[30+7]= 1.9;
-//Params->parm_step[50+3]=1.8;	Params->parm_step[50+14]=1.8;    Params->parm_step[50+15]=1.8;	Params->parm_step[50+16]=1.8;
-
-}
 
 // ---------------------------------------------------------------------------------------------------------------- //
 void random_restart_parms(void *Paramstuff,gsl_rng *r_seed,int num_adj_pars,int test,int pro)

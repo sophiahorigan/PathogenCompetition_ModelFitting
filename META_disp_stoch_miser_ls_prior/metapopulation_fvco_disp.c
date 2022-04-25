@@ -71,9 +71,11 @@ int num_ltfparams = 54;	//number of parameters to fit
 double ltf_params[54] = {0};      //arrays to hold different parameter values
 double init_ltfparams[54]={0};
 
+double log_prior=0;
+
 for (i=0;i<num_ltfparams;i++){ 											//give random initial value for each parameter
     double randn = gsl_rng_uniform_pos(r_seed);
-    ltf_params[i] = bound(i,1) + randn * bound(i,2);
+    ltf_params[i] = ls_bound(i,1) + randn * ls_bound(i,2);
     init_ltfparams[i] = ltf_params[i]; 
     //printf("%lf\n",init_ltfparams[i]);
 	//printf("i = %i\t, lft_params = %lf\n %lf\n",i, init_ltfparams[i]);
@@ -85,8 +87,11 @@ double localmax_posterior; double max_posterior;
 for (c=0;c<num_ltfparams;c++){			//initial parameters begin as 'best' parameters
     localmax_params[c]=ltf_params[c];
 }
-
-int r;
+//calculate priors
+for (k=0; k<num_ltfparams; k++){
+	log_prior = log_prior + log(gsl_ran_flat_pdf(ltf_params[k], prior_bound(k,1), (prior_bound(k,2)+prior_bound(k,1))));
+	//printf("k = %i\t param = %lf\t log prior = %lf\n", k, ltf_params[k], log_prior);
+}
 
 
 //----------------------------------------------------Print Output to File-------------------------------------------//
@@ -114,23 +119,23 @@ fpl=fopen(namel, "a+");
 //int len_paramfit = 17; //length of fit array - 1
 
 for (round=0;round<numround;round++){
-	printf("in the rounds loop\n");
+	//printf("in the rounds loop\n");
 	localmax_posterior=-999999999999;
 	a=0;
 	while (a<num_ltfparams){            
 		if (round>0){					
 			ltf_params[a] = ltf_params[a] - step(a) * searches;
-			if(ltf_params[a] <= bound(i,1)){
-				printf("in the a loop\n");
-				ltf_params[a] = bound(i,1);
+			if(ltf_params[a] <= ls_bound(i,1)){
+				//printf("in the a loop\n");
+				ltf_params[a] = ls_bound(i,1);
 			}
 		}
 		for (b=0;b<searches;b++){ 
 			if (b>0){
 				ltf_params[a] = ltf_params[a] + step(a);
-				printf("in the b loop\n");
-				if(ltf_params[a] >= (bound(i,2)+bound(i,1))){
-					ltf_params[a] = (bound(i,2)+bound(i,1));
+				//printf("in the b loop\n");
+				if(ltf_params[a] >= (ls_bound(i,2)+ls_bound(i,1))){
+					ltf_params[a] = (ls_bound(i,2)+ls_bound(i,1));
 				}
 			}
 
@@ -222,7 +227,7 @@ for (round=0;round<numround;round++){
 			
 			//-------------------MISER CALCULATE LIKELIHOOD------------------------------//
 		double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
-		double log_prior=0; double new_posterior=0;
+		double new_posterior=0;
 		double meta_err=0;
 		double lhood_total=0;
 		double lhood_reps=0;
@@ -264,14 +269,6 @@ for (round=0;round<numround;round++){
 			//printf("MADE IT OUT: log_lhood_meta = %lf\n", log_lhood_meta);
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
 			//printf("total = %lf\n", total_loghood_metas);
-
-			//calculate priors
-			for (k=0; k<num_ltfparams; k++){
-				//printf("numparams = %i\n", num_ltfparams);
-				log_prior = log_prior + log(gsl_ran_flat_pdf(ltf_params[k], bound(k,1), (bound(k,2)+bound(k,1))));
-				//printf("param = %lf\t log prior = %lf\n", ltf_params[k], log(gsl_ran_flat_pdf(ltf_params[k], bound(k,1), (bound(k,2)+bound(k,1)))));
-				//printf("k = %i\t param = %lf\t log prior = %lf\n", k, ltf_params[k], log_prior);
-			}
 
 			new_posterior = total_loghood_metas + log_prior;
 			//printf("new posterior = %lf\n", new_posterior);

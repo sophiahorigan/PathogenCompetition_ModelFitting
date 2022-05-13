@@ -19,7 +19,7 @@ float DotProduct (int Length, double *Holder, double *PCA)
 int main(void)
 {
 
-int linesearch = 1;
+int linesearch = 0;
 int mcmc = 0;
 
 int test = 66; //CK// Second test mode.  Like the full program but less runs and less MISER calls
@@ -32,6 +32,7 @@ int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is 
 //printf("Profile Parameter is %d\n",pro);	fflush(stdout);
 // ------------------------------------- Adustable accuracy vs. speed ------------------------------------------------ //
 int num_runs	 = 20;
+
 double parm_inc, host_inc, initR_inc;	//int inc_gamma_box= 1;
 
 //if (pro==1)	{	parm_inc=200.0;		host_inc=100.0;	initR_inc=100.0;	}
@@ -47,11 +48,13 @@ if (test==66)	{      num_runs=5;	parm_inc=12.0;	host_inc=6.0;	initR_inc=8.0;}
 //printf("runs=%d\t incs: parm=%2.0f\t S_0=%2.0f\t R_0=%2.0f\n",num_runs,parm_inc,host_inc,initR_inc);
 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
-int i=0; int j;int ii; int jj; int k; int l; 
+int i; int j;int ii; int jj; int k; int l; 
+
 int num_adj_pars = 54;			// number of adjustable parameters
 int epi_length = 48;
 
 inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
+
 /*
 double lhood_meta; double log_lhood_meta;
 double meta_err;
@@ -69,10 +72,104 @@ FILE *fp_results;
 // ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
 gsl_rng *r_seed;
 r_seed=random_setup();
+
 //printf("Random Seed: %f\n", r_seed); //getc(stdin);
 
-//----------------------------------Set-Up Line Search------------------------//
+//------------------------------Best-Parm Realizations-----------------------------------------//
 
+Params.FITINIT[1][0] = 100; //initS
+Params.FITINIT[1][1] = 100; //initS
+Params.FITINIT[1][2] = 100; //initS
+Params.FITINIT[1][3] = 100; //initS
+Params.FITINIT[1][4] = 0; 				//initV //fonly
+Params.FITINIT[1][5] = 0.2; //initV
+Params.FITINIT[1][6] = 0.2; //initV
+Params.FITINIT[1][7] = 0; 				//initV //control
+Params.FITINIT[1][8] = 0.00236; //initR
+Params.FITINIT[1][9] = 0.00236; //initR
+Params.FITINIT[1][10] = 0.00236; //initR
+Params.FITINIT[1][11] = 0.00236; //initR
+
+//metapopulation two
+Params.FITINIT[2][0] = 100; //initS
+Params.FITINIT[2][1] = 100; //initS
+Params.FITINIT[2][2] = 100; //initS
+Params.FITINIT[2][3] = 100; //initS
+Params.FITINIT[2][4] = 0; 				//initV //fonly
+Params.FITINIT[2][5] = 0.2; //initV
+Params.FITINIT[2][6] = 0.2; //initV
+Params.FITINIT[2][7] = 0; 				//initV //control
+Params.FITINIT[2][8] = 0.00236; //initR
+Params.FITINIT[2][9] = 0.00236; //initR
+Params.FITINIT[2][10] = 0.00236; //initR
+Params.FITINIT[2][11] = 0.00236; //initR
+
+//metapopulation three
+Params.FITINIT[3][0] = 100; //initS
+Params.FITINIT[3][1] = 100; //initS
+Params.FITINIT[3][2] = 100; //initS
+Params.FITINIT[3][3] = 100; //initS
+Params.FITINIT[3][4] = 0; 				//initV //f only
+Params.FITINIT[3][5] = 0.2; //initV
+Params.FITINIT[3][6] = 0.2; //initV
+Params.FITINIT[3][7] = 0;				 //initV //control
+Params.FITINIT[3][8] = 0.00236; //initR
+Params.FITINIT[3][9] = 0.00236; //initR
+Params.FITINIT[3][10] = 0.00236; //initR
+Params.FITINIT[3][11] = 0.00236; //initR
+
+//metapopultion four
+Params.FITINIT[4][0] = 100; //initS
+Params.FITINIT[4][4] = 0.3; //initV
+Params.FITINIT[4][8] = 0.00236; //initR
+
+//metapopultion five
+Params.FITINIT[5][0] = 100; //initS
+Params.FITINIT[5][4] = 0.3; //initV
+Params.FITINIT[5][8] = 0.00236; //initR
+
+//metapopultion six
+Params.FITINIT[6][0] = 100; //initS
+Params.FITINIT[6][4] = 0.3; //initV
+Params.FITINIT[6][8] = 0.00236; //initR
+
+//dispersal parameters
+Params.con_mrg 		= 50;
+Params.a 			= 0.5;
+Params.lar_disp 	= 0.2;
+//coinfection parameters
+Params.coinf_V		= 0.5;
+Params.VFSus		= 30;
+//stochasticity parameters
+Params.Rsd_exp 		= 1;
+Params.Fsd_exp		= 1;
+Params.Rsd_obs		= 1;
+Params.Fsd_exp		= 1;
+
+
+int numreps = 10;
+size_t dim;
+dim = 48*2;
+int pop;
+int year = 1;
+
+char name1[50];
+sprintf(name1, "model_realizations");
+fp1=fopen(name1, "a+");
+
+
+for (i=0; i<numreps; i++){
+	printf("rep = %i\n", i);
+	for (j=1;j<=DATA_SETS;j++)	{
+		printf("j = %i\n", j);
+		DDEVF(&Params,r_seed,dim,pop,48,0,year,j);
+	}
+}
+printf("13\n");
+fclose(fp1); //model realizations
+
+//----------------------------------Set-Up Line Search------------------------//
+/*
 //set initial likelihood adjustment values
 Params.lhood_adjust[1] = 6000;
 Params.lhood_adjust[2] = 6000;
@@ -85,7 +182,6 @@ int searches = 5; //number of iterations for each specific parameter
 int round;
 int numround = 5;
 int calls;
-size_t dim;
 
 int num_ltfparams = 54;	//number of parameters to fit
 double ltf_params[54] = {0};      //arrays to hold different parameter values
@@ -122,9 +218,6 @@ char namev[50];
 sprintf(namev, "allmeta_s%i_r%i_%d", searches, numround, pid);
 fpv=fopen(namev, "a+");
 
-char name1[50];
-sprintf(name1, "model_realizations");
-fp1=fopen(name1, "a+");
 
 //char namel[50];
 //sprintf(namel, "lhood_s%i_r%i_%d", searches, numround, pid);
@@ -732,7 +825,7 @@ while (LoopNumber<=Realizations) {
 		}
 
 		// ------------------------------------------ output results to file  --------------------------------------- //
-		/*
+		
 		if (LoopNumber % 10 == 0)   	//CK// output results every 10 loops (probably not best plan but we'll see)
 		{
 
@@ -742,10 +835,10 @@ while (LoopNumber<=Realizations) {
 
 			fflush(stdout);
 		}
-		*/
+		
 	}
 
 }
-
+*/
 return 0;
 }

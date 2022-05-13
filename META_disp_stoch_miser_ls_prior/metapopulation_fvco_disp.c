@@ -63,9 +63,9 @@ Params.lhood_adjust[4] = 2000;
 Params.lhood_adjust[5] = 2000;
 Params.lhood_adjust[6] = 1000;
 
-int searches = 5; //number of iterations for each specific parameter
+int searches = 3; //number of iterations for each specific parameter
 int round;
-int numround = 5;
+int numround = 2;
 
 int num_ltfparams = 54;	//number of parameters to fit
 double ltf_params[54] = {0};      //arrays to hold different parameter values

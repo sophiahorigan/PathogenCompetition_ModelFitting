@@ -87,10 +87,8 @@ Params->PARS[50+pop]=fdensity;
 int dataset;
 dataset = Params->j;
 
-//printf("dataset in lhood meta = %i\n", Params->j);
-//printf("PRE DDEVF DATA S = %i\n", Params->DATA[6][15][0]);
-
 DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
+
 
 //printf("POST DDEVF DATA S = %i\n", Params->DATA[6][15][0]);
 

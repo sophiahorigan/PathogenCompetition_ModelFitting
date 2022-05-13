@@ -21,6 +21,7 @@ int main(void)
 
 int linesearch = 1;
 int mcmc = 0;
+int reals = 0;
 
 int test = 66; //CK// Second test mode.  Like the full program but less runs and less MISER calls
 
@@ -61,7 +62,7 @@ double ave_lhood;
 // --------------------------------------- Name for Output Files ----------------------------------------------------- //
 char strFileName[99];					// from filenames.h
 GetString(pro,0,strFileName,98);		fflush(stdout);		//getc(stdin);
-FILE *fp_results;
+FILE *mcmc_results;
 
 //char named[50];
 //sprintf(named, "daily_output");
@@ -112,6 +113,127 @@ for (k=0; k<num_ltfparams; k++){
 	log_prior = log_prior + log(gsl_ran_flat_pdf(ltf_params[k], prior_bound(k,1), (prior_bound(k,2)+prior_bound(k,1))));
 	//printf("k = %i\t param = %lf\t log prior = %lf\n", k, ltf_params[k], log_prior);
 }
+//-------------------------------------------------Realizations-----------------------------------------------//
+if(reals==1){
+
+	char name1[50];
+	sprintf(name1, "model_realizations");
+	fpm=fopen(name1, "a+");
+
+	//propose parameter values
+	//metapopulation one
+	Params.FITINIT[1][0] = 100; //initS
+	Params.FITINIT[1][1] = 100; //initS
+	Params.FITINIT[1][2] = 100; //initS
+	Params.FITINIT[1][3] = 100; //initS
+	Params.FITINIT[1][4] = 0; 				//initV //fonly
+	Params.FITINIT[1][5] = 0.2; //initV
+	Params.FITINIT[1][6] = 0.2; //initV
+	Params.FITINIT[1][7] = 0; 				//initV //control
+	Params.FITINIT[1][8] = 0.00236; //initR
+	Params.FITINIT[1][9] = 0.00236; //initR
+	Params.FITINIT[1][10] = 0.00236; //initR
+	Params.FITINIT[1][11] = 0.00236; //initR
+
+	//metapopulation two
+	Params.FITINIT[2][0] = 100; //initS
+	Params.FITINIT[2][1] = 100; //initS
+	Params.FITINIT[2][2] = 100; //initS
+	Params.FITINIT[2][3] = 100; //initS
+	Params.FITINIT[2][4] = 0; 				//initV //fonly
+	Params.FITINIT[2][5] = 0.2; //initV
+	Params.FITINIT[2][6] = 0.2; //initV
+	Params.FITINIT[2][7] = 0; 				//initV //control
+	Params.FITINIT[2][8] = 0.00236; //initR
+	Params.FITINIT[2][9] = 0.00236; //initR
+	Params.FITINIT[2][10] = 0.00236; //initR
+	Params.FITINIT[2][11] = 0.00236; //initR
+
+	//metapopulation three
+	Params.FITINIT[3][0] = 100; //initS
+	Params.FITINIT[3][1] = 100; //initS
+	Params.FITINIT[3][2] = 100; //initS
+	Params.FITINIT[3][3] = 100; //initS
+	Params.FITINIT[3][4] = 0; 				//initV //f only
+	Params.FITINIT[3][5] = 0.2; //initV
+	Params.FITINIT[3][6] = 0.2; //initV
+	Params.FITINIT[3][7] = 0;				 //initV //control
+	Params.FITINIT[3][8] = 0.00236; //initR
+	Params.FITINIT[3][9] = 0.00236; //initR
+	Params.FITINIT[3][10] = 0.00236; //initR
+	Params.FITINIT[3][11] = 0.00236; //initR
+
+	//metapopultion four
+	Params.FITINIT[4][0] = 100; //initS
+	Params.FITINIT[4][4] = 0.3; //initV
+	Params.FITINIT[4][8] = 0.00236; //initR
+
+	//metapopultion five
+	Params.FITINIT[5][0] = 100; //initS
+	Params.FITINIT[5][4] = 0.3; //initV
+	Params.FITINIT[5][8] = 0.00236; //initR
+
+	//metapopultion six
+	Params.FITINIT[6][0] = 100; //initS
+	Params.FITINIT[6][4] = 0.3; //initV
+	Params.FITINIT[6][8] = 0.00236; //initR
+
+	//dispersal parameters
+	Params.con_mrg 		= 50;
+	Params.a 			= 0.5;
+	Params.lar_disp 	= 0.2;
+	//coinfection parameters
+	Params.coinf_V		= 0.2;
+	Params.VFSus		= 0.1;
+	//stochasticity parameters
+	Params.Rsd_exp 		= 1;
+	Params.Fsd_exp		= 1;
+	Params.Rsd_obs		= 1;
+	Params.Fsd_exp		= 1;
+
+	//start realizations. In this case, calls = # realizations
+	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
+	double new_posterior=0;
+	double meta_err=0;
+	double lhood_total=0;
+	double lhood_reps=0;
+
+	calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
+
+	for(j=1; j<=DATA_SETS; j++){
+		//for(j=1; j<2; j++){
+			Params.j = j;
+
+			dim = 48*2; 
+
+			//define function
+			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
+			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
+			for (jj=0;jj<=dim;jj++)	{
+				xl[jj]=0;	
+				xu[jj]=1;
+			}
+
+			gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+			gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&lhood_meta,&meta_err); //call MISER, pop_lhood is output from .h (likelihood value)
+			gsl_monte_miser_free(s);
+
+			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
+			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
+				log_lhood_meta = 0;
+			}
+			else{
+				Params.lhood_adjust[j] = -1*log_lhood_meta; //update lhood adj based on average so it is dynamic
+				//printf("ELSE adj = %lf\n", Params.lhood_adjust[j]);
+			}
+			//printf("MADE IT OUT: log_lhood_meta = %lf\n", log_lhood_meta);
+			total_loghood_metas = total_loghood_metas + log_lhood_meta;
+			//printf("total = %lf\n", total_loghood_metas);
+			new_posterior = total_loghood_metas + log_prior;
+	}
+	fclose(fp1); //TURN ON FP1 PRINT STATEMENT IN DDEVF
+
+}
 //----------------------------------------------------Print Output to File-------------------------------------------//
 
 if(linesearch==1){
@@ -133,7 +255,7 @@ fp1=fopen(name1, "a+");
 ///////////////////////////////////////////////////LINE-SEARCH///////////////////////////////////////////////////
 
 for (round=0;round<numround;round++){
-	//printf("in the rounds loop\n");
+	//printf("round");
 	best_posterior=-999999999999;
 	a=0;
 	while (a<num_ltfparams){            
@@ -296,11 +418,13 @@ for (round=0;round<numround;round++){
 		ltf_params[c]=localmax_params[c];
 	}
 	a++; //move to next parameter
+	for(ii=0; ii<num_ltfparams; ii++){
+		fprintf(fpv, "%lf\t", ltf_params[ii]);
+		fprintf(fpv, "\n");
+	}	
 	} //a
 }
-for(ii=0; ii<num_ltfparams; ii++){
-	fprintf(fpv, "%lf\t", ltf_params[ii]);
-}	
+
 //fclose(fpl);
 fclose(fpv); //parameter values
 fclose(fp1); //model realizations
@@ -313,8 +437,11 @@ fclose(fp1); //model realizations
 
 if(mcmc==1){
 
+	char namem[50];
+	sprintf(namem, "mcmc_results");
+	fpm=fopen(namem, "a+");
 
-	int NumberOfParams=54;			// 28 parameters
+	int NumberOfParams=54;		
 
 	int Realizations=10;         //JL: Number of realizations in the MCMC step
 
@@ -732,19 +859,15 @@ while (LoopNumber<=Realizations) {
 		}
 
 		// ------------------------------------------ output results to file  --------------------------------------- //
-		/*
 		if (LoopNumber % 10 == 0)   	//CK// output results every 10 loops (probably not best plan but we'll see)
 		{
-
-			fp_results = fopen(strFileName,"a");
-			output_file(&Params,fp_results,LogOldPosterior,num_adj_pars,pro); // prints to output file (filenames.h)
-			fclose(fp_results);
-
-			fflush(stdout);
+			for(ii=0; ii<NumberOfParams; ii++){
+				fprintf(fpm, "%lf\t", PCAparams[ii]);
+			}
+			//fflush(stdout);
 		}
-		*/
 	}
-
+	fclose(fpm);
 }
 
 return 0;

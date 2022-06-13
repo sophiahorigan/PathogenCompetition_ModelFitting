@@ -1,6 +1,6 @@
 // DDEVF sets up model and calls 0DE_SOLVER, returns Params->sim_results
 
-double DDEVF(void *Paramstuff, gsl_rng *RandNumsPass ,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
+double DDEVF(void *Paramstuff, double *RandNumsPass ,size_t dim,int pop,int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
 
 {
 
@@ -72,8 +72,8 @@ int n2=n-n1;                  //The number of the first group of exposed classes
 double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
 double epsilon = pow(10,-6);
 double y_ode[DIM]; //**SH** this holds 
-double rand_nuR;
-double rand_nuF;
+double rand_nuR[MAXT3];
+double rand_nuF[MAXT3];
 
 double ave_R = Params->PARS[50+pop];
 double specific_muF = Params->PARS[6];   //general intercept for MAX TEMP decay function for conidia
@@ -115,22 +115,21 @@ double DD10=0;    //accumulated degree days about 10 degrees C
 double R_seed = 0.05;
 
 // --------------------------------------- STOCHASTICITY -------------------------------------------- //
-
-if (j==1 || j==2 || j==3){
-	rand_nuR = gsl_ran_gaussian(RandNumsPass,Params->Rsd_exp);
-	rand_nuF = gsl_ran_gaussian(RandNumsPass,Params->Fsd_exp);
-	//printf("rand_nuR=%lf\n", rand_nuR);
-	//printf("rand_nuF=%lf\n", rand_nuF);
-}
-else if (j==4 || j==5 || j==6){
-	rand_nuR = gsl_ran_gaussian(RandNumsPass,Params->Rsd_obs);
-	rand_nuF = gsl_ran_gaussian(RandNumsPass,Params->Fsd_obs);	
-}
-//printf("randon nuR = %lf\t, random nuF = %lf\n", rand_nuR[i], rand_nuF[i]);
-
+for (i=0;i<=MAXT3;i++)	{
+	if (j==1 || j==2 || j==3){
+	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->Rsd_exp);
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->Fsd_exp);
+	}
+	if (j==4 || j==5 || j==6){
+	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->Rsd_obs);
+	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->Fsd_obs);	
+	}
+	//printf("randon nuR = %lf\t, random nuF = %lf\n", rand_nuR[i], rand_nuF[i]);
+}//getc(stdin);
 
 
 // ------------------------------------- INITIAL CONDITIONS ---------------------------------------------- //
+
 Params->INITS[0] = Params->PARS[30+pop];			// initS
 Params->INITS[3] = ave_R;												// initR  //CK// changed to use average R(0), not site-specific
 
@@ -143,6 +142,7 @@ double initR = Params->INITS[3];			// initR
 
 
 // ----------------------------------------- FIXED PARAMETERS  ---------------------------------------------- //
+
 int gstepsV		= (int) Params->PARS[8];	int gstepsF	= (int) Params->PARS[9]; //gstepsV = m, gstepsF = n
 double ratio = 1;
 double neo_v	= 7.0;			// latent period of neonates (days) FUNGUS ONLY MODEL!
@@ -166,20 +166,23 @@ int line_ticker2;
 int test_day=0;	//CK// used to find the line in the weather data that corresponds to the starting day of collections
 int num_day =  hatch;  //CK// Starting day number
 
+
 line_ticker = num_day;
 
 line_ticker=line_ticker-1;
 
 int num_weeks=48/7;
+
 //SH CHECK WITH GREG
 //state variable declaration
 double S[num_sub]; double V[num_sub]; double C[num_sub]; double R[num_sub];
 double IV[num_sub]; double IF[num_sub]; double IVF[num_sub]; double IFV[num_sub];
+
 //exposed class declaratoin
-printf("11\n");double E_V[num_sub][n2+1]; printf("12\n");double E_F[num_sub][gstepsF+1]; printf("13\n");double E_VF[num_sub][n1+1]; printf("14\n");double E_FV[num_sub][gstepsF+1];
+double E_V[num_sub][n2+1]; double E_F[num_sub][gstepsF+1]; double E_VF[num_sub][n1+1]; double E_FV[num_sub][gstepsF+1];
 
 //treatment indexing to fill arrays
-printf("15\n");
+
 
 // ----------------------------------- CONIDIA BLOOMING TIMES --------------------------------------- //
 
@@ -198,6 +201,7 @@ while(DD10 <= DDstop){
 }
 
 DD10=0.0;
+
 
 
 // ---------------------------- INITIALIZE POPULATION SIZES ------------------------------- //
@@ -223,7 +227,7 @@ if (j==4 || j==5 || j==6){
 	INITV[0] = Params->FITINIT[j][4];
 	INITR[0] = Params->FITINIT[j][8];
 }
-printf("11\n");
+
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
 
 //single epizootic state params
@@ -237,7 +241,7 @@ for(i=0; i<num_sub; i++){
 
 	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
 		E_V[i][ii]=0;
-	}printf("12\n");
+	}
 	for (ii=1;ii<=n1;ii++){
 		E_VF[i][ii]=0;
 	}
@@ -261,7 +265,7 @@ for(i=0; i<num_sub; i++){ //initial conditions
 	Fnext[i] = 0;
 	Fkill[i] = 0;
 }
-printf("13\n");
+
 
 double timing[6]={r_germ,R_end,MAXT3};
 
@@ -397,44 +401,53 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		*/
 
 	//-------------------------------------- LARVAE DISPERSAL -------------------------------------------//
-	if(larvae_dispersal_on == 1){
-		//printf("Made it to dispersal! day = %i\n", day-1);
-		if(day-1<8){ //dispersal only occurs as first instars, 1 week
+								
+	if(larvae_dispersal_on == 1){ //turn off at declaration at top of script
 
-			if (j==1 || j==2 || j==3){ //only for datasets with subpopulations
-				//printf("In the larval dispersal loop. j = %i\n", j);
-			
-				int subout; //indexing
-				int subin; //indexing
-				double poptotal;
-				double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
-				double netSdisp[4] = {0, 0, 0, 0};
-				double fracV; //fracS = 1-fracV //early in epi, only S and V around
-				
-				double lar_disp = Params->lar_disp; //prob of migrating out //TO FIT
-				
-				for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
-					for(subin = 0; subin < num_sub; subin++){
-							poptotal = S[subout]+V[subout]+C[subout];
-							fracV = V[subout]/poptotal; //what frac are virus
-							//EVENT 1: RANDOM INSECTS LEAVE, FRAC ARE V FRAC ARE S
-							netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; //frac of virus infected insects that leave
-							netSdisp[subout] = netSdisp[subout] - lar_disp*poptotal*(1-fracV);
-							//EVENT 2: THEY MAKE IT TO ANOTHER SUBPOP
-							netVdisp[subin] = netVdisp[subin] + lar_disp*poptotal*fracV*Params->DISPROB[j][subout][subin]; //prob leave * prob make it 
-							netSdisp[subin] = netSdisp[subin] + lar_disp*poptotal*(1-fracV)*Params->DISPROB[j][subout][subin];
-							//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
-					}
+	if(day-1<8){ //dispersal only occurs as first instars, 1 week
+
+		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+		//printf("I'm in the dispersal loop! j = %i\n", j);
+		int subout; //indexing
+		int subin; //indexing
+		double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
+		double netSdisp[4] = {0, 0, 0, 0};
+		double fracV;
+		double poptotal;
+		double lar_disp;
+		double lard = 0.3;
+		double a3 = 0.2;
+		
+		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
+			for(subin = 0; subin < num_sub; subin++){
+				if(subout != subin){
+					poptotal = S[subout]+V[subout]+C[subout];
+					fracV = V[subout]/poptotal; //what frac are virus
+					//printf("fracV = %lf\n", fracV);
+					lar_disp = Params->lar_mgr*exp(-Params->a2*Params->DISTANCE[j][subout][subin]);
+					//lar_mgr = lard*exp(-a3*Params->DISTANCE[j][subout][subin]);
+					//printf("lar_disp=%lf\n", lar_disp);
+					//Virus
+					netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; 
+					netVdisp[subin] = netVdisp[subin] + lar_disp*poptotal*fracV;
+					//Suseptible
+					netSdisp[subout] = netVdisp[subout] - lar_disp*poptotal*(1-fracV); 
+					netSdisp[subin] = netVdisp[subin] + lar_disp*poptotal*(1-fracV);
+					
 				}
-				for(sub=0; sub<num_sub; sub++){ //update larvae density
-					//printf("pre-disp C[%i]= %e\n", sub, C[sub]);
-					S[sub] = S[sub] + S[sub]*netSdisp[sub]; //net movement * frac that are S
-					V[sub] = V[sub] + V[sub]*netVdisp[sub]; //net movement * frac that are V
-					//printf("post-disp C[%i]= %e\n", sub, C[sub]);
-				}
+			}
+		}
+		for(sub=0; sub<num_sub; sub++){ //update conidia density
+			//printf("pre-disp S[%i]= %e\n", sub, S[sub]);
+			//printf("pre-disp V[%i]= %e\n", sub, V[sub]);
+			S[sub] = S[sub] + S[sub]*netSdisp[sub]; //net movement * frac that are S
+			V[sub] = V[sub] + V[sub]*netVdisp[sub]; //net movement * frac that are V
+			//printf("post-disp S[%i]= %e\n", sub, S[sub]);
+			//printf("post-disp V[%i]= %e\n", sub, V[sub]);
+		}
 			} 
 		}
-	}
+	}	
 
 	//******************************* Weather Stuff ******************************//
 	Params->nuV = Params->PARS[2];
@@ -443,7 +456,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 
 
-	nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF);    //JL: Reading in MinRH here
+	nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
 	if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
 	Params->nuF = (DD10/fourth_size)*nuF2;
 
@@ -465,7 +478,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		}
 	}
 
-	nuR2=(rain_P/(1+rain_P2*exp(-rain_P3*total_rainfall)) - rain_P/(rain_P2+1))*exp(rand_nuR);  //JL: Should be the same as DDEVF for MCMC?
+	nuR2=(rain_P/(1+rain_P2*exp(-rain_P3*total_rainfall)) - rain_P/(rain_P2+1))*exp(rand_nuR[(int)t]);  //JL: Should be the same as DDEVF for MCMC?
 	if(nuR2> pow(10.0,10.0)){nuR2= pow(10.0,10.0);}
 
 	Params->nuR = (DD10/fourth_size)*nuR2;
@@ -534,17 +547,9 @@ for(k=0; k<DIM; k++){
 
 	}
 	//printf("day = %i\t j = %i\t sub = %i\t IF = %lf\t IV = %lf\t IVF = %lf\n",day, j, sub, IF[sub], IV[sub], IFV[sub]);
-//*************************SH below line prints daily output to global file fp1 **************/
-//fprintf(fp1, "%d\t %d\t %d\n", S/initS, IV/initS, IF/initS);
-//fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,Vkill,Fcadaver,Vcadaver,IF,IV,y_ode[0]+Fkill+Vkill+IV+IF); //getc(stdin);
-//SH yode[0] host at end of day, IV/IF: individuals in exposed classes (i.e. infected but not yet killed)
-/*
-for(sub=0; sub<num_sub; sub++){	
-	printf("DAILY OUTPUT %i\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",sub, day-1,initS,y_ode[0+sub_index[sub]],Fkill[sub],Vkill[sub],Fcadaver[sub],Vcadaver[sub],IF[sub],IV[sub],y_ode[0+sub_index[sub]]+Fkill[sub]+Vkill[sub]+IV[sub]+IF[sub]); //getc(stdin);
-}
-*/
+
 //*******************************Appends output for each treatment run based on one epizootic length of 48**************************//
-		printf("bottom of DDEVF");
+
 		//LOOP THROUGH ARRAYS
 	int day_index[4] = {0, 47, 95, 143}; //to append 48 day epizootics //probably a better way to do this
 	
@@ -552,19 +557,13 @@ for(sub=0; sub<num_sub; sub++){
 
 		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction uninfected S 
 		//printf("DAY = %i\t j = %i\t sub = %i\t S = %lf\t yode = %lf\t IV = %lf\t IF = %lf\t IVF = %lf\n", day-1, j, sub, S[sub], y_ode[0+sub_index[sub]], IV[sub], IF[sub], IVF[sub]);
-		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected V 
+		Params->MODEL[j][day-1+day_index[sub]][1] = (IV[sub]+IVF[sub])/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected V 
 		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected F
 		Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction coinfected 
 
-		fprintf(fp1, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
+		//fprintf(fpm, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
 		//printf("%i\t %i\t %i\t %lf\t %lf\t %lf\t %lf\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
-
 	}
-
-	//SH need to fix print statement
-	//fprintf(fp1, "%d\t %e\t %e\t %e\t %e\n %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n", day-1, S_1/(y_ode[0]+IV_1+IF_1+IVF_1), IV_1/(y_ode[0]+IV_1+IF_1+IVF_1), IF_1/(y_ode[0]+IV_1+IF_1+IVF_1), IFV_1/(y_ode[0]+IV_1+IF_1+IVF_1), S_2/(y_ode[0]+IV_2+IF_2+IVF_2), IV_2/(y_ode[0]+IV_2+IF_2+IVF_2), IF_2/(y_ode[0]+IV_2+IF_2+IVF_2), IFV_2/(y_ode[0]+IV_2+IF_2+IVF_2), S_3/(y_ode[0]+IV_3+IF_3+IVF_3), IV_3/(y_ode[0]+IV_3+IF_3+IVF_3), IF_3/(y_ode[0]+IV_3+IF_3+IVF_3), IFV_3/(y_ode[0]+IV_3+IF_3+IVF_3), S_4/(y_ode[0]+IV_4+IF_4+IVF_4), IV_4/(y_ode[0]+IV_4+IF_4+IVF_4), IF_4/(y_ode[0]+IV_4+IF_4+IVF_4), IFV_4/(y_ode[0]+IV_4+IF_4+IVF_4));
-	//fprintf(fp1, "%d\t %d\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\t %e\n",pop,day-1,initS,y_ode[0],Fkill,FRnext,Vkill,Vnext,Fcadaver,Vcadaver,Fkill+IF+IVF,Vkill+IV,y_ode[0]+Fkill+Vkill+IV+IF+IVF);
-
 	}
 
 //Done with daily plotting output here

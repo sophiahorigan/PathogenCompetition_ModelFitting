@@ -125,23 +125,18 @@ if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with n
 	//printf("likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 }
+
 //printf("dataset = %i\t, lhood=%lf\n", dataset, lhood_meta);
-//remove super bad likelihood scores
-if (lhood_meta < -7500){
-	lhood_meta = 0;
-}
-//printf("was it bad?=%lf\n", lhood_meta);
 
 //adjust and exponentiate
 lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
 //printf("adj = %lf\t, lhood post adj=%lf\n", Params->lhood_adjust[dataset], lhood_meta2);
 
-lhood_meta2 = exp(lhood_meta2);
-
-//if nan, replace with zero
-if(isnan(lhood_meta2) || isinf(lhood_meta2)){
-	lhood_meta2 = -6000;
+if (lhood_meta2 < -700 || lhood_meta2 > 700){
+	lhood_meta2 = -700;
 }
+
+lhood_meta2 = exp(lhood_meta2);
 
 //printf("exp lhood = %lf\n", lhood_meta2);
 

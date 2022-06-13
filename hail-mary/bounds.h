@@ -67,19 +67,20 @@ else if (i==43)		{	low = 0;			high = 0.5;		} 	//initV
 else if (i==44)		{	low = 0;			high = 0.01;	} 	//initR
 
 //dispersal
-else if (i==45)		{	low = 0;			high = 100;		} 	//con_mrg //rate of conidia dispersal
-else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter
-else if (i==47)		{	low = 0;			high = 1;		}	//lar_disp //prob of dispersal
+else if (i==45)		{	low = 0;			high = 100;		} 	//con_mgr //rate of conidia dispersal
+else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter conidia
+else if (i==47)		{	low = 0;			high = 100;		}	//lar_mgr //rate of larval dispersal
+else if (i==48)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
 
 //coifection
-else if (i==48) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==49) 	{	low = 0;			high = 500;		}	//VFSus //enhanced susceptibility 
+else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==50) 	{	low = 0;			high = 500;		}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (i==50)		{	low = 0;			high = 2;		}	//Rsd_exp
-else if (i==51)		{	low = 0;			high = 2;		}	//Fsd_exp
-else if (i==52)		{	low = 0;			high = 2;		}	//Rsd_obs
-else if (i==53)		{	low = 0;			high = 2;		}	//Fsd_obs
+else if (i==51)		{	low = 0;			high = 2;		}	//Rsd_exp
+else if (i==52)		{	low = 0;			high = 2;		}	//Fsd_exp
+else if (i==53)		{	low = 0;			high = 2;		}	//Rsd_obs
+else if (i==54)		{	low = 0;			high = 2;		}	//Fsd_obs
 
 if		(j==1)	return low;
 else if (j==2)	return high;
@@ -154,19 +155,20 @@ else if (i==43)		{	step_size = 0.005;	}  	//initV
 else if (i==44)		{	step_size = 0.0005;	}	//initR
 
 //dispersal
-else if (i==45)		{	step_size = 1;	}  	//con_mrg //rate of conidia dispersal
+else if (i==45)		{	step_size = 1;	}  	//con_mgr //rate of conidia dispersal
 else if (i==46)		{	step_size = .01;	} 	//a //distance dispersal parameter
-else if (i==47)		{	step_size = .01;	}	//lar_disp //prob of dispersal
+else if (i==47)		{	step_size = 1;	}	//lar_mgr //prob of dispersal
+else if (i==48)		{	step_size = .01;	}	//a2 //prob of dispersal
 
 //coifection
-else if (i==48) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==49) 	{	step_size = 5;	}	//VFSus //enhanced susceptibility 
+else if (i==49) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==50) 	{	step_size = 5;	}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (1==50)		{	step_size = .05;	}	//Rsd_exp
-else if (1==51)		{	step_size = .05;	}	//Fsd_exp
-else if (1==52)		{	step_size = .05;	}	//Rsd_obs
-else if (1==53)		{	step_size = .05;	}	//Fsd_obs
+else if (1==51)		{	step_size = .05;	}	//Rsd_exp
+else if (1==52)		{	step_size = .05;	}	//Fsd_exp
+else if (1==53)		{	step_size = .05;	}	//Rsd_obs
+else if (1==54)		{	step_size = .05;	}	//Fsd_obs
 
 return step_size;
 }
@@ -240,19 +242,21 @@ else if (i==43)		{	low = 0;			high = 1;		} 	//initV
 else if (i==44)		{	low = 0;			high = 1;		} 	//initR
 
 //dispersal
-else if (i==45)		{	low = 0;			high = 10000;	} 	//con_mrg //rate of conidia dispersal
-else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter
-else if (i==47)		{	low = 0;			high = 1;		}	//lar_disp //prob of dispersal
+else if (i==45)		{	low = 0;			high = 10000;	} 	//con_mgr //rate of conidia dispersal
+else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter conidia
+else if (i==47)		{	low = 0;			high = 10000;	}	//lar_mgr //prob of dispersal
+else if (i==48)		{	low = 0;			high = 1;		}	//a2 //distance dispersal parameter larvae
+
 
 //coifection
-else if (i==48) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==49) 	{	low = 0;			high = 10000;	}	//VFSus //enhanced susceptibility 
+else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==50) 	{	low = 0;			high = 10000;	}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (i==50)		{	low = 0;			high = 10;		}	//Rsd_exp
-else if (i==51)		{	low = 0;			high = 10;		}	//Fsd_exp
-else if (i==52)		{	low = 0;			high = 10;		}	//Rsd_obs
-else if (i==53)		{	low = 0;			high = 10;		}	//Fsd_obs
+else if (i==51)		{	low = 0;			high = 10;		}	//Rsd_exp
+else if (i==52)		{	low = 0;			high = 10;		}	//Fsd_exp
+else if (i==53)		{	low = 0;			high = 10;		}	//Rsd_obs
+else if (i==54)		{	low = 0;			high = 10;		}	//Fsd_obs
 
 if		(j==1)	return low;
 else if (j==2)	return high;

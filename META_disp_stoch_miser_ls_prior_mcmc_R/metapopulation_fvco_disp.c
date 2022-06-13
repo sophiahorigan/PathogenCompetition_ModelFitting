@@ -82,9 +82,9 @@ Params.lhood_adjust[4] = 2000;
 Params.lhood_adjust[5] = 2000;
 Params.lhood_adjust[6] = 1000;
 
-int searches = 5; //number of iterations for each specific parameter
+int searches = 3; //number of iterations for each specific parameter
 int round;
-int numround = 5;
+int numround = 2;
 int calls;
 size_t dim;
 
@@ -119,77 +119,79 @@ if(reals==1){
 	char name1[50];
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
+	
+	double linesearchpars[54] = {198.890583,105.518878,118.732095,150.761538,0.007897,0.172561,0.045577,0.002373,0.008667,0.009468,0.009891,0.001392,164.394604,135.896308,98.305476,199.724284,0.002756,0.097985,0.182305,0.007402,0.006673,0.000479,0.001276,0.000786,101.259181,93.120187,134.255696,96.491262,0.003349,0.017231,0.06059,0.007751,0.007525,0.003303,0.008875,0.000574,57.938313,0.306001,0.003744,48.973371,0.472622,0.006452,69.554753,0.155475,0.005912,6.405986,0.579409,0.958631,0.639453,87.161354,1.985191,0.176238,1.471849,1.352933};
 
 	//propose parameter values
 	//metapopulation one
-	Params.FITINIT[1][0] = 100; //initS
-	Params.FITINIT[1][1] = 100; //initS
-	Params.FITINIT[1][2] = 100; //initS
-	Params.FITINIT[1][3] = 100; //initS
-	Params.FITINIT[1][4] = 0; 				//initV //fonly
-	Params.FITINIT[1][5] = 0.2; //initV
-	Params.FITINIT[1][6] = 0.2; //initV
-	Params.FITINIT[1][7] = 0; 				//initV //control
-	Params.FITINIT[1][8] = 0.00236; //initR
-	Params.FITINIT[1][9] = 0.00236; //initR
-	Params.FITINIT[1][10] = 0.00236; //initR
-	Params.FITINIT[1][11] = 0.00236; //initR
+	Params.FITINIT[1][0] = linesearchpars[0]; //initS
+	Params.FITINIT[1][1] = linesearchpars[1]; //initS
+	Params.FITINIT[1][2] = linesearchpars[2]; //initS
+	Params.FITINIT[1][3] = linesearchpars[3]; //initS
+	Params.FITINIT[1][4] = linesearchpars[4]; 				//initV //fonly
+	Params.FITINIT[1][5] = linesearchpars[5]; //initV
+	Params.FITINIT[1][6] = linesearchpars[6]; //initV
+	Params.FITINIT[1][7] = linesearchpars[7]; 				//initV //control
+	Params.FITINIT[1][8] = linesearchpars[8]; //initR
+	Params.FITINIT[1][9] = linesearchpars[9]; //initR
+	Params.FITINIT[1][10] = linesearchpars[10]; //initR
+	Params.FITINIT[1][11] = linesearchpars[11]; //initR
 
 	//metapopulation two
-	Params.FITINIT[2][0] = 100; //initS
-	Params.FITINIT[2][1] = 100; //initS
-	Params.FITINIT[2][2] = 100; //initS
-	Params.FITINIT[2][3] = 100; //initS
-	Params.FITINIT[2][4] = 0; 				//initV //fonly
-	Params.FITINIT[2][5] = 0.2; //initV
-	Params.FITINIT[2][6] = 0.2; //initV
-	Params.FITINIT[2][7] = 0; 				//initV //control
-	Params.FITINIT[2][8] = 0.00236; //initR
-	Params.FITINIT[2][9] = 0.00236; //initR
-	Params.FITINIT[2][10] = 0.00236; //initR
-	Params.FITINIT[2][11] = 0.00236; //initR
+	Params.FITINIT[2][0] = linesearchpars[12]; //initS
+	Params.FITINIT[2][1] = linesearchpars[13]; //initS
+	Params.FITINIT[2][2] = linesearchpars[14]; //initS
+	Params.FITINIT[2][3] = linesearchpars[15]; //initS
+	Params.FITINIT[2][4] = linesearchpars[16]; 				//initV //fonly
+	Params.FITINIT[2][5] = linesearchpars[17]; //initV
+	Params.FITINIT[2][6] = linesearchpars[18]; //initV
+	Params.FITINIT[2][7] = linesearchpars[19]; 				//initV //control
+	Params.FITINIT[2][8] = linesearchpars[20]; //initR
+	Params.FITINIT[2][9] = linesearchpars[21]; //initR
+	Params.FITINIT[2][10] = linesearchpars[22]; //initR
+	Params.FITINIT[2][11] = linesearchpars[23]; //initR
 
 	//metapopulation three
-	Params.FITINIT[3][0] = 100; //initS
-	Params.FITINIT[3][1] = 100; //initS
-	Params.FITINIT[3][2] = 100; //initS
-	Params.FITINIT[3][3] = 100; //initS
-	Params.FITINIT[3][4] = 0; 				//initV //f only
-	Params.FITINIT[3][5] = 0.2; //initV
-	Params.FITINIT[3][6] = 0.2; //initV
-	Params.FITINIT[3][7] = 0;				 //initV //control
-	Params.FITINIT[3][8] = 0.00236; //initR
-	Params.FITINIT[3][9] = 0.00236; //initR
-	Params.FITINIT[3][10] = 0.00236; //initR
-	Params.FITINIT[3][11] = 0.00236; //initR
+	Params.FITINIT[3][0] = linesearchpars[24]; //initS
+	Params.FITINIT[3][1] = linesearchpars[25]; //initS
+	Params.FITINIT[3][2] = linesearchpars[26]; //initS
+	Params.FITINIT[3][3] = linesearchpars[27]; //initS
+	Params.FITINIT[3][4] = linesearchpars[28]; 				//initV //f only
+	Params.FITINIT[3][5] = linesearchpars[29]; //initV
+	Params.FITINIT[3][6] = linesearchpars[30]; //initV
+	Params.FITINIT[3][7] = linesearchpars[31];				 //initV //control
+	Params.FITINIT[3][8] = linesearchpars[32]; //initR
+	Params.FITINIT[3][9] = linesearchpars[33]; //initR
+	Params.FITINIT[3][10] = linesearchpars[34]; //initR
+	Params.FITINIT[3][11] = linesearchpars[35]; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 100; //initS
-	Params.FITINIT[4][4] = 0.3; //initV
-	Params.FITINIT[4][8] = 0.00236; //initR
+	Params.FITINIT[4][0] = linesearchpars[36]; //initS
+	Params.FITINIT[4][4] = linesearchpars[37]; //initV
+	Params.FITINIT[4][8] = linesearchpars[38]; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 100; //initS
-	Params.FITINIT[5][4] = 0.3; //initV
-	Params.FITINIT[5][8] = 0.00236; //initR
+	Params.FITINIT[5][0] = linesearchpars[39]; //initS
+	Params.FITINIT[5][4] = linesearchpars[40]; //initV
+	Params.FITINIT[5][8] = linesearchpars[41]; //initR
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 100; //initS
-	Params.FITINIT[6][4] = 0.3; //initV
-	Params.FITINIT[6][8] = 0.00236; //initR
+	Params.FITINIT[6][0] = linesearchpars[42]; //initS
+	Params.FITINIT[6][4] = linesearchpars[43]; //initV
+	Params.FITINIT[6][8] = linesearchpars[44]; //initR
 
 	//dispersal parameters
-	Params.con_mrg 		= 50;
-	Params.a 			= 0.5;
-	Params.lar_disp 	= 0.2;
+	Params.con_mrg 		= linesearchpars[45];
+	Params.a 			= linesearchpars[46];
+	Params.lar_disp 	= linesearchpars[47];
 	//coinfection parameters
-	Params.coinf_V		= 0.2;
-	Params.VFSus		= 0.1;
+	Params.coinf_V		= linesearchpars[48];
+	Params.VFSus		= linesearchpars[49];
 	//stochasticity parameters
-	Params.Rsd_exp 		= 1;
-	Params.Fsd_exp		= 1;
-	Params.Rsd_obs		= 1;
-	Params.Fsd_exp		= 1;
+	Params.Rsd_exp 		= linesearchpars[50];
+	Params.Fsd_exp		= linesearchpars[51];
+	Params.Rsd_obs		= linesearchpars[52];
+	Params.Fsd_exp		= linesearchpars[53];
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -231,7 +233,7 @@ if(reals==1){
 			//printf("total = %lf\n", total_loghood_metas);
 			new_posterior = total_loghood_metas + log_prior;
 	}
-	fclose(fp1); //TURN ON FP1 PRINT STATEMENT IN DDEVF
+	fclose(fpm); //TURN ON FP1 PRINT STATEMENT IN DDEVF
 
 }
 //----------------------------------------------------Print Output to File-------------------------------------------//
@@ -394,7 +396,6 @@ for (round=0;round<numround;round++){
 			
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
-				log_lhood_meta = 0;
 			}
 			else{
 				Params.lhood_adjust[j] = -1*log_lhood_meta; //update lhood adj based on average so it is dynamic
@@ -408,6 +409,7 @@ for (round=0;round<numround;round++){
 		}//j 
 		if (new_posterior>best_posterior){ //compare likelihood //sum - one you just generated //local max - best you've seen
 			best_posterior=new_posterior;
+			printf("best posterior = %lf\n", best_posterior);
 			for (c=0;c<num_ltfparams;c++){
 				localmax_params[c]=ltf_params[c]; //save best param set from each individual search
 			}
@@ -417,12 +419,13 @@ for (round=0;round<numround;round++){
 	for (c=0;c<num_ltfparams;c++){
 		ltf_params[c]=localmax_params[c];
 	}
-	a++; //move to next parameter
+	a++; //move to next parameter	
+	} //a
 	for(ii=0; ii<num_ltfparams; ii++){
 		fprintf(fpv, "%lf\t", ltf_params[ii]);
-		fprintf(fpv, "\n");
-	}	
-	} //a
+	}
+	fprintf(fpv, "%lf\t", best_posterior);
+	fprintf(fpv, "\n");
 }
 
 //fclose(fpl);
@@ -437,13 +440,16 @@ fclose(fp1); //model realizations
 
 if(mcmc==1){
 
+	int pid;
+	pid=getpid();
+
 	char namem[50];
-	sprintf(namem, "mcmc_results");
+	sprintf(namem, "mcmc_results_%d", pid);
 	fpm=fopen(namem, "a+");
 
 	int NumberOfParams=54;		
 
-	int Realizations=10;         //JL: Number of realizations in the MCMC step
+	int Realizations=100;         //JL: Number of realizations in the MCMC step
 
 	double RandomNumber;
 
@@ -565,11 +571,11 @@ if(mcmc==1){
 
 //------------------------begin loop---------------------------------//
 while (LoopNumber<=Realizations) {     
-		printf("loop number = %i\n", LoopNumber);
+		//printf("loop number = %i\n", LoopNumber);
 		LoopNumber=LoopNumber+1;
 
 		Case=LoopNumber%NumberOfParams;					//Determines which PC to change
-		printf("CASE = %i\n");
+		//printf("CASE = %i\n");
 
 		for (a=0; a<NumberOfParams; a++)
 		{
@@ -712,7 +718,7 @@ while (LoopNumber<=Realizations) {
 			//printf("total = %lf\n", total_loghood_metas);
 			LogNewPosterior = 0.0;
 			LogNewPosterior = total_loghood_metas + log_prior;
-			printf("new posterior = %lf\n", LogNewPosterior);
+			//printf("new posterior = %lf\n", LogNewPosterior);
 		}//j 
 
 		//-------------------assign old parameter values-----------------------//
@@ -829,7 +835,7 @@ while (LoopNumber<=Realizations) {
 			//printf("total = %lf\n", total_loghood_metas);
 			LogOldPosterior=0.0;
 			LogOldPosterior = total_loghood_metas + log_prior;
-			printf("old posterior = %lf\n", LogOldPosterior);
+			//printf("old posterior = %lf\n", LogOldPosterior);
 		}//j 
 
 
@@ -861,9 +867,11 @@ while (LoopNumber<=Realizations) {
 		// ------------------------------------------ output results to file  --------------------------------------- //
 		if (LoopNumber % 10 == 0)   	//CK// output results every 10 loops (probably not best plan but we'll see)
 		{
+			printf("printing! loop number = %i\n", LoopNumber);
 			for(ii=0; ii<NumberOfParams; ii++){
 				fprintf(fpm, "%lf\t", PCAparams[ii]);
 			}
+			fprintf(fpm, "\n");
 			//fflush(stdout);
 		}
 	}

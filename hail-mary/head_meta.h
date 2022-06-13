@@ -88,9 +88,10 @@ double VPass;          //variable to pass the value of initialV in each generati
 
 
 //SH global declaration of global file fp1 to print daily output into
-FILE *fp1;
+FILE *fp1; //realization output
 FILE *fpl; //line-search likelihood output
 FILE *fpv; //line-search parameter value output
+FILE *fpm; //mcmc output
 
 //double vinfected; //SH to hold daily fraction infected
 //double finfected; //SH add coinfected eventually
@@ -175,9 +176,10 @@ typedef struct
 	double FITMETA[NUM_PARS];	//dispersal and coinfection parameters fit across all datasets
 
 	//dispersal
-	double con_mrg; //0
+	double con_mgr; //0
 	double a;		//1
-	double lar_disp;//2
+	double lar_mgr;	//2
+	double a2;
 
 	//coinfection
 	double coinf_V;	//3

@@ -188,8 +188,8 @@ if(reals==1){
 
 	//coinfection parameters
 	Params.coinf_V		= linesearchpars[49];
-	//Params.VFSus		= linesearchpars[50];
-	Params.VFSus 		= 0;
+	Params.VFSus		= linesearchpars[50];
+
 	//stochasticity parameters
 	Params.Rsd_exp 		= linesearchpars[51];
 	Params.Fsd_exp		= linesearchpars[52];
@@ -242,6 +242,8 @@ if(reals==1){
 //----------------------------------------------------Print Output to File-------------------------------------------//
 
 if(linesearch==1){
+
+int exptmt = 1;	
 int pid;
 pid=getpid();
 
@@ -280,6 +282,99 @@ for (round=0;round<numround;round++){
 				}
 			}
 
+			if(exptmt==1){
+				//Send new parameter values into code
+			//printf("made it in");
+			//metapopulation one
+			Params.FITINIT[1][0] = 100; //initS
+			Params.FITINIT[1][1] = 100; //initS
+			Params.FITINIT[1][2] = 100; //initS
+			Params.FITINIT[1][3] = 100; //initS
+			Params.FITINIT[1][4] = 0; 				//initV //fonly
+			Params.FITINIT[1][5] = 0.2; //initV
+			Params.FITINIT[1][6] = 0.2; //initV
+			Params.FITINIT[1][7] = 0; 				//initV //control
+			Params.FITINIT[1][8] = ltf_params[8]; //initR
+			//Params.FITINIT[1][9] = ltf_params[8]; //initR //same R across all sites
+			//Params.FITINIT[1][10] = ltf_params[8]; //initR
+			//Params.FITINIT[1][11] = ltf_params[8]; //initR
+			Params.FITINIT[1][9] = ltf_params[9]; //initR
+			Params.FITINIT[1][10] = ltf_params[10]; //initR
+			Params.FITINIT[1][11] = ltf_params[11]; //initR
+
+			//metapopulation two
+			Params.FITINIT[2][0] = 100; //initS
+			Params.FITINIT[2][1] = 100; //initS
+			Params.FITINIT[2][2] = 100; //initS
+			Params.FITINIT[2][3] = 100; //initS
+			Params.FITINIT[2][4] = 0; 				//initV //fonly
+			Params.FITINIT[2][5] = 0.2; //initV
+			Params.FITINIT[2][7] = 0; 				//initV //control
+			//Params.FITINIT[2][8] = ltf_params[8]; //initR //same R across all sites
+			//Params.FITINIT[2][9] = ltf_params[8]; //initR
+			//Params.FITINIT[2][10] = ltf_params[8]; //initR
+			//Params.FITINIT[2][11] = ltf_params[8]; //initR
+			Params.FITINIT[2][8] = ltf_params[20]; //initR
+			Params.FITINIT[2][9] = ltf_params[21]; //initR
+			Params.FITINIT[2][10] = ltf_params[22]; //initR
+			Params.FITINIT[2][11] = ltf_params[23]; //initR
+
+			//metapopulation three
+			Params.FITINIT[3][0] = 100; //initS
+			Params.FITINIT[3][1] = 100; //initS
+			Params.FITINIT[3][2] = 100; //initS
+			Params.FITINIT[3][3] = 100; //initS
+			Params.FITINIT[3][4] = 0; 				//initV //f only
+			Params.FITINIT[3][5] = 0.2; //initV
+			Params.FITINIT[3][6] = 0.2; //initV
+			Params.FITINIT[3][7] = 0;				 //initV //control
+			//Params.FITINIT[3][8] = ltf_params[8]; //initR
+			//Params.FITINIT[3][9] = ltf_params[8]; //initR
+			//Params.FITINIT[3][10] = ltf_params[8]; //initR
+			//Params.FITINIT[3][11] = ltf_params[8]; //initR
+			Params.FITINIT[3][8] = ltf_params[32]; //initR
+			Params.FITINIT[3][9] = ltf_params[33]; //initR
+			Params.FITINIT[3][10] = ltf_params[34]; //initR
+			Params.FITINIT[3][11] = ltf_params[35]; //initR
+
+			//metapopultion four
+			Params.FITINIT[4][0] = ltf_params[36]; //initS
+			Params.FITINIT[4][4] = ltf_params[37]; //initV
+			//Params.FITINIT[4][8] = ltf_params[8]; //initR
+			Params.FITINIT[4][8] = ltf_params[38]; //initR
+
+			//metapopultion five
+			Params.FITINIT[5][0] = ltf_params[39]; //initS
+			Params.FITINIT[5][4] = ltf_params[40]; //initV
+			//Params.FITINIT[5][8] = ltf_params[8]; //initR
+			Params.FITINIT[5][8] = ltf_params[41]; //initR
+
+			//metapopultion six
+			Params.FITINIT[6][0] = ltf_params[42]; //initS
+			Params.FITINIT[6][4] = ltf_params[43]; //initV
+			//Params.FITINIT[6][8] = ltf_params[8]; //initR
+			Params.FITINIT[6][8] = ltf_params[44]; //initR
+
+			//dispersal parameters
+			Params.con_mgr 		= ltf_params[45];
+			Params.a 			= ltf_params[46];
+			Params.lar_mgr	 	= ltf_params[47];
+			Params.a2 			= ltf_params[48];
+			//coinfection parameters
+			//Params.coinf_V		= ltf_params[49];
+			//Params.VFSus		= ltf_params[50];
+			Params.coinf_V		= 0;
+			Params.VFSus		= 0;
+			//stochasticity parameters
+			Params.Rsd_exp 		= ltf_params[51];
+			Params.Fsd_exp		= ltf_params[52];
+			Params.Rsd_obs		= ltf_params[53];
+			Params.Fsd_exp		= ltf_params[54];
+			}
+
+
+
+			if(exptmt==0){
 			//Send new parameter values into code
 			//metapopulation one
 			Params.FITINIT[1][0] = ltf_params[0]; //initS
@@ -358,13 +453,17 @@ for (round=0;round<numround;round++){
 			Params.lar_mgr	 	= ltf_params[47];
 			Params.a2 			= ltf_params[48];
 			//coinfection parameters
-			Params.coinf_V		= ltf_params[49];
-			Params.VFSus		= ltf_params[50];
+			//Params.coinf_V		= ltf_params[49];
+			//Params.VFSus		= ltf_params[50];
+			Params.coinf_V		= 0;
+			Params.VFSus		= 0;
 			//stochasticity parameters
 			Params.Rsd_exp 		= ltf_params[51];
 			Params.Fsd_exp		= ltf_params[52];
 			Params.Rsd_obs		= ltf_params[53];
 			Params.Fsd_exp		= ltf_params[54];
+			}
+			
 		
 			
 			//-------------------MISER CALCULATE LIKELIHOOD------------------------------//
@@ -425,8 +524,14 @@ for (round=0;round<numround;round++){
 	}
 	a++; //move to next parameter	
 	} //a
-	for(ii=0; ii<num_ltfparams; ii++){
-		fprintf(fpv, "%lf\t", ltf_params[ii]);
+
+	//modified printing to only print fitting params without having to change num_lftparams
+	int print_len = 30;
+	int printlist[30] = {8, 9, 10, 11, 20, 21, 22, 23, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54};
+	int index;
+	for(ii=0; ii<print_len; ii++){
+		index = printlist[ii];
+		fprintf(fpv, "%lf\t", ltf_params[index]);
 	}
 	fprintf(fpv, "%lf\t", best_posterior);
 	fprintf(fpv, "\n");
@@ -826,7 +931,7 @@ while (LoopNumber<=Realizations) {
 
 			//fprintf(fpl, "For dataset %i, lhood = %lf\t, err = %lf\n", j, lhood_meta, meta_err);
 			//fprintf(fpl, "For dataset %i, lhood = %lf\n", j, lhood_meta);
-			//printf("out of the old\n");
+			//printf("out of the old\n");l
 			
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not

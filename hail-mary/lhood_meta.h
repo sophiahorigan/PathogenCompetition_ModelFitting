@@ -71,19 +71,6 @@ int year;
 //double fdensity;
 //double vdensity;
 
-
-
-double sdensity;
-double fdensity;
-double vdensity;
-sdensity=100; //SH random pick 
-fdensity=0.026; //SH from literature
-vdensity=0.01; //SH guesstimate
-
-Params->PARS[30+pop]=sdensity; 
-VPass=vdensity;
-Params->PARS[50+pop]=fdensity;
-
 int dataset;
 dataset = Params->j;
 

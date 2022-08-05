@@ -70,17 +70,17 @@ else if (i==44)		{	low = 0;			high = 0.01;	} 	//initR
 else if (i==45)		{	low = 0;			high = 100;		} 	//con_mgr //rate of conidia dispersal
 else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter conidia
 else if (i==47)		{	low = 0;			high = 100;		}	//lar_mgr //rate of larval dispersal
-else if (i==48)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==48)		{	low = 0;			high = 0.1;		} 	//a2 //distance dispersal parameter larvae
 
 //coifection
 else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
 else if (i==50) 	{	low = 0;			high = 500;		}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (i==51)		{	low = 0;			high = 2;		}	//Rsd_exp
-else if (i==52)		{	low = 0;			high = 2;		}	//Fsd_exp
-else if (i==53)		{	low = 0;			high = 2;		}	//Rsd_obs
-else if (i==54)		{	low = 0;			high = 2;		}	//Fsd_obs
+else if (i==51)		{	low = 0;			high = 4;		}	//Rsd_exp
+else if (i==52)		{	low = 0;			high = 4;		}	//Fsd_exp
+else if (i==53)		{	low = 0;			high = 4;		}	//Rsd_obs
+else if (i==54)		{	low = 0;			high = 4;		}	//Fsd_obs
 
 if		(j==1)	return low;
 else if (j==2)	return high;
@@ -140,25 +140,25 @@ else if (i==34)		{	step_size = 0.0005;	}	//initR fungus-virus
 else if (i==35)		{	step_size = 0.0005;	}	//initR control
 
 //metapopulation four
-else if (i==36)		{	step_size = 1;	}	//initS
-else if (i==37)		{	step_size = 0.005;	}	//initV
+else if (i==36)		{	step_size = 5;	}	//initS
+else if (i==37)		{	step_size = 0.05;	}	//initV
 else if (i==38)		{	step_size = 0.0005;	} 	//initR
 
 //metapopulation five
-else if (i==39)		{	step_size = 1;	}	//initS
-else if (i==40)		{	step_size = 0.005;	} 	//initV
+else if (i==39)		{	step_size = 5;	}	//initS
+else if (i==40)		{	step_size = 0.05;	} 	//initV
 else if (i==41)		{	step_size = 0.0005;	} 	//initR
 
 //metapopulation six
-else if (i==42)		{	step_size = 1;	}	//initS
-else if (i==43)		{	step_size = 0.005;	}  	//initV
+else if (i==42)		{	step_size = 5;	}	//initS
+else if (i==43)		{	step_size = 0.05;	}  	//initV
 else if (i==44)		{	step_size = 0.0005;	}	//initR
 
 //dispersal
 else if (i==45)		{	step_size = 1;	}  	//con_mgr //rate of conidia dispersal
 else if (i==46)		{	step_size = .01;	} 	//a //distance dispersal parameter
 else if (i==47)		{	step_size = 1;	}	//lar_mgr //prob of dispersal
-else if (i==48)		{	step_size = .01;	}	//a2 //prob of dispersal
+else if (i==48)		{	step_size = .0001;	}	//a2 //prob of dispersal
 
 //coifection
 else if (i==49) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what proportion of OBs/conidia

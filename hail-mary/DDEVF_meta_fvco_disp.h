@@ -221,6 +221,7 @@ if (j==1 || j==2 || j==3){
 		INITV[i] = Params->FITINIT[j][i+num_sub];
 		INITR[i] = Params->FITINIT[j][i+num_sub+num_sub];
 	}
+	//printf("j = %i\t initS = %lf\t initV = %lf\t initR = %lf\n");
 }
 if (j==4 || j==5 || j==6){
 	INITS[0] = Params->FITINIT[j][0];
@@ -234,7 +235,7 @@ if (j==4 || j==5 || j==6){
 //printf("numsub = %i\n", num_sub);
 for(i=0; i<num_sub; i++){ 
 	S[i] = INITS[i];
-	V[i] = INITV[i]; //need to link with main.c eventually
+	V[i] = INITV[i]; 
 	C[i] = 0;
 	R[i] = INITR[i];
 	//printf("J = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
@@ -265,7 +266,6 @@ for(i=0; i<num_sub; i++){ //initial conditions
 	Fnext[i] = 0;
 	Fkill[i] = 0;
 }
-
 
 double timing[6]={r_germ,R_end,MAXT3};
 
@@ -405,7 +405,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	if(larvae_dispersal_on == 1){ //turn off at declaration at top of script
 
 	if(day-1<8){ //dispersal only occurs as first instars, 1 week
-
+		//printf("day = %i\n", day-1);
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
 		//printf("I'm in the dispersal loop! j = %i\n", j);
 		int subout; //indexing
@@ -415,16 +415,17 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		double fracV;
 		double poptotal;
 		double lar_disp;
-		double lard = 0.3;
-		double a3 = 0.2;
 		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
+			//printf("subout = %i\n", subout);
 			for(subin = 0; subin < num_sub; subin++){
+				//printf("subin = %i\n", subin);
 				if(subout != subin){
 					poptotal = S[subout]+V[subout]+C[subout];
 					fracV = V[subout]/poptotal; //what frac are virus
-					//printf("fracV = %lf\n", fracV);
+					//printf("fracV out = %lf\n", fracV);
 					lar_disp = Params->lar_mgr*exp(-Params->a2*Params->DISTANCE[j][subout][subin]);
+					//printf("lar_mrg=%lf\t a = %lf\t distance = %i\n",Params->lar_mgr, Params->a2, Params->DISTANCE[j][subout][subin]);
 					//lar_mgr = lard*exp(-a3*Params->DISTANCE[j][subout][subin]);
 					//printf("lar_disp=%lf\n", lar_disp);
 					//Virus
@@ -437,11 +438,11 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 				}
 			}
 		}
-		for(sub=0; sub<num_sub; sub++){ //update conidia density
+		for(sub=0; sub<num_sub; sub++){ //update larval density
 			//printf("pre-disp S[%i]= %e\n", sub, S[sub]);
 			//printf("pre-disp V[%i]= %e\n", sub, V[sub]);
-			S[sub] = S[sub] + S[sub]*netSdisp[sub]; //net movement * frac that are S
-			V[sub] = V[sub] + V[sub]*netVdisp[sub]; //net movement * frac that are V
+			S[sub] = S[sub] + netSdisp[sub]; 
+			V[sub] = V[sub] + netVdisp[sub]; 
 			//printf("post-disp S[%i]= %e\n", sub, S[sub]);
 			//printf("post-disp V[%i]= %e\n", sub, V[sub]);
 		}
@@ -561,6 +562,7 @@ for(k=0; k<DIM; k++){
 		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected F
 		Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction coinfected 
 
+		//MODEL REALIZATION PRINTING
 		//fprintf(fpm, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
 		//printf("%i\t %i\t %i\t %lf\t %lf\t %lf\t %lf\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
 	}

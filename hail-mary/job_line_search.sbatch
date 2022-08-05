@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#SBATCH --job-name=long_term_logsiticf
+#SBATCH --job-name=vf_fitting
+#SBATCH --account=pi-gdwyer
 #SBATCH --error=error_meta_fvco_disp.txt
 #SBATCH --time=36:00:00
 #SBATCH --nodes=1

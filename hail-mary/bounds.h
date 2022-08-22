@@ -4,7 +4,7 @@ double low;
 double high;
 
 //metapopulation one
-if (i==0)			{	low = 70;			high = 140;		}	//initS fungus-only
+if (i==0)			{	low = 0;			high = 100;		}	//initS fungus-only
 else if (i==1)		{	low = 70;			high = 140;		}	//initS virus-only
 else if (i==2)		{	low = 70;			high = 140;		}	//initS fungus-virus
 else if (i==3)		{	low = 70;			high = 140;		}	//initS control

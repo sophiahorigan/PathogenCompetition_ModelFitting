@@ -7,6 +7,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=28
 #SBATCH --partition=broadwl
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=shorigan@uchicago.edu
+
 module load openmpi
 
 mpiexec -n 28 ./metapopulation_fvco_disp

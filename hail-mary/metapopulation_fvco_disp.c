@@ -161,19 +161,19 @@ if(reals==1){
 	Params.FITINIT[3][11] = 0.001; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 6; //initS
-	Params.FITINIT[4][4] = 0.122221; //initV
-	Params.FITINIT[4][8] = 0.001; //initR
+	Params.FITINIT[4][0] = 15.968701; //initS
+	Params.FITINIT[4][4] = 0.123265; //initV
+	Params.FITINIT[4][8] = 0.001997; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 6; //initS
-	Params.FITINIT[5][4] = 0.15; //initV
-	Params.FITINIT[5][8] = 0.000533; //initR
+	Params.FITINIT[5][0] = 82.875750; //initS
+	Params.FITINIT[5][4] = 0.112749; //initV
+	Params.FITINIT[5][8] = 0; //initR
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 1; //initS
-	Params.FITINIT[6][4] = 0.1; //initV
-	Params.FITINIT[6][8] = 0.001; //initR
+	Params.FITINIT[6][0] = 4.944996; //initS
+	Params.FITINIT[6][4] = 0.05; //initV
+	Params.FITINIT[6][8] = 0.003756; //initR
 
 	//dispersal parameters
 	Params.con_mgr 		= 9.81101;
@@ -182,14 +182,14 @@ if(reals==1){
 	Params.a2			= 0.019726;
 
 	//coinfection parameters
-	Params.coinf_V		= 0;
-	Params.VFSus		= 0;
+	Params.coinf_V		= 0.2;
+	Params.VFSus		= 5;
 
 	//stochasticity parameters
 	Params.Rsd_exp 		= 0;
 	Params.Fsd_exp		= 0;
-	Params.Rsd_obs		= 2;
-	Params.Fsd_obs		= 1;
+	Params.Rsd_obs		= 0;
+	Params.Fsd_obs		= 0;
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -201,7 +201,7 @@ if(reals==1){
 	calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
 	//for(j=1; j<=DATA_SETS; j++){
-		for(j=1; j<2; j++){
+		for(j=4; j<7; j++){
 			Params.j = j;
 
 			dim = 48*2; 
@@ -260,9 +260,11 @@ for (round=0;round<numround;round++){
 	best_posterior=-999999999999;
 	a=0;
 
-	while (a<num_ltfparams){         
+	while (a<num_ltfparams){     
+		if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48){ 
 		//if (a==8 | a==9 | a==10 | a==11 | a==45 | a==46 | a==47 | a==48){
-		if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 || a == 44 || a == 49 || a == 50){   
+		//observationals
+		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 || a == 44 || a == 49 || a == 50){   
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step(a) * searches);
 			if(ltf_params[a] <= ls_bound(a,1)){
@@ -283,10 +285,10 @@ for (round=0;round<numround;round++){
 			//Send new parameter values into code
 			//printf("made it in");
 			//metapopulation one
-			Params.FITINIT[1][0] = 100; //initS
-			Params.FITINIT[1][1] = 100; //initS
-			Params.FITINIT[1][2] = 100; //initS
-			Params.FITINIT[1][3] = 100; //initS
+			Params.FITINIT[1][0] = ltf_params[0]; //initS
+			Params.FITINIT[1][1] = ltf_params[0]; //initS
+			Params.FITINIT[1][2] = ltf_params[0]; //initS
+			Params.FITINIT[1][3] = ltf_params[0]; //initS
 			Params.FITINIT[1][4] = 0.0000000001; 				//initV //fonly
 			Params.FITINIT[1][5] = 0.2; //initV
 			Params.FITINIT[1][6] = 0.2; //initV
@@ -301,10 +303,10 @@ for (round=0;round<numround;round++){
 			//Params.FITINIT[1][11] = ltf_params[11]; //initR
 
 			//metapopulation two
-			Params.FITINIT[2][0] = 100; //initS
-			Params.FITINIT[2][1] = 100; //initS
-			Params.FITINIT[2][2] = 100; //initS
-			Params.FITINIT[2][3] = 100; //initS
+			Params.FITINIT[2][0] = ltf_params[0]; //initS
+			Params.FITINIT[2][1] = ltf_params[0]; //initS
+			Params.FITINIT[2][2] = ltf_params[0]; //initS
+			Params.FITINIT[2][3] = ltf_params[0]; //initS
 
 			Params.FITINIT[2][4] = 0.0000000001; 				//initV //fonly
 			Params.FITINIT[2][5] = 0.2; //initV
@@ -312,15 +314,15 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[2][7] = 0.0000000001; 				//initV //control
 
 			Params.FITINIT[2][8] = ltf_params[20]; //initR
-			Params.FITINIT[2][9] = ltf_params[20]; //initR
-			Params.FITINIT[2][10] = ltf_params[20]; //initR
-			Params.FITINIT[2][11] = ltf_params[20]; //initR
+			Params.FITINIT[2][9] = ltf_params[21]; //initR
+			Params.FITINIT[2][10] = ltf_params[22]; //initR
+			Params.FITINIT[2][11] = ltf_params[23]; //initR
 
 			//metapopulation three
-			Params.FITINIT[3][0] = 100; //initS
-			Params.FITINIT[3][1] = 100; //initS
-			Params.FITINIT[3][2] = 100; //initS
-			Params.FITINIT[3][3] = 100; //initS
+			Params.FITINIT[3][0] = ltf_params[0]; //initS
+			Params.FITINIT[3][1] = ltf_params[0]; //initS
+			Params.FITINIT[3][2] = ltf_params[0]; //initS
+			Params.FITINIT[3][3] = ltf_params[0]; //initS
 
 			Params.FITINIT[3][4] = 0.0000000001; 				//initV //f only
 			Params.FITINIT[3][5] = 0.2; //initV
@@ -328,9 +330,9 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[3][7] = 0.0000000001;				 //initV //control
 
 			Params.FITINIT[3][8] = ltf_params[32]; //initR
-			Params.FITINIT[3][9] = ltf_params[32]; //initR
-			Params.FITINIT[3][10] = ltf_params[32]; //initR
-			Params.FITINIT[3][11] = ltf_params[32]; //initR
+			Params.FITINIT[3][9] = ltf_params[33]; //initR
+			Params.FITINIT[3][10] = ltf_params[34]; //initR
+			Params.FITINIT[3][11] = ltf_params[35]; //initR
 
 			//metapopultion four
 			Params.FITINIT[4][0] = ltf_params[36]; //initS
@@ -468,10 +470,10 @@ for (round=0;round<numround;round++){
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		calls=100;					//number of stochastic simulations for each parameter and IC set //100-300
+		calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		//for(j=1; j<=DATA_SETS; j++){
-		for(j=4; j<7; j++){
+		for(j=1; j<4; j++){
 			Params.j = j;
 			//printf("j in meta = %i\n", Params.j);
 
@@ -523,11 +525,12 @@ for (round=0;round<numround;round++){
 	} //a
 
 	//modified printing to only print fitting params without having to change num_lftparams
-	int print_len = 11;
+	int print_len = 17;
 
 	//meta 1 : len = 10
+	int printlist[17] = {0,8,9,10,11,20,21,22,23,32,33,34,35,45,46,47,48};
 	//int printlist[8] = {8, 9, 10, 11, 45, 46, 47, 48};
-	int printlist[11] = {36, 37, 38, 39, 40, 41, 42, 43, 44, 49, 50};
+	//int printlist[11] = {36, 37, 38, 39, 40, 41, 42, 43, 44, 49, 50};
 
 	//experimental treatment : len = 30
 	//int printlist[30] = {8, 9, 10, 11, 20, 21, 22, 23, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54};
@@ -545,7 +548,6 @@ for (round=0;round<numround;round++){
 fclose(fpv); //parameter values
 fclose(fp1); //model realizations
 }
-
 
 ///////////////////////////////////////////////////MCMC///////////////////////////////////////////////////
 

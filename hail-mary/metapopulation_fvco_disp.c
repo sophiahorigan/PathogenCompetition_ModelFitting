@@ -19,9 +19,9 @@ float DotProduct (int Length, double *Holder, double *PCA)
 int main(void)
 {
 
-int linesearch = 1;
+int linesearch = 0;
 int mcmc = 0;
-int reals = 0;
+int reals = 1;
 
 STRUCTURE Params;
 
@@ -31,7 +31,7 @@ int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
 int i=0; int j;int ii; int jj; int k; int l; 
 int num_adj_pars = 55;			// number of adjustable parameters
-int epi_length = 48;
+int epi_length = 49;
 
 inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
 /*
@@ -101,64 +101,49 @@ if(reals==1){
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
 	
-	double linesearchpars[55] = {198.890583,105.518878,118.732095,150.761538,0.007897,0.172561,0.045577,0.002373,0.008667,0.009468,0.009891,0.001392,164.394604,135.896308,98.305476,199.724284,0.002756,0.097985,0.182305,0.007402,0.006673,0.000479,0.001276,0.000786,101.259181,93.120187,134.255696,96.491262,0.003349,0.017231,0.06059,0.007751,0.007525,0.003303,0.008875,0.000574,57.938313,0.306001,0.003744,48.973371,0.472622,0.006452,69.554753,0.155475,0.005912,6.405986,0.579409,100,0.958631,0.639453,87.161354,1.985191,0.176238,1.471849,1.352933};
-
+	double initS_fit = 19.53;
 	//propose parameter values
 	//metapopulation one
-	Params.FITINIT[1][0] = 100; //initS
-	Params.FITINIT[1][1] = 100; //initS
-	Params.FITINIT[1][2] = 100; //initS
-	Params.FITINIT[1][3] = 100; //initS
+	Params.FITINIT[1][0] = initS_fit; //initS
+	Params.FITINIT[1][1] = initS_fit; //initS
+	Params.FITINIT[1][2] = initS_fit; //initS
+	Params.FITINIT[1][3] = initS_fit; //initS
 	Params.FITINIT[1][4] = 0.000001; 				//initV //fonly
 	Params.FITINIT[1][5] = 0.2; //initV
 	Params.FITINIT[1][6] = 0.2; //initV
 	Params.FITINIT[1][7] = 0.000001; 				//initV //control
-	Params.FITINIT[1][8] = 0.003; //initR
-	Params.FITINIT[1][9] = 0.005269; //initR
-	Params.FITINIT[1][10] = 0.006862; //initR
-	Params.FITINIT[1][11] = 0.009971; //initR
+	Params.FITINIT[1][8] = 0.003396; //initR
+	Params.FITINIT[1][9] = 0.002306; //initR
+	Params.FITINIT[1][10] = 0.000446; //initR
+	Params.FITINIT[1][11] = 0.002157; //initR
 
 	//metapopulation two
-	Params.FITINIT[2][0] = linesearchpars[12]; //initS
-	Params.FITINIT[2][1] = linesearchpars[13]; //initS
-	Params.FITINIT[2][2] = linesearchpars[14]; //initS
-	Params.FITINIT[2][3] = linesearchpars[15]; //initS
-	Params.FITINIT[2][4] = linesearchpars[16]; 				//initV //fonly
-	Params.FITINIT[2][5] = linesearchpars[17]; //initV
-	Params.FITINIT[2][6] = linesearchpars[18]; //initV
-	Params.FITINIT[2][7] = linesearchpars[19]; 				//initV //control
-	Params.FITINIT[2][8] = linesearchpars[20]; //initR
-	Params.FITINIT[2][9] = linesearchpars[21]; //initR
-	Params.FITINIT[2][10] = linesearchpars[22]; //initR
-	Params.FITINIT[2][11] = linesearchpars[23]; //initR
-	/*
+	Params.FITINIT[2][0] = initS_fit; //initS
+	Params.FITINIT[2][1] = initS_fit; //initS
+	Params.FITINIT[2][2] = initS_fit; //initS
+	Params.FITINIT[2][3] = initS_fit; //initS
+	Params.FITINIT[2][4] = 0.000001; 				//initV //fonly
+	Params.FITINIT[2][5] = 0.2; //initV
+	Params.FITINIT[2][6] = 0.2; //initV
+	Params.FITINIT[2][7] = 0.000001; 				//initV //control
+	Params.FITINIT[2][8] = 0.001272; //initR
+	Params.FITINIT[2][9] = 0.002010; //initR
+	Params.FITINIT[2][10] = 0.003034; //initR
+	Params.FITINIT[2][11] = 0.003778; //initR
+
 	//metapopulation three
-	Params.FITINIT[3][0] = linesearchpars[24]; //initS
-	Params.FITINIT[3][1] = linesearchpars[25]; //initS
-	Params.FITINIT[3][2] = linesearchpars[26]; //initS
-	Params.FITINIT[3][3] = linesearchpars[27]; //initS
-	Params.FITINIT[3][4] = linesearchpars[28]; 				//initV //f only
-	Params.FITINIT[3][5] = linesearchpars[29]; //initV
-	Params.FITINIT[3][6] = linesearchpars[30]; //initV
-	Params.FITINIT[3][7] = linesearchpars[31];				 //initV //control
-	Params.FITINIT[3][8] = linesearchpars[32]; //initR
-	Params.FITINIT[3][9] = linesearchpars[33]; //initR
-	Params.FITINIT[3][10] = linesearchpars[34]; //initR
-	Params.FITINIT[3][11] = linesearchpars[35]; //initR
-	*/
-	//metapopulation three
-	Params.FITINIT[3][0] = 100; //initS
-	Params.FITINIT[3][1] = 100; //initS
-	Params.FITINIT[3][2] = 100; //initS
-	Params.FITINIT[3][3] = 100; //initS
+	Params.FITINIT[3][0] = initS_fit; //initS
+	Params.FITINIT[3][1] = initS_fit; //initS
+	Params.FITINIT[3][2] = initS_fit; //initS
+	Params.FITINIT[3][3] = initS_fit; //initS
 	Params.FITINIT[3][4] = 0.0000000001; 				//initV //f only
 	Params.FITINIT[3][5] = 0.2; //initV
 	Params.FITINIT[3][6] = 0.2; //initV
 	Params.FITINIT[3][7] = 0.0000000001;				 //initV //control
-	Params.FITINIT[3][8] = 0.001; //initR
-	Params.FITINIT[3][9] = 0.001; //initR
-	Params.FITINIT[3][10] = 0.001; //initR
-	Params.FITINIT[3][11] = 0.001; //initR
+	Params.FITINIT[3][8] = 0.006094; //initR
+	Params.FITINIT[3][9] = 0.002874; //initR
+	Params.FITINIT[3][10] = 0.008925; //initR
+	Params.FITINIT[3][11] = 0.006389; //initR
 
 	//metapopultion four
 	Params.FITINIT[4][0] = 15.968701; //initS
@@ -176,14 +161,14 @@ if(reals==1){
 	Params.FITINIT[6][8] = 0.003756; //initR
 
 	//dispersal parameters
-	Params.con_mgr 		= 9.81101;
-	Params.a 			= 0.630642;
-	Params.lar_mgr 		= 48.110870;
-	Params.a2			= 0.019726;
+	Params.con_mgr 		= 20.658830;
+	Params.a 			= 1;
+	Params.lar_mgr 		= 54.001590;
+	Params.a2			= 0.055372;
 
 	//coinfection parameters
-	Params.coinf_V		= 0.2;
-	Params.VFSus		= 5;
+	Params.coinf_V		= 0;
+	Params.VFSus		= 0;
 
 	//stochasticity parameters
 	Params.Rsd_exp 		= 0;
@@ -201,10 +186,10 @@ if(reals==1){
 	calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
 	//for(j=1; j<=DATA_SETS; j++){
-		for(j=4; j<7; j++){
+		for(j=1; j<4; j++){
 			Params.j = j;
 
-			dim = 48*2; 
+			dim = 49*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -477,7 +462,7 @@ for (round=0;round<numround;round++){
 			Params.j = j;
 			//printf("j in meta = %i\n", Params.j);
 
-			dim = 48*2; 
+			dim = 49*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -803,7 +788,7 @@ while (LoopNumber<=Realizations) {
 		//for(j=1; j<2; j++){
 			Params.j = j;
 
-			dim = 48*2; 
+			dim = 49*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -920,7 +905,7 @@ while (LoopNumber<=Realizations) {
 		//for(j=1; j<2; j++){
 			Params.j = j;
 
-			dim = 48*2; 
+			dim = 49*2; 
 			//printf("in the old loop\n");
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h

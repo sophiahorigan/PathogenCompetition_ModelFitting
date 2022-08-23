@@ -37,7 +37,7 @@ int lhood_adj = 0;		//adjustment for likelihood in and out of log scale
 
 const double h = 0.01;		        // time step
 
-double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
+//double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
 double squareCVV=0.86*0.86;
 
 double exposetime = 16;
@@ -59,9 +59,9 @@ double preda=0.967;           //Predation parameters, for host-pathogen-predator
 double predb=0.14*0.39/0.64;
 
 //Enhanced susceptibility and coinfection parameters
-double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
-double VFSus;
-double coinf_V=0.1; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
+//double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
+//double VFSus;
+//double coinf_V=0.1; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
 
 
 //JL: Recording the status at the end of an epizootic

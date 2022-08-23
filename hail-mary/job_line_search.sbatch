@@ -13,5 +13,3 @@
 module load openmpi
 
 mpiexec -n 28 ./metapopulation_fvco_disp
-
-testing testing 123

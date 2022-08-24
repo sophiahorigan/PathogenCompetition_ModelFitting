@@ -18,7 +18,7 @@ float DotProduct (int Length, double *Holder, double *PCA)
 
 int main(void)
 {
-
+printf("hello world");
 int linesearch = 1;
 int mcmc = 0;
 int reals = 0;
@@ -63,9 +63,9 @@ Params.lhood_adjust[4] = 2000;
 Params.lhood_adjust[5] = 2000;
 Params.lhood_adjust[6] = 1000;
 
-int searches = 7; //number of iterations for each specific parameter
+int searches = 2; //number of iterations for each specific parameter
 int round;
-int numround = 4;
+int numround = 2;
 int calls;
 size_t dim;
 
@@ -245,22 +245,25 @@ for (round=0;round<numround;round++){
 	best_posterior=-999999999999;
 	a=0;
 
-	while (a<num_ltfparams){     
-		if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48 ){ 
+	while (a<num_ltfparams){    
+		//experimental 
+		//if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48 ){ 
 		//if (a==8 | a==9 | a==10 | a==11 | a==45 | a==46 | a==47 | a==48){
+		//all
+		if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 | a == 43 | a == 44 | a==45 | a==46 | a==47 | a==48 | a == 49 | a == 50 | a == 55){ 
 		//observationals
-		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 || a == 44 || a == 49 || a == 50){   
+		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 | a == 44 | a == 49 | a == 50){   
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step(a) * searches);
 			if(ltf_params[a] <= ls_bound(a,1)){
-				//printf("in the a loop\n");
+				printf("in the a loop\n");
 				ltf_params[a] = ls_bound(a,1);
 			}
 		}
 		for (b=0;b<searches;b++){ 
 			if (b>0){
 				ltf_params[a] = ltf_params[a] + step(a);
-				//printf("in the b loop\n");
+				printf("in the b loop\n");
 				if(ltf_params[a] >= (ls_bound(a,2)+ls_bound(a,1))){
 					ltf_params[a] = (ls_bound(a,2)+ls_bound(a,1));
 				}
@@ -268,16 +271,16 @@ for (round=0;round<numround;round++){
 
 			if(exptmt==1){
 			//Send new parameter values into code
-			//printf("made it in");
+			printf("made it in");
 			//metapopulation one
 			Params.FITINIT[1][0] = ltf_params[0]; //initS
 			Params.FITINIT[1][1] = ltf_params[0]; //initS
 			Params.FITINIT[1][2] = ltf_params[0]; //initS
 			Params.FITINIT[1][3] = ltf_params[0]; //initS
-			Params.FITINIT[1][4] = 0.0000000001; 				//initV //fonly
+			Params.FITINIT[1][4] = 0.000000000001; 				//initV //fonly
 			Params.FITINIT[1][5] = 0.2; //initV
 			Params.FITINIT[1][6] = 0.2; //initV
-			Params.FITINIT[1][7] = 0.0000000001; 				//initV //control
+			Params.FITINIT[1][7] = 0.000000000001; 				//initV //control
 			Params.FITINIT[1][8] = ltf_params[8]; //initR
 			//printf("initR one of them = %lf\n", Params.FITINIT[1][8]);
 			Params.FITINIT[1][9] = ltf_params[9]; //initR //same R across all sites
@@ -293,10 +296,10 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[2][2] = ltf_params[0]; //initS
 			Params.FITINIT[2][3] = ltf_params[0]; //initS
 
-			Params.FITINIT[2][4] = 0.0000000001; 				//initV //fonly
+			Params.FITINIT[2][4] = 0.000000000001; 				//initV //fonly
 			Params.FITINIT[2][5] = 0.2; //initV
 			Params.FITINIT[2][6] = 0.2; //initV
-			Params.FITINIT[2][7] = 0.0000000001; 				//initV //control
+			Params.FITINIT[2][7] = 0.000000000001; 				//initV //control
 
 			Params.FITINIT[2][8] = ltf_params[20]; //initR
 			Params.FITINIT[2][9] = ltf_params[21]; //initR
@@ -309,10 +312,10 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[3][2] = ltf_params[0]; //initS
 			Params.FITINIT[3][3] = ltf_params[0]; //initS
 
-			Params.FITINIT[3][4] = 0.0000000001; 				//initV //f only
+			Params.FITINIT[3][4] = 0.000000000001; 				//initV //f only
 			Params.FITINIT[3][5] = 0.2; //initV
 			Params.FITINIT[3][6] = 0.2; //initV
-			Params.FITINIT[3][7] = 0.0000000001;				 //initV //control
+			Params.FITINIT[3][7] = 0.000000000001;				 //initV //control
 
 			Params.FITINIT[3][8] = ltf_params[32]; //initR
 			Params.FITINIT[3][9] = ltf_params[33]; //initR
@@ -358,6 +361,7 @@ for (round=0;round<numround;round++){
 			//Params.Fsd_exp		= ltf_params[54];
 
 			Params.muV			= ltf_params[55];
+			printf("muV=%lf\n", Params.muV);
 			}
 
 
@@ -461,8 +465,8 @@ for (round=0;round<numround;round++){
 
 		calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
-		//for(j=1; j<=DATA_SETS; j++){
-		for(j=1; j<4; j++){
+		for(j=1; j<=DATA_SETS; j++){
+		//for(j=1; j<4; j++){
 			Params.j = j;
 			//printf("j in meta = %i\n", Params.j);
 
@@ -514,10 +518,10 @@ for (round=0;round<numround;round++){
 	} //a
 
 	//modified printing to only print fitting params without having to change num_lftparams
-	int print_len = 17;
+	int print_len = 29;
 
 	//meta 1 : len = 10
-	int printlist[17] = {0,8,9,10,11,20,21,22,23,32,33,34,35,45,46,47,48};
+	int printlist[29] = {0,8,9,10,11,20,21,22,23,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,55};
 	//int printlist[8] = {8, 9, 10, 11, 45, 46, 47, 48};
 	//int printlist[11] = {36, 37, 38, 39, 40, 41, 42, 43, 44, 49, 50};
 

@@ -8,7 +8,7 @@ Params = (STRUCTURE*) Paramstuff;
 double nuV		= Params->PARS[2]; //virus transmission
 double nuF		= Params->nuF;	//conidia transmission	//Params->PARS[3];
 double nuR		= Params->nuR;	//resting spore transmission
-double muV		= Params->muV; //virus decay
+
 double muF		= Params->muF;  //CK//  Using the site-specific muF that was loaded up in DDEVF14
 double lambdaV = 1/exposetime;
 double lambdaF=Params->PARS[18];		// decay rate of E_V and E_F
@@ -49,6 +49,7 @@ if (j==4 || j==5 || j==6){
 	//printf("S0 = %lf\t R = %lf\n", S0[0], R[0]);
 }
 
+printf("muV=", Params->muV);
 
 //dispersal
 int coni_dispersal_on = 1; //set to 0 for no dispersal
@@ -112,7 +113,7 @@ for(sub=0; sub<num_sub; sub++){
 	//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
 	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
 	for (i=2;i<=n1;i++){
-		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*Params->VFSus;
+		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
 	}
 
 	//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
@@ -122,16 +123,16 @@ for(sub=0; sub<num_sub; sub++){
 	}
 	dydt[m+n+1+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C - muF*y[m+n+1+sub_index[sub]];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
 	dydt[m+n+2+sub_index[sub]] = indexR*m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
-	dydt[m+n+3+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V-muV*y[m+n+3+sub_index[sub]];  //Class of cadavers infected by virus
+	dydt[m+n+3+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V-Params->muV*y[m+n+3+sub_index[sub]];  //Class of cadavers infected by virus
 	dydt[m+n+4+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V;
 	dydt[m+n+5+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
 	dydt[m+n+6+sub_index[sub]] = indexV*(n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V);
 
 	//Recording the hosts already infected with virus and taken over by the fungus //coinfections
-	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*Params->VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
+	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
 	//printf("sub = %i\t nuf = %lf\t C = %lf\t nuR = %lf\t R = %lf\t V = %lf\t VFSUS = %lf\n", sub, nuF, y[m+n+1+sub_index[sub]], nuR, R[sub], y[m+1+sub_index[sub]], Params->VFSus);
 	for (i=2;i<=n1;i++){
-		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*Params->VFSus;
+		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*VFSus;
 	}
 	for(i=2; i <= m; i++){
 		dydt[m+n+6+i+sub_index[sub]]=m*lambdaF*(y[m+n+6+i-1+sub_index[sub]] -y[m+n+6+i+sub_index[sub]]);

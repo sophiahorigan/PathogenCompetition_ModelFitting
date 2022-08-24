@@ -182,11 +182,7 @@ typedef struct
 	double a2;
 
 	//virus decay
-	double muV;
-
-	//coinfection
-	double coinf_V;	//3
-	double VFSus;	//4
+	//double muV;
 
 	//stochasticity
 	double Rsd_exp;

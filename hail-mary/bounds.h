@@ -82,6 +82,9 @@ else if (i==52)		{	low = 0;			high = 4;		}	//Fsd_exp
 else if (i==53)		{	low = 0;			high = 4;		}	//Rsd_obs
 else if (i==54)		{	low = 0;			high = 4;		}	//Fsd_obs
 
+//virus 
+else if (i==55)		{	low = 0;			high = 1;		}	//decay rate
+
 if		(j==1)	return low;
 else if (j==2)	return high;
 else { printf("PROBLEM WITH BOUNDS ON PARAMETERS!!\n");	return 0;	}
@@ -165,10 +168,13 @@ else if (i==49) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what propo
 else if (i==50) 	{	step_size = 5;	}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (1==51)		{	step_size = .05;	}	//Rsd_exp
-else if (1==52)		{	step_size = .05;	}	//Fsd_exp
-else if (1==53)		{	step_size = .05;	}	//Rsd_obs
-else if (1==54)		{	step_size = .05;	}	//Fsd_obs
+else if (i==51)		{	step_size = .05;	}	//Rsd_exp
+else if (i==52)		{	step_size = .05;	}	//Fsd_exp
+else if (i==53)		{	step_size = .05;	}	//Rsd_obs
+else if (i==54)		{	step_size = .05;	}	//Fsd_obs
+
+//virus
+else if (i==55)		{	step_size = 0.05;	}	//virus decay
 
 return step_size;
 }
@@ -257,6 +263,9 @@ else if (i==51)		{	low = 0;			high = 10;		}	//Rsd_exp
 else if (i==52)		{	low = 0;			high = 10;		}	//Fsd_exp
 else if (i==53)		{	low = 0;			high = 10;		}	//Rsd_obs
 else if (i==54)		{	low = 0;			high = 10;		}	//Fsd_obs
+
+//virus
+else if (i==55)		{	low = 0;			high = 1;		} 	//virus decay rate
 
 if		(j==1)	return low;
 else if (j==2)	return high;

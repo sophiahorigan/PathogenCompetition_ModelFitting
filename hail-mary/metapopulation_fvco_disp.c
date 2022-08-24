@@ -19,9 +19,9 @@ float DotProduct (int Length, double *Holder, double *PCA)
 int main(void)
 {
 
-int linesearch = 0;
+int linesearch = 1;
 int mcmc = 0;
-int reals = 1;
+int reals = 0;
 
 STRUCTURE Params;
 
@@ -30,7 +30,7 @@ int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is 
 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
 int i=0; int j;int ii; int jj; int k; int l; 
-int num_adj_pars = 55;			// number of adjustable parameters
+int num_adj_pars = 56;			// number of adjustable parameters
 int epi_length = 49;
 
 inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
@@ -69,9 +69,9 @@ int numround = 4;
 int calls;
 size_t dim;
 
-int num_ltfparams = 55;	//number of parameters to fit
-double ltf_params[55] = {0};      //arrays to hold different parameter values
-double init_ltfparams[55]={0};
+int num_ltfparams = 56;	//number of parameters to fit
+double ltf_params[56] = {0};      //arrays to hold different parameter values
+double init_ltfparams[56]={0};
 
 double log_prior=0;
 
@@ -83,7 +83,7 @@ for (i=0;i<num_ltfparams;i++){ 											//give random initial value for each p
 	//printf("i = %i\t, lft_params = %lf\n %lf\n",i, init_ltfparams[i]);
 }
 //CHECK
-double localmax_params[55]={0};         //Array to record param values for the local max likelihood in line search
+double localmax_params[56]={0};         //Array to record param values for the local max likelihood in line search
 int a,b,c;								//indexing loops
 double best_posterior;
 for (c=0;c<num_ltfparams;c++){			//initial parameters begin as 'best' parameters
@@ -246,7 +246,7 @@ for (round=0;round<numround;round++){
 	a=0;
 
 	while (a<num_ltfparams){     
-		if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48){ 
+		if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48 ){ 
 		//if (a==8 | a==9 | a==10 | a==11 | a==45 | a==46 | a==47 | a==48){
 		//observationals
 		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 || a == 44 || a == 49 || a == 50){   
@@ -356,6 +356,8 @@ for (round=0;round<numround;round++){
 			Params.Fsd_exp		= 0;
 			//Params.Rsd_obs		= ltf_params[53];
 			//Params.Fsd_exp		= ltf_params[54];
+
+			Params.muV			= ltf_params[55];
 			}
 
 
@@ -444,6 +446,8 @@ for (round=0;round<numround;round++){
 			Params.Fsd_exp		= ltf_params[52];
 			Params.Rsd_obs		= ltf_params[53];
 			Params.Fsd_obs		= ltf_params[54];
+
+			Params.muV			= ltf_params[55];
 			}
 			
 		
@@ -546,7 +550,7 @@ if(mcmc==1){
 	sprintf(namem, "mcmc_results_%d", pid);
 	fpm=fopen(namem, "a+");
 
-	int NumberOfParams=55;		
+	int NumberOfParams=56;		
 
 	int Realizations=100;         //JL: Number of realizations in the MCMC step
 
@@ -774,6 +778,8 @@ while (LoopNumber<=Realizations) {
 			Params.Fsd_exp		= PCAparams[52];
 			Params.Rsd_obs		= PCAparams[53];
 			Params.Fsd_obs		= PCAparams[54];
+
+			Params.muV			= ltf_params[55];
 		
 		//-------------------MISER likelihood new------------------------------//
 		double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -891,6 +897,8 @@ while (LoopNumber<=Realizations) {
 			Params.Fsd_exp		= Old_Params[52];
 			Params.Rsd_obs		= Old_Params[53];
 			Params.Fsd_obs		= Old_Params[54];
+
+			Params.muV			= ltf_params[55];
 
 		//-------------------MISER likelihood old------------------------------//
 		lhood_meta=0; log_lhood_meta=0; total_loghood_metas = 0;

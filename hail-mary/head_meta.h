@@ -59,9 +59,9 @@ double preda=0.967;           //Predation parameters, for host-pathogen-predator
 double predb=0.14*0.39/0.64;
 
 //Enhanced susceptibility and coinfection parameters
-//double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
-//double VFSus;
-//double coinf_V=0.1; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
+double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
+double VFSus;
+double coinf_V; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
 
 
 //JL: Recording the status at the end of an epizootic
@@ -180,6 +180,9 @@ typedef struct
 	double a;		//1
 	double lar_mgr;	//2
 	double a2;
+
+	//virus decay
+	double muV;
 
 	//coinfection
 	double coinf_V;	//3

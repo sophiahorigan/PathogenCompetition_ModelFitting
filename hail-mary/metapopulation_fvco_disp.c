@@ -18,7 +18,7 @@ float DotProduct (int Length, double *Holder, double *PCA)
 
 int main(void)
 {
-printf("hello world");
+//printf("hello world");
 int linesearch = 1;
 int mcmc = 0;
 int reals = 0;
@@ -31,7 +31,7 @@ int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
 int i=0; int j;int ii; int jj; int k; int l; 
 int num_adj_pars = 56;			// number of adjustable parameters
-int epi_length = 49;
+int epi_length = 48;
 
 inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
 /*
@@ -63,9 +63,9 @@ Params.lhood_adjust[4] = 2000;
 Params.lhood_adjust[5] = 2000;
 Params.lhood_adjust[6] = 1000;
 
-int searches = 2; //number of iterations for each specific parameter
+int searches = 5; //number of iterations for each specific parameter
 int round;
-int numround = 2;
+int numround = 3;
 int calls;
 size_t dim;
 
@@ -189,7 +189,7 @@ if(reals==1){
 		for(j=1; j<4; j++){
 			Params.j = j;
 
-			dim = 49*2; 
+			dim = 48*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -256,14 +256,14 @@ for (round=0;round<numround;round++){
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step(a) * searches);
 			if(ltf_params[a] <= ls_bound(a,1)){
-				printf("in the a loop\n");
+				//printf("in the a loop\n");
 				ltf_params[a] = ls_bound(a,1);
 			}
 		}
 		for (b=0;b<searches;b++){ 
 			if (b>0){
 				ltf_params[a] = ltf_params[a] + step(a);
-				printf("in the b loop\n");
+				//printf("in the b loop\n");
 				if(ltf_params[a] >= (ls_bound(a,2)+ls_bound(a,1))){
 					ltf_params[a] = (ls_bound(a,2)+ls_bound(a,1));
 				}
@@ -271,7 +271,7 @@ for (round=0;round<numround;round++){
 
 			if(exptmt==1){
 			//Send new parameter values into code
-			printf("made it in");
+			//printf("made it in\n");
 			//metapopulation one
 			Params.FITINIT[1][0] = ltf_params[0]; //initS
 			Params.FITINIT[1][1] = ltf_params[0]; //initS
@@ -361,7 +361,7 @@ for (round=0;round<numround;round++){
 			//Params.Fsd_exp		= ltf_params[54];
 
 			Params.muV			= ltf_params[55];
-			printf("muV=%lf\n", Params.muV);
+			//printf("proposal muV=%lf\n", Params.muV);
 			}
 
 
@@ -470,7 +470,7 @@ for (round=0;round<numround;round++){
 			Params.j = j;
 			//printf("j in meta = %i\n", Params.j);
 
-			dim = 49*2; 
+			dim = 48*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -798,7 +798,7 @@ while (LoopNumber<=Realizations) {
 		//for(j=1; j<2; j++){
 			Params.j = j;
 
-			dim = 49*2; 
+			dim = 48*2; 
 
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
@@ -917,7 +917,7 @@ while (LoopNumber<=Realizations) {
 		//for(j=1; j<2; j++){
 			Params.j = j;
 
-			dim = 49*2; 
+			dim = 48*2; 
 			//printf("in the old loop\n");
 			//define function
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h

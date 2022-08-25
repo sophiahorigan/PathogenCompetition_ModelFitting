@@ -49,7 +49,7 @@ if (j==4 || j==5 || j==6){
 	//printf("S0 = %lf\t R = %lf\n", S0[0], R[0]);
 }
 
-printf("muV=", Params->muV);
+//printf("muV=%lf\n", Params->muV);
 
 //dispersal
 int coni_dispersal_on = 1; //set to 0 for no dispersal
@@ -97,7 +97,8 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 }
 
 for(sub=0; sub<num_sub; sub++){
-	//printf("GREETINGS from line 54 in DDEVF\n");
+	//printf("sub=%i\n", sub);
+	//printf("GREETINGS from line 100 in ode\n");
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
 	//printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]); //SH GREG CHECK; THIS ALWAYS = 0...
 	//getc(stdin);
@@ -111,9 +112,9 @@ for(sub=0; sub<num_sub; sub++){
 	}
 
 	//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
-	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
+	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*Params->VFSus;
 	for (i=2;i<=n1;i++){
-		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
+		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*Params->VFSus;
 	}
 
 	//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
@@ -129,10 +130,10 @@ for(sub=0; sub<num_sub; sub++){
 	dydt[m+n+6+sub_index[sub]] = indexV*(n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V);
 
 	//Recording the hosts already infected with virus and taken over by the fungus //coinfections
-	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
+	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*Params->VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
 	//printf("sub = %i\t nuf = %lf\t C = %lf\t nuR = %lf\t R = %lf\t V = %lf\t VFSUS = %lf\n", sub, nuF, y[m+n+1+sub_index[sub]], nuR, R[sub], y[m+1+sub_index[sub]], Params->VFSus);
 	for (i=2;i<=n1;i++){
-		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*VFSus;
+		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*Params->VFSus;
 	}
 	for(i=2; i <= m; i++){
 		dydt[m+n+6+i+sub_index[sub]]=m*lambdaF*(y[m+n+6+i-1+sub_index[sub]] -y[m+n+6+i+sub_index[sub]]);

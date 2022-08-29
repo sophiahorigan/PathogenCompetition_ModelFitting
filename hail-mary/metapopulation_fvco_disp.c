@@ -19,9 +19,9 @@ float DotProduct (int Length, double *Holder, double *PCA)
 int main(void)
 {
 //printf("hello world");
-int linesearch = 1;
+int linesearch = 0;
 int mcmc = 0;
-int reals = 0;
+int reals = 1;
 
 STRUCTURE Params;
 
@@ -63,9 +63,9 @@ Params.lhood_adjust[4] = 2000;
 Params.lhood_adjust[5] = 2000;
 Params.lhood_adjust[6] = 1000;
 
-int searches = 5; //number of iterations for each specific parameter
+int searches = 4; //number of iterations for each specific parameter
 int round;
-int numround = 3;
+int numround = 2;
 int calls;
 size_t dim;
 
@@ -101,7 +101,7 @@ if(reals==1){
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
 	
-	double initS_fit = 19.53;
+	double initS_fit = 78.627317;
 	//propose parameter values
 	//metapopulation one
 	Params.FITINIT[1][0] = initS_fit; //initS
@@ -112,10 +112,10 @@ if(reals==1){
 	Params.FITINIT[1][5] = 0.2; //initV
 	Params.FITINIT[1][6] = 0.2; //initV
 	Params.FITINIT[1][7] = 0.000001; 				//initV //control
-	Params.FITINIT[1][8] = 0.003396; //initR
-	Params.FITINIT[1][9] = 0.002306; //initR
-	Params.FITINIT[1][10] = 0.000446; //initR
-	Params.FITINIT[1][11] = 0.002157; //initR
+	Params.FITINIT[1][8] = 0.001878; //initR
+	Params.FITINIT[1][9] = 0.002570; //initR
+	Params.FITINIT[1][10] = 0.005965; //initR
+	Params.FITINIT[1][11] = 0.007627; //initR
 
 	//metapopulation two
 	Params.FITINIT[2][0] = initS_fit; //initS
@@ -126,10 +126,10 @@ if(reals==1){
 	Params.FITINIT[2][5] = 0.2; //initV
 	Params.FITINIT[2][6] = 0.2; //initV
 	Params.FITINIT[2][7] = 0.000001; 				//initV //control
-	Params.FITINIT[2][8] = 0.001272; //initR
-	Params.FITINIT[2][9] = 0.002010; //initR
-	Params.FITINIT[2][10] = 0.003034; //initR
-	Params.FITINIT[2][11] = 0.003778; //initR
+	Params.FITINIT[2][8] = 0.008477; //initR
+	Params.FITINIT[2][9] = 0.002499; //initR
+	Params.FITINIT[2][10] = 0.004494; //initR
+	Params.FITINIT[2][11] = 0.009659; //initR
 
 	//metapopulation three
 	Params.FITINIT[3][0] = initS_fit; //initS
@@ -140,41 +140,43 @@ if(reals==1){
 	Params.FITINIT[3][5] = 0.2; //initV
 	Params.FITINIT[3][6] = 0.2; //initV
 	Params.FITINIT[3][7] = 0.0000000001;				 //initV //control
-	Params.FITINIT[3][8] = 0.006094; //initR
-	Params.FITINIT[3][9] = 0.002874; //initR
-	Params.FITINIT[3][10] = 0.008925; //initR
-	Params.FITINIT[3][11] = 0.006389; //initR
+	Params.FITINIT[3][8] = 0.004518; //initR
+	Params.FITINIT[3][9] = 0.007204; //initR
+	Params.FITINIT[3][10] = 0.009933; //initR
+	Params.FITINIT[3][11] = 0.008698; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 15.968701; //initS
-	Params.FITINIT[4][4] = 0.123265; //initV
-	Params.FITINIT[4][8] = 0.001997; //initR
+	Params.FITINIT[4][0] = 13.381044; //initS
+	Params.FITINIT[4][4] = 0.064982; //initV
+	Params.FITINIT[4][8] = 0.001841; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 82.875750; //initS
-	Params.FITINIT[5][4] = 0.112749; //initV
-	Params.FITINIT[5][8] = 0; //initR
+	Params.FITINIT[5][0] = 120.884525; //initS
+	Params.FITINIT[5][4] = 0.114355; //initV
+	Params.FITINIT[5][8] = 0.000955; //initR
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 4.944996; //initS
-	Params.FITINIT[6][4] = 0.05; //initV
-	Params.FITINIT[6][8] = 0.003756; //initR
+	Params.FITINIT[6][0] = 42.242077; //initS
+	Params.FITINIT[6][4] = 0.395324; //initV
+	Params.FITINIT[6][8] = 0.005991; //initR
 
 	//dispersal parameters
-	Params.con_mgr 		= 20.658830;
-	Params.a 			= 1;
-	Params.lar_mgr 		= 54.001590;
-	Params.a2			= 0.055372;
+	Params.con_mgr 		= 34.805383;
+	Params.a 			= 0.952292;
+	Params.lar_mgr 		= 6.665141;
+	Params.a2			= 0.003858;
 
 	//coinfection parameters
-	Params.coinf_V		= 0;
-	Params.VFSus		= 0;
+	Params.coinf_V		= 0.828306;
+	Params.VFSus		= 15.091118;
 
 	//stochasticity parameters
 	Params.Rsd_exp 		= 0;
 	Params.Fsd_exp		= 0;
 	Params.Rsd_obs		= 0;
 	Params.Fsd_obs		= 0;
+
+	Params.muV			= 0.312776; 
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -185,8 +187,8 @@ if(reals==1){
 
 	calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
-	//for(j=1; j<=DATA_SETS; j++){
-		for(j=1; j<4; j++){
+	for(j=1; j<=DATA_SETS; j++){
+		//for(j=1; j<4; j++){
 			Params.j = j;
 
 			dim = 48*2; 

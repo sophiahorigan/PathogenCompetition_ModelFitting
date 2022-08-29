@@ -11,10 +11,10 @@ double nuR		= Params->nuR;	//resting spore transmission
 
 double muF		= Params->muF;  //CK//  Using the site-specific muF that was loaded up in DDEVF14
 double lambdaV = 1/exposetime;
-double lambdaF=Params->PARS[18];		// decay rate of E_V and E_F
-VFPass=exposetime-1/Params->PARS[18];
+double lambdaF = Params->PARS[18];		// decay rate of E_V and E_F
+VFPass = exposetime-1/Params->PARS[18];
 
-double size_C		= Params->size_C;  //Scaling effect of size on susceptibility over time.
+double size_C = Params->size_C;  //Scaling effect of size on susceptibility over time.
 double indexR = Params->indexR;
 double indexV = Params->indexV;
 
@@ -29,26 +29,36 @@ int sub;
 //exposed classes
 int m = Params->PARS[9]; //fungus
 int n = Params->PARS[8];  //virus
-int n1=(VFPass/exposetime)*Params->PARS[8];    //virus exposed that can be taken over by fungus
-int n2=n-n1;                //The number of the first group of exposed classes to virus
+int n1 = (VFPass/exposetime)*Params->PARS[8];    //virus exposed that can be taken over by fungus
+int n2 = n-n1;                //The number of the first group of exposed classes to virus
 
 //state variables
 double S0[4];
 double R[4];
+
+//coinfection variables
+//we don't want coinfection to play a part in our experimental data
+double VFSus;
+double coinf_V;
 
 if (j==1 || j==2 || j==3){
 	for(i=0; i<num_sub; i++){
 		S0[i] = Params->FITINIT[j][i];
 		R[i] = Params->FITINIT[j][i+num_sub+num_sub];
 		//printf("S0 = %lf\t R = %lf\n", S0[i], R[i]);
+		VFSus = 0;
+		coinf_V = 0;
 	}
 }
 if (j==4 || j==5 || j==6){
 	S0[0] = Params->FITINIT[j][0];
 	R[0] = Params->FITINIT[j][8];
 	//printf("S0 = %lf\t R = %lf\n", S0[0], R[0]);
+	VFSus = Params->VFSus;
+	coinf_V = Params->coinf_V;
 }
 
+//printf("j = %i\t, VFSus = %lf\t, coinf_V = %lf\n", j, VFSus, coinf_V);
 //printf("muV=%lf\n", Params->muV);
 
 //dispersal
@@ -112,9 +122,9 @@ for(sub=0; sub<num_sub; sub++){
 	}
 
 	//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
-	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*Params->VFSus;
+	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
 	for (i=2;i<=n1;i++){
-		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*Params->VFSus;
+		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
 	}
 
 	//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
@@ -130,10 +140,10 @@ for(sub=0; sub<num_sub; sub++){
 	dydt[m+n+6+sub_index[sub]] = indexV*(n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V);
 
 	//Recording the hosts already infected with virus and taken over by the fungus //coinfections
-	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*Params->VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
+	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
 	//printf("sub = %i\t nuf = %lf\t C = %lf\t nuR = %lf\t R = %lf\t V = %lf\t VFSUS = %lf\n", sub, nuF, y[m+n+1+sub_index[sub]], nuR, R[sub], y[m+1+sub_index[sub]], Params->VFSus);
 	for (i=2;i<=n1;i++){
-		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*Params->VFSus;
+		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*VFSus;
 	}
 	for(i=2; i <= m; i++){
 		dydt[m+n+6+i+sub_index[sub]]=m*lambdaF*(y[m+n+6+i-1+sub_index[sub]] -y[m+n+6+i+sub_index[sub]]);

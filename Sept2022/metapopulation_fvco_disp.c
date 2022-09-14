@@ -194,6 +194,7 @@ if(reals==1){
 			dim = 48*2; 
 
 			//define function
+			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
 			for (jj=0;jj<=dim;jj++)	{
@@ -475,6 +476,7 @@ for (round=0;round<numround;round++){
 			dim = 48*2; 
 
 			//define function
+			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
 			for (jj=0;jj<=dim;jj++)	{
@@ -803,6 +805,7 @@ while (LoopNumber<=Realizations) {
 			dim = 48*2; 
 
 			//define function
+			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
 			for (jj=0;jj<=dim;jj++)	{
@@ -922,6 +925,7 @@ while (LoopNumber<=Realizations) {
 			dim = 48*2; 
 			//printf("in the old loop\n");
 			//define function
+			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
 			for (jj=0;jj<=dim;jj++)	{

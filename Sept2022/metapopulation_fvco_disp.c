@@ -194,10 +194,9 @@ if(reals==1){
 			dim = 48*2; 
 
 			//define function
-			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
-			for (jj=0;jj<=dim;jj++)	{
+			for (jj=0;jj<dim;jj++)	{
 				xl[jj]=0;	
 				xu[jj]=1;
 			}
@@ -258,7 +257,7 @@ for (round=0;round<numround;round++){
 		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 | a == 44 | a == 49 | a == 50){   
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step(a) * searches);
-			if(ltf_params[a] <= ls_bound(a,1)){
+			if(ltf_params[a] < ls_bound(a,1)){
 				//printf("in the a loop\n");
 				ltf_params[a] = ls_bound(a,1);
 			}
@@ -476,10 +475,9 @@ for (round=0;round<numround;round++){
 			dim = 48*2; 
 
 			//define function
-			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
-			for (jj=0;jj<=dim;jj++)	{
+			for (jj=0;jj<dim;jj++)	{
 				xl[jj]=0;	
 				xu[jj]=1;
 			}
@@ -805,10 +803,9 @@ while (LoopNumber<=Realizations) {
 			dim = 48*2; 
 
 			//define function
-			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
-			for (jj=0;jj<=dim;jj++)	{
+			for (jj=0;jj<dim;jj++)	{
 				xl[jj]=0;	
 				xu[jj]=1;
 			}
@@ -925,10 +922,9 @@ while (LoopNumber<=Realizations) {
 			dim = 48*2; 
 			//printf("in the old loop\n");
 			//define function
-			gsl_set_error_handler_off();
 			gsl_monte_function G = { &LHood_Meta, dim, &Params };	// declares function calling lhood_meta.h
 			double xl[dim];	double xu[dim];	// need to redeclare xl and xu since the size changes
-			for (jj=0;jj<=dim;jj++)	{
+			for (jj=0;jj<dim;jj++)	{
 				xl[jj]=0;	
 				xu[jj]=1;
 			}

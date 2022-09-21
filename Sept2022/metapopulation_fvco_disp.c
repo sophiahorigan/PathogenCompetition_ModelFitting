@@ -56,16 +56,9 @@ r_seed=random_setup();
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-Params.lhood_adjust[1] = 2500;
-Params.lhood_adjust[2] = 2500;
-Params.lhood_adjust[3] = 2500;
-Params.lhood_adjust[4] = 2000;
-Params.lhood_adjust[5] = 2000;
-Params.lhood_adjust[6] = 1000;
-
-int searches = 4; //number of iterations for each specific parameter
+int searches = 20; //number of iterations for each specific parameter
 int round;
-int numround = 2;
+int numround = 10;
 int calls;
 size_t dim;
 
@@ -101,7 +94,7 @@ if(reals==1){
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
 	
-	double initS_fit = 78.627317;
+	double initS_fit = 1;
 	//propose parameter values
 	//metapopulation one
 	Params.FITINIT[1][0] = initS_fit; //initS
@@ -187,9 +180,11 @@ if(reals==1){
 
 	calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
-	for(j=1; j<=DATA_SETS; j++){
-		//for(j=1; j<4; j++){
+	//for(j=1; j<=DATA_SETS; j++){
+		for(j=1; j<2; j++){
 			Params.j = j;
+
+			Params.miser_ticker = 1;
 
 			dim = 48*2; 
 
@@ -206,16 +201,12 @@ if(reals==1){
 			gsl_monte_miser_free(s);
 
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
-			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
+			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){
 				log_lhood_meta = 0;
 			}
-			else{
-				Params.lhood_adjust[j] = -1*log_lhood_meta; //update lhood adj based on average so it is dynamic
-				//printf("ELSE adj = %lf\n", Params.lhood_adjust[j]);
-			}
-			//printf("MADE IT OUT: log_lhood_meta = %lf\n", log_lhood_meta);
+			
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
-			//printf("total = %lf\n", total_loghood_metas);
+
 			new_posterior = total_loghood_metas + log_prior;
 	}
 	fclose(fpm); //TURN ON FP1 PRINT STATEMENT IN DDEVF
@@ -470,7 +461,8 @@ for (round=0;round<numround;round++){
 		for(j=1; j<=DATA_SETS; j++){
 		//for(j=1; j<4; j++){
 			Params.j = j;
-			//printf("j in meta = %i\n", Params.j);
+
+			Params.miser_ticker = 1;
 
 			dim = 48*2; 
 
@@ -486,22 +478,15 @@ for (round=0;round<numround;round++){
 			gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&lhood_meta,&meta_err); //call MISER, pop_lhood is output from .h (likelihood value)
 			gsl_monte_miser_free(s);
 
-			//fprintf(fpl, "For dataset %i, lhood = %lf\t, err = %lf\n", j, lhood_meta, meta_err);
-			//fprintf(fpl, "For dataset %i, lhood = %lf\n", j, lhood_meta);
-			//printf("lhood post MISER = %lf\n", lhood_meta);
-			
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
+				log_lhood_meta = 0;
 			}
-			else{
-				Params.lhood_adjust[j] = -1*log_lhood_meta; //update lhood adj based on average so it is dynamic
-				//printf("ELSE adj = %lf\n", Params.lhood_adjust[j]);
-			}
-			//printf("MADE IT OUT: log_lhood_meta = %lf\n", log_lhood_meta);
+
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
-			//printf("total = %lf\n", total_loghood_metas);
+			//printf("total_log_lhood_meta = %lf\n", total_loghood_metas);
+
 			new_posterior = total_loghood_metas + log_prior;
-			//printf("new posterior = %lf\n", new_posterior);
 		}//j 
 		if (new_posterior>best_posterior){ //compare likelihood //sum - one you just generated //local max - best you've seen
 			best_posterior=new_posterior;
@@ -510,7 +495,7 @@ for (round=0;round<numround;round++){
 				localmax_params[c]=ltf_params[c]; //save best param set from each individual search
 			}
 		}
-		//printf("best post = %lf\n", best_posterior);
+
 	}  //best param set from within searches
 	for (c=0;c<num_ltfparams;c++){
 		ltf_params[c]=localmax_params[c];

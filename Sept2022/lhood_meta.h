@@ -76,7 +76,6 @@ dataset = Params->j;
 
 DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
 
-
 //printf("POST DDEVF DATA S = %i\n", Params->DATA[6][15][0]);
 
 int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0; double lhood_meta2;
@@ -113,18 +112,17 @@ if (dataset==4 || dataset==5 || dataset==6) { //three observational sites with n
 	//fprintf(fpl, "Likelihood for metapop %i = %lf\n", dataset, lhood_meta);
 }
 
-//printf("dataset = %i\t, lhood=%lf\n", dataset, lhood_meta);
+//save first likelihood in stochastic set as adjustment value
+if(Params->miser_ticker==1){
+	Params->lhood_adjust[dataset] = -lhood_meta;
+}
+Params->miser_ticker++;
 
 //adjust and exponentiate
 lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
 //printf("adj = %lf\t, lhood post adj=%lf\n", Params->lhood_adjust[dataset], lhood_meta2);
 
-if (lhood_meta2 < -700 || lhood_meta2 > 700){
-	lhood_meta2 = -700;
-}
-
 lhood_meta2 = exp(lhood_meta2);
-
 //printf("exp lhood = %lf\n", lhood_meta2);
 
 return lhood_meta2;

@@ -195,6 +195,7 @@ typedef struct
 
 	//lhood_adjust
 	double lhood_adjust[DATA_SETS+1];
+	int miser_ticker;
 
 
 }STRUCTURE;

@@ -56,9 +56,9 @@ r_seed=random_setup();
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-int searches = 20; //number of iterations for each specific parameter
+int searches = 4; //number of iterations for each specific parameter
 int round;
-int numround = 10;
+int numround = 2;
 int calls;
 size_t dim;
 
@@ -234,8 +234,8 @@ fp1=fopen(name1, "a+");
 
 ///////////////////////////////////////////////////LINE-SEARCH///////////////////////////////////////////////////
 for (round=0;round<numround;round++){
-	printf("round=%i\n", round);
-	best_posterior=-999999999999;
+	//printf("round=%i\n", round);
+	best_posterior=-66666666666666;
 	a=0;
 
 	while (a<num_ltfparams){    
@@ -243,7 +243,7 @@ for (round=0;round<numround;round++){
 		//if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48 ){ 
 		//if (a==8 | a==9 | a==10 | a==11 | a==45 | a==46 | a==47 | a==48){
 		//all
-		if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 | a == 43 | a == 44 | a==45 | a==46 | a==47 | a==48 | a == 49 | a == 50 | a == 55){ 
+		if (a == 0 | a == 8 | a == 20 | a == 21 | a == 22 | a == 23 | a == 32 | a == 33 | a == 34 | a == 35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 42 | a == 43 | a == 44 | a == 45 | a == 46 | a == 47 | a == 48 | a == 49 | a == 50 | a == 51 | a == 52 | a == 53 | a == 54 | a == 55){ 
 		//observationals
 		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 | a == 44 | a == 49 | a == 50){   
 		if (round>0){		
@@ -263,25 +263,28 @@ for (round=0;round<numround;round++){
 			}
 
 			if(exptmt==1){
+			//ltf_params[0] = 0;
 			//Send new parameter values into code
 			//printf("made it in\n");
 			//metapopulation one
 			Params.FITINIT[1][0] = ltf_params[0]; //initS
+			//printf("initS=%lf\n", ltf_params[0]);
 			Params.FITINIT[1][1] = ltf_params[0]; //initS
 			Params.FITINIT[1][2] = ltf_params[0]; //initS
 			Params.FITINIT[1][3] = ltf_params[0]; //initS
+
 			Params.FITINIT[1][4] = 0.000000000001; 				//initV //fonly
 			Params.FITINIT[1][5] = 0.2; //initV
 			Params.FITINIT[1][6] = 0.2; //initV
 			Params.FITINIT[1][7] = 0.000000000001; 				//initV //control
-			Params.FITINIT[1][8] = ltf_params[8]; //initR
-			//printf("initR one of them = %lf\n", Params.FITINIT[1][8]);
-			Params.FITINIT[1][9] = ltf_params[9]; //initR //same R across all sites
-			Params.FITINIT[1][10] = ltf_params[10]; //initR
-			Params.FITINIT[1][11] = ltf_params[11]; //initR
-			//Params.FITINIT[1][9] = ltf_params[9]; //initR
-			//Params.FITINIT[1][10] = ltf_params[10]; //initR
-			//Params.FITINIT[1][11] = ltf_params[11]; //initR
+
+			Params.FITINIT[1][8] = ltf_params[8]; //initR //fonly
+			//Params.FITINIT[1][9] = 0.0000000000000000001; //initR //vonly //based on exp data
+			Params.FITINIT[1][9] = 0;
+			Params.FITINIT[1][10] = 0;
+			Params.FITINIT[1][11] = 0;
+			//Params.FITINIT[1][10] = 0.000000000000000001; //initR //fv
+			//Params.FITINIT[1][11] = 0.000000000000000001; //initR //control
 
 			//metapopulation two
 			Params.FITINIT[2][0] = ltf_params[0]; //initS
@@ -294,10 +297,10 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[2][6] = 0.2; //initV
 			Params.FITINIT[2][7] = 0.000000000001; 				//initV //control
 
-			Params.FITINIT[2][8] = ltf_params[20]; //initR
-			Params.FITINIT[2][9] = ltf_params[21]; //initR
-			Params.FITINIT[2][10] = ltf_params[22]; //initR
-			Params.FITINIT[2][11] = ltf_params[23]; //initR
+			Params.FITINIT[2][8] = ltf_params[20]; //initR //fonly
+			Params.FITINIT[2][9] = ltf_params[21]; //initR //vonly
+			Params.FITINIT[2][10] = ltf_params[22]; //initR //fv
+			Params.FITINIT[2][11] = ltf_params[23]; //initR //control
 
 			//metapopulation three
 			Params.FITINIT[3][0] = ltf_params[0]; //initS
@@ -310,27 +313,24 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[3][6] = 0.2; //initV
 			Params.FITINIT[3][7] = 0.000000000001;				 //initV //control
 
-			Params.FITINIT[3][8] = ltf_params[32]; //initR
-			Params.FITINIT[3][9] = ltf_params[33]; //initR
-			Params.FITINIT[3][10] = ltf_params[34]; //initR
-			Params.FITINIT[3][11] = ltf_params[35]; //initR
+			Params.FITINIT[3][8] = ltf_params[32]; //initR //fonly
+			Params.FITINIT[3][9] = ltf_params[33]; //initR //vonly
+			Params.FITINIT[3][10] = ltf_params[34]; //initR //fv
+			Params.FITINIT[3][11] = ltf_params[35]; //initR //control
 
 			//metapopultion four
 			Params.FITINIT[4][0] = ltf_params[36]; //initS
 			Params.FITINIT[4][4] = ltf_params[37]; //initV
-			//Params.FITINIT[4][8] = ltf_params[8]; //initR
 			Params.FITINIT[4][8] = ltf_params[38]; //initR
 
 			//metapopultion five
 			Params.FITINIT[5][0] = ltf_params[39]; //initS
 			Params.FITINIT[5][4] = ltf_params[40]; //initV
-			//Params.FITINIT[5][8] = ltf_params[8]; //initR
-			Params.FITINIT[5][8] = ltf_params[41]; //initR
+			Params.FITINIT[5][8] = 0.0000000000000000001; //initR
 
 			//metapopultion six
 			Params.FITINIT[6][0] = ltf_params[42]; //initS
 			Params.FITINIT[6][4] = ltf_params[43]; //initV
-			//Params.FITINIT[6][8] = ltf_params[8]; //initR
 			Params.FITINIT[6][8] = ltf_params[44]; //initR
 
 			//dispersal parameters
@@ -344,14 +344,10 @@ for (round=0;round<numround;round++){
 			Params.VFSus		= ltf_params[50];
 	
 			//stochasticity parameters
-			//Params.Rsd_exp 		= ltf_params[51];
-			Params.Rsd_exp 		= 0;
-			Params.Fsd_exp		= 0;
-			//Params.Fsd_exp		= ltf_params[52];
-			Params.Rsd_obs		= 0;
-			Params.Fsd_exp		= 0;
-			//Params.Rsd_obs		= ltf_params[53];
-			//Params.Fsd_exp		= ltf_params[54];
+			Params.Rsd_exp 		= ltf_params[51];
+			Params.Fsd_exp		= ltf_params[52];
+			Params.Rsd_obs		= ltf_params[53];
+			Params.Fsd_exp		= ltf_params[54];
 
 			Params.muV			= ltf_params[55];
 			//printf("proposal muV=%lf\n", Params.muV);
@@ -456,7 +452,7 @@ for (round=0;round<numround;round++){
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
+		calls=50;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		for(j=1; j<=DATA_SETS; j++){
 		//for(j=1; j<4; j++){
@@ -480,18 +476,20 @@ for (round=0;round<numround;round++){
 
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
-				log_lhood_meta = 0;
+				log_lhood_meta = -999999999999; //was 0, probably was messing things up majorly
+				//printf("bummer\n");
+				//printf("param fail = %i\t, value = %lf\n", a, ltf_params[a]);	
 			}
 
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
 			//printf("total_log_lhood_meta = %lf\n", total_loghood_metas);
 
 			new_posterior = total_loghood_metas + log_prior;
-			printf("new posterior = %lf\n", new_posterior);
+			//printf("new posterior = %lf\n", new_posterior);
 		}//j 
 		if (new_posterior>best_posterior){ //compare likelihood //sum - one you just generated //local max - best you've seen
 			best_posterior=new_posterior;
-			printf("best posterior = %lf\n", best_posterior);
+			//printf("best posterior = %lf\n", best_posterior);
 			for (c=0;c<num_ltfparams;c++){
 				localmax_params[c]=ltf_params[c]; //save best param set from each individual search
 			}
@@ -505,23 +503,16 @@ for (round=0;round<numround;round++){
 	a++; //move to next parameter	
 	} //a
 
-	//modified printing to only print fitting params without having to change num_lftparams
 	int print_len = 29;
-
-	//meta 1 : len = 10
-	int printlist[29] = {0,8,9,10,11,20,21,22,23,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,55};
-	//int printlist[8] = {8, 9, 10, 11, 45, 46, 47, 48};
-	//int printlist[11] = {36, 37, 38, 39, 40, 41, 42, 43, 44, 49, 50};
-
-	//experimental treatment : len = 30
-	//int printlist[30] = {8, 9, 10, 11, 20, 21, 22, 23, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 51, 52, 53, 54};
+	int printlist[29] = {0,8,20,21,22,23,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,49,50,51,52,53,54,55};
 	int index;
 	for(ii=0; ii<print_len; ii++){
 		index = printlist[ii];
 		fprintf(fpv, "%lf\t", ltf_params[index]);
 	}
+
 	fprintf(fpv, "%lf\t", best_posterior);
-	//printf("best posterior = %lf\n", best_posterior);
+	//printf("final best posterior = %lf\n", best_posterior);
 	fprintf(fpv, "\n");
 }
 

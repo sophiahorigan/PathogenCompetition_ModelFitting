@@ -56,7 +56,7 @@ r_seed=random_setup();
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-int searches = 4; //number of iterations for each specific parameter
+int searches = 3; //number of iterations for each specific parameter
 int round;
 int numround = 2;
 int calls;
@@ -94,7 +94,7 @@ if(reals==1){
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
 	
-	double initS_fit = 9.157859;
+	double initS_fit = 5.192481;
 	//propose parameter values
 	//metapopulation one
 	Params.FITINIT[1][0] = initS_fit; //initS
@@ -102,10 +102,10 @@ if(reals==1){
 	Params.FITINIT[1][2] = initS_fit; //initS
 	Params.FITINIT[1][3] = initS_fit; //initS
 	Params.FITINIT[1][4] = 0.000000000001; 				//initV //fonly
-	Params.FITINIT[1][5] = 0.2; //initV
-	Params.FITINIT[1][6] = 0.2; //initV
+	Params.FITINIT[1][5] = 0.6; //initV
+	Params.FITINIT[1][6] = 0.6; //initV
 	Params.FITINIT[1][7] = 0.000000000001;				//initV //control
-	Params.FITINIT[1][8] = 0.004195; //initR
+	Params.FITINIT[1][8] = 0.007092; //initR
 	Params.FITINIT[1][9] = 0.0000000000000000001; //initR
 	Params.FITINIT[1][10] = 0.0000000000000000001; //initR
 	Params.FITINIT[1][11] = 0.0000000000000000001; //initR
@@ -119,10 +119,10 @@ if(reals==1){
 	Params.FITINIT[2][5] = 0.2; //initV
 	Params.FITINIT[2][6] = 0.2; //initV
 	Params.FITINIT[2][7] = 0.000000000001; 				//initV //control
-	Params.FITINIT[2][8] = 0.006441; //initR
-	Params.FITINIT[2][9] = 0.001725; //initR
-	Params.FITINIT[2][10] = 0.008453; //initR
-	Params.FITINIT[2][11] = 0.001831; //initR
+	Params.FITINIT[2][8] = 0.007092; //initR
+	Params.FITINIT[2][9] = 0.005922; //initR
+	Params.FITINIT[2][10] = 0.008845; //initR
+	Params.FITINIT[2][11] = 0.003426; //initR
 
 	//metapopulation three
 	Params.FITINIT[3][0] = initS_fit; //initS
@@ -133,43 +133,43 @@ if(reals==1){
 	Params.FITINIT[3][5] = 0.2; //initV
 	Params.FITINIT[3][6] = 0.2; //initV
 	Params.FITINIT[3][7] = 0.000000000001;				 //initV //control
-	Params.FITINIT[3][8] = 0.000120; //initR
-	Params.FITINIT[3][9] = 0.007310; //initR
-	Params.FITINIT[3][10] = 0.002163; //initR
-	Params.FITINIT[3][11] = 0.001467; //initR
+	Params.FITINIT[3][8] = 0.003084; //initR
+	Params.FITINIT[3][9] = 0.004200; //initR
+	Params.FITINIT[3][10] = 0.007814; //initR
+	Params.FITINIT[3][11] = 0.003009; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 19.95815; //initS
-	Params.FITINIT[4][4] = 0.500000; //initV
-	Params.FITINIT[4][8] = 	0.000500; //initR
+	Params.FITINIT[4][0] = 36.800361; //initS
+	Params.FITINIT[4][4] = 0.275799; //initV
+	Params.FITINIT[4][8] = 	0.001113; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 19.054361; //initS
-	Params.FITINIT[5][4] = 0.204825; //initV
+	Params.FITINIT[5][0] = 110.631706; //initS
+	Params.FITINIT[5][4] = 0.182471; //initV
 	Params.FITINIT[5][8] = 0.0000000000000000001; //initR
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 	117.108009; //initS
-	Params.FITINIT[6][4] = 0.368075; //initV
-	Params.FITINIT[6][8] = 0.006305; //initR
+	Params.FITINIT[6][0] = 77.548836; //initS
+	Params.FITINIT[6][4] = 0.173089; //initV
+	Params.FITINIT[6][8] = 0.004435; //initR
 
 	//dispersal parameters
-	Params.con_mgr 		= 36.63840;
-	Params.a 			= 0.498168;
-	Params.lar_mgr 		= 85.603058;
-	Params.a2			= 0.021578;
+	Params.con_mgr 		= 45.038833;
+	Params.a 			= 0.209932;
+	Params.lar_mgr 		= .9999;
+	Params.a2			= .00000000001;
 
 	//coinfection parameters
 	Params.coinf_V		= 0.077836;
-	Params.VFSus		= 76.806793;
+	Params.VFSus		= 21.232211;
 
 	//stochasticity parameters
-	Params.Rsd_exp 		= 0.761380;
-	Params.Fsd_exp		= 3.724681;
-	Params.Rsd_obs		= 1.618694;
-	Params.Fsd_obs		= 2.428269;
+	Params.Rsd_exp 		= 2.110050;
+	Params.Fsd_exp		= 2.770818;
+	Params.Rsd_obs		= 2.024175;
+	Params.Fsd_obs		= 2.375879;
 
-	Params.muV			= 2.705082; 
+	Params.muV			= 2.742669; 
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -279,9 +279,9 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[1][7] = 0.000000000001; 				//initV //control
 
 			Params.FITINIT[1][8] = ltf_params[8]; //initR //fonly
-			Params.FITINIT[1][9] = 0.0000000000000000001; //initR //vonly //based on exp data
-			Params.FITINIT[1][10] = 0.000000000000000001; //initR //fv
-			Params.FITINIT[1][11] = 0.000000000000000001; //initR //control
+			Params.FITINIT[1][9] = 0.0000000000000000000001; //initR //vonly //based on exp data
+			Params.FITINIT[1][10] = 0.0000000000000000000001; //initR //fv
+			Params.FITINIT[1][11] = 0.0000000000000000000001; //initR //control
 
 			//metapopulation two
 			Params.FITINIT[2][0] = ltf_params[0]; //initS
@@ -323,7 +323,7 @@ for (round=0;round<numround;round++){
 			//metapopultion five
 			Params.FITINIT[5][0] = ltf_params[39]; //initS
 			Params.FITINIT[5][4] = ltf_params[40]; //initV
-			Params.FITINIT[5][8] = 0.0000000000000000001; //initR
+			Params.FITINIT[5][8] = 0.0000000000000000000001; //initR
 
 			//metapopultion six
 			Params.FITINIT[6][0] = ltf_params[42]; //initS

@@ -251,6 +251,10 @@ for(i=0; i<num_sub; i++){
 		E_FV[i][ii]=0;
 	}
 
+	IF[i]=0;
+	IV[i]=0;
+	IVF[i]=0;
+	IFV[i]=0;
 }
 
 //long-term state params
@@ -348,8 +352,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		getc(stdin);
 	}
 
-
-	// -------------------------- integrate until next stoppage event ---------------------------------- //
 	
 	//indexing variables
 	int sub;
@@ -361,10 +363,65 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		//printf("sub_index=%i", sub_index[sub]);
 	}
 
-//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
+
+	// -------------------------- integrate until next stoppage event ---------------------------------- //
 
 	while (t<t_next)	{
+
+	//-------------------------------------- LARVAE DISPERSAL -------------------------------------------//
+								
+	if(larvae_dispersal_on == 1){ //turn off at declaration at top of script
+
+		if(day-1<8){ //dispersal only occurs as first instars, 1 week
+			//printf("day = %i\n", day-1);
+			if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+			//printf("I'm in the dispersal loop! j = %i\n", j);
+			int subout; //indexing
+			int subin; //indexing
+			double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
+			double netSdisp[4] = {0, 0, 0, 0};
+			double fracV;
+			double poptotal;
+			double lar_disp;
+			
+				for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
+					//printf("subout = %i\n", subout);
+					for(subin = 0; subin < num_sub; subin++){
+						//printf("subin = %i\n", subin);
+						if(subout != subin){
+							poptotal = S[subout]+IV[subout]+IVF[subout]+IF[subout]+IFV[subout];
+							//printf("day = %i\t subout = %i\t S = %lf\t IV = %lf\t IVF = %lf\t IF = %lf\t IVF = %lf\n", day, subout, S[subout], IV[subout], IVF[subout], IF[subout], IFV[subout]);
+							//printf("day = %i\t sub = %i\t fracV = %lf\n", day, subout, V[subout]);
+							//printf("poptotal = %lf\n", poptotal);
+							fracV = (IVF[subout]+IV[subout])/poptotal; //what frac are virus
+							//printf("fracV out = %lf\n", fracV);
+							lar_disp = Params->lar_mgr*exp(-Params->a2*Params->DISTANCE[j][subout][subin]);
+							//printf("lar_mrg=%lf\t a = %lf\t distance = %i\n",Params->lar_mgr, Params->a2, Params->DISTANCE[j][subout][subin]);
+							//lar_mgr = lard*exp(-a3*Params->DISTANCE[j][subout][subin]);
+							//printf("lar_disp=%lf\n", lar_disp);
+							//Virus
+							netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV;
+							netVdisp[subin] = netVdisp[subin] + lar_disp*poptotal*fracV;
+							//Suseptible
+							netSdisp[subout] = netSdisp[subout] - lar_disp*poptotal*(1-fracV); 
+							netSdisp[subin] = netSdisp[subin] + lar_disp*poptotal*(1-fracV);
+						}
+					}
+				}
+				for(sub=0; sub<num_sub; sub++){ //update larval density
+					//printf("pre-disp S[%i]= %lf\n", sub, S[sub]);
+					//printf("pre-disp V[%i]= %lf\n", sub, IV[sub]+IVF[sub]);
+					S[sub] = S[sub] + netSdisp[sub]; 
+					IV[sub] = IV[sub] + netVdisp[sub]; //?? do I need to share between IV and IVF //what exposed class is it being removed from?? *** this is the issue
+					//printf("post-disp S[%i]= %lf\n", sub, S[sub]);
+					//printf("post-disp V[%i]= %lf\n", sub, IV[sub]+IVF[sub]);
+				}
+			} 
+		}
+	}	
 		
+		//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
+		printf("day = %i\n", day);
 		for(sub=0; sub<num_sub; sub++){ //for each treatment
 			y_ode[0+sub_index[sub]]=S[sub];	y_ode[m+n+1+sub_index[sub]]=C[sub];	Params->POPS[3]=R[sub];
 			//printf("PreODES[%i] = %e\n", sub, S[sub]);
@@ -376,10 +433,11 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			}
 			for (i=1;i<=n1;i++)	{
 				y_ode[gstepsF+i+sub_index[sub]]=E_VF[sub][i];
-				//printf("EVF = %lf\n", E_VF[sub][i+sub_index[sub]]);
+				printf("sub = %i\t EVF = %lf\n", sub, E_VF[sub][i+sub_index[sub]]);
 			}
 			for (i=1;i<=n2;i++)	{
 				y_ode[gstepsF+n1+i+sub_index[sub]]=E_V[sub][i];
+				printf("sub = %i\t EV = %lf\n", sub, E_V[sub][i+sub_index[sub]]);
 			}
 			y_ode[m+n+2+sub_index[sub]]=Fnext[sub];
 			y_ode[m+n+4+sub_index[sub]]=Vkill[sub];
@@ -399,56 +457,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			//getc(stdin);
 		}
 		*/
-
-	//-------------------------------------- LARVAE DISPERSAL -------------------------------------------//
-								
-	if(larvae_dispersal_on == 1){ //turn off at declaration at top of script
-
-	if(day-1<8){ //dispersal only occurs as first instars, 1 week
-		//printf("day = %i\n", day-1);
-		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
-		//printf("I'm in the dispersal loop! j = %i\n", j);
-		int subout; //indexing
-		int subin; //indexing
-		double netVdisp[4] = {0, 0, 0, 0}; //one for each subpop 0-3
-		double netSdisp[4] = {0, 0, 0, 0};
-		double fracV;
-		double poptotal;
-		double lar_disp;
-		
-		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
-			//printf("subout = %i\n", subout);
-			for(subin = 0; subin < num_sub; subin++){
-				//printf("subin = %i\n", subin);
-				if(subout != subin){
-					poptotal = S[subout]+V[subout]+C[subout];
-					fracV = V[subout]/poptotal; //what frac are virus
-					//printf("fracV out = %lf\n", fracV);
-					lar_disp = Params->lar_mgr*exp(-Params->a2*Params->DISTANCE[j][subout][subin]);
-					//printf("lar_mrg=%lf\t a = %lf\t distance = %i\n",Params->lar_mgr, Params->a2, Params->DISTANCE[j][subout][subin]);
-					//lar_mgr = lard*exp(-a3*Params->DISTANCE[j][subout][subin]);
-					//printf("lar_disp=%lf\n", lar_disp);
-					//Virus
-					netVdisp[subout] = netVdisp[subout] - lar_disp*poptotal*fracV; 
-					netVdisp[subin] = netVdisp[subin] + lar_disp*poptotal*fracV;
-					//Suseptible
-					netSdisp[subout] = netVdisp[subout] - lar_disp*poptotal*(1-fracV); 
-					netSdisp[subin] = netVdisp[subin] + lar_disp*poptotal*(1-fracV);
-					
-				}
-			}
-		}
-		for(sub=0; sub<num_sub; sub++){ //update larval density
-			//printf("pre-disp S[%i]= %e\n", sub, S[sub]);
-			//printf("pre-disp V[%i]= %e\n", sub, V[sub]);
-			S[sub] = S[sub] + netSdisp[sub]; 
-			V[sub] = V[sub] + netVdisp[sub]; 
-			//printf("post-disp S[%i]= %e\n", sub, S[sub]);
-			//printf("post-disp V[%i]= %e\n", sub, V[sub]);
-		}
-			} 
-		}
-	}	
 
 	//******************************* Weather Stuff ******************************//
 	Params->nuV = Params->PARS[2];
@@ -501,8 +509,8 @@ for(k=0; k<DIM; k++){
 	for(sub=0; sub<num_sub; sub++){
 		S[sub]=y_ode[0+sub_index[sub]]; //SH ASK GREG: FOR OBS SITE, THIS ISN'T GETTING UPDATED
 		//printf("POSTODES[%i] = %e\n", sub, S[sub]);
-		C[sub]=y_ode[m+n+1+sub_index[sub]]; 
-		V[sub]=y_ode[m+n+3+sub_index[sub]];
+		C[sub]=y_ode[m+n+1+sub_index[sub]]; //fungus cadavers?
+		V[sub]=y_ode[m+n+3+sub_index[sub]]; //virus cadavers?
 		//printf("sub = %i\t V = %lf\n",sub, V[sub]);
 		Fnext[sub]=y_ode[m+n+2+sub_index[sub]];			
 		Vkill[sub]=y_ode[m+n+4+sub_index[sub]];
@@ -521,6 +529,8 @@ for(k=0; k<DIM; k++){
 		RestBefore = Params->POPS[3]*nuR2;
 	}
 
+
+	//sum daily infected across exposed classes
 	for(sub=0; sub<num_sub; sub++){	
 	
 		for (i=1;i<=gstepsF;i++)	{

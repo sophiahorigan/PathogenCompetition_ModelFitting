@@ -4,7 +4,7 @@ double low;
 double high;
 
 //metapopulation one
-if (i==0)			{	low = 1e-5;			high = 25;		}	//initS fungus-only
+if (i==0)			{	low = 1e-5;			high = 100;		}	//initS fungus-only
 else if (i==1)		{	low = 70;			high = 140;		}	//initS virus-only
 else if (i==2)		{	low = 70;			high = 140;		}	//initS fungus-virus
 else if (i==3)		{	low = 70;			high = 140;		}	//initS control
@@ -52,18 +52,18 @@ else if (i==34)		{	low = 0;			high = 0.01;	}	//initR fungus-virus
 else if (i==35)		{	low = 0;			high = 0.01;	}	//initR control
 
 //metapopulation four
-else if (i==36)		{	low = 1;			high = 100;		} 	//initS
+else if (i==36)		{	low = 1;			high = 150;		} 	//initS
 else if (i==37)		{	low = 0;			high = 0.2;		} 	//initV
 else if (i==38)		{	low = 0;			high = 0.01;	} 	//initR
 
 //metapopulation five
-else if (i==39)		{	low = 1;			high = 150;		} 	//initS
-else if (i==40)		{	low = 0;			high = 0.5;		} 	//initV
+else if (i==39)		{	low = 1;			high = 20;		} 	//initS
+else if (i==40)		{	low = 0;			high = 0.2;		} 	//initV
 else if (i==41)		{	low = 0;			high = 0.01;	} 	//initR
 
 //metapopulation six
-else if (i==42)		{	low = 1;			high = 20;		} 	//initS
-else if (i==43)		{	low = 0;			high = 0.2;		} 	//initV
+else if (i==42)		{	low = 1;			high = 200;		} 	//initS
+else if (i==43)		{	low = 0;			high = 0.5;		} 	//initV
 else if (i==44)		{	low = 0;			high = 0.01;	} 	//initR
 
 //dispersal
@@ -74,7 +74,7 @@ else if (i==48)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter 
 
 //coifection
 else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==50) 	{	low = 0;			high = 50;		}	//VFSus //enhanced susceptibility 
+else if (i==50) 	{	low = 0;			high = 100;		}	//VFSus //enhanced susceptibility 
 
 //stochasticity
 else if (i==51)		{	low = 0;			high = 2;		}	//Rsd_exp
@@ -95,7 +95,7 @@ double step(int i)				// bounds on parameters for parhood line search
 double step_size;
 
 //metapopulation one
-if (i==0)			{	step_size = 0.5;	}	//initS fungus-only
+if (i==0)			{	step_size = 1;	}	//initS fungus-only
 else if (i==1)		{	step_size = 1;	}	//initS virus-only
 else if (i==2)		{	step_size = 1;	}	//initS fungus-virus
 else if (i==3)		{	step_size = 1;	}	//initS control
@@ -105,10 +105,10 @@ else if (i==5)		{	step_size = 0.005;	}	//initV virus-only
 else if (i==6)		{	step_size = 0.005;	}	//initV fungus-virus
 else if (i==7)		{	step_size = 0.001;	}	//initV control
 
-else if (i==8)		{	step_size = 0.0001;	}	//initR fungus-only
-else if (i==9)		{	step_size = 0.0001;	}	//initR virus-only
-else if (i==10)		{	step_size = 0.0001;	}	//initR fungus-virus
-else if (i==11)		{	step_size = 0.0001;	}	//initR control
+else if (i==8)		{	step_size = 0.0005;	}	//initR fungus-only
+else if (i==9)		{	step_size = 0.0005;	}	//initR virus-only
+else if (i==10)		{	step_size = 0.0005;	}	//initR fungus-virus
+else if (i==11)		{	step_size = 0.0005;	}	//initR control
 
 //metapopulation two
 else if (i==12)		{	step_size = 1;	}	//initS fungus-only
@@ -121,10 +121,10 @@ else if (i==17)		{	step_size = 0.005;	}	//initV virus-only
 else if (i==18)		{	step_size = 0.005;	}	//initV fungus-virus
 else if (i==19)		{	step_size = 0.001;	}	//initV control
 
-else if (i==20)		{	step_size = 0.0001;	}	//initR fungus-only
-else if (i==21)		{	step_size = 0.0001;	}	//initR virus-only
-else if (i==22)		{	step_size = 0.0001;	}	//initR fungus-virus
-else if (i==23)		{	step_size = 0.0001;	}	//initR control
+else if (i==20)		{	step_size = 0.0005;	}	//initR fungus-only
+else if (i==21)		{	step_size = 0.0005;	}	//initR virus-only
+else if (i==22)		{	step_size = 0.0005;	}	//initR fungus-virus
+else if (i==23)		{	step_size = 0.0005;	}	//initR control
 
 //metapopulation three
 else if (i==24)		{	step_size = 1;	}	//initS fungus-only
@@ -137,25 +137,25 @@ else if (i==29)		{	step_size = 0.005;	}	//initV virus-only
 else if (i==30)		{	step_size = 0.005;	}	//initV fungus-virus
 else if (i==31)		{	step_size = 0.001;	}	//initV control
 
-else if (i==32)		{	step_size = 0.0001;	}	//initR fungus-only
-else if (i==33)		{	step_size = 0.0001;	}	//initR virus-only
-else if (i==34)		{	step_size = 0.0001;	}	//initR fungus-virus
-else if (i==35)		{	step_size = 0.0001;	}	//initR control
+else if (i==32)		{	step_size = 0.0005;	}	//initR fungus-only
+else if (i==33)		{	step_size = 0.0005;	}	//initR virus-only
+else if (i==34)		{	step_size = 0.0005;	}	//initR fungus-virus
+else if (i==35)		{	step_size = 0.0005;	}	//initR control
 
 //metapopulation four
 else if (i==36)		{	step_size = 5;	}	//initS
-else if (i==37)		{	step_size = 0.01;	}	//initV
-else if (i==38)		{	step_size = 0.0001;	} 	//initR
+else if (i==37)		{	step_size = 0.05;	}	//initV
+else if (i==38)		{	step_size = 0.0005;	} 	//initR
 
 //metapopulation five
-else if (i==39)		{	step_size = 5;	}	//initS
-else if (i==40)		{	step_size = 0.01;	} 	//initV
-else if (i==41)		{	step_size = 0.0001;	} 	//initR
+else if (i==39)		{	step_size = 2;	}	//initS
+else if (i==40)		{	step_size = 0.05;	} 	//initV
+else if (i==41)		{	step_size = 0.0005;	} 	//initR
 
 //metapopulation six
-else if (i==42)		{	step_size = 2;	}	//initS
-else if (i==43)		{	step_size = 0.01;	}  	//initV
-else if (i==44)		{	step_size = 0.0001;	}	//initR
+else if (i==42)		{	step_size = 5;	}	//initS
+else if (i==43)		{	step_size = 0.05;	}  	//initV
+else if (i==44)		{	step_size = 0.0005;	}	//initR
 
 //dispersal
 else if (i==45)		{	step_size = 0.5;	}  	//con_mgr //rate of conidia dispersal
@@ -165,7 +165,7 @@ else if (i==48)		{	step_size = 0.5;	}	//a2 //prob of dispersal
 
 //coifection
 else if (i==49) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==50) 	{	step_size = 1;	}	//VFSus //enhanced susceptibility 
+else if (i==50) 	{	step_size = 5;	}	//VFSus //enhanced susceptibility 
 
 //stochasticity
 else if (i==51)		{	step_size = .1;	}	//Rsd_exp

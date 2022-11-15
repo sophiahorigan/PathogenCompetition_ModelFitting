@@ -23,6 +23,8 @@ int linesearch = 1;
 int mcmc = 0;
 int reals = 0;
 
+int flag_flag=0;
+
 STRUCTURE Params;
 
 int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is the i^th input)
@@ -56,9 +58,9 @@ r_seed=random_setup();
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-int searches = 3; //number of iterations for each specific parameter
+int searches = 10; //number of iterations for each specific parameter
 int round;
-int numround = 2;
+int numround = 5;
 int calls;
 size_t dim;
 
@@ -94,7 +96,7 @@ if(reals==1){
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
 	
-	double initS_fit = 5.192481;
+	double initS_fit = 5.000010;
 	//propose parameter values
 	//metapopulation one
 	Params.FITINIT[1][0] = initS_fit; //initS
@@ -102,10 +104,10 @@ if(reals==1){
 	Params.FITINIT[1][2] = initS_fit; //initS
 	Params.FITINIT[1][3] = initS_fit; //initS
 	Params.FITINIT[1][4] = 0.000000000001; 				//initV //fonly
-	Params.FITINIT[1][5] = 0.6; //initV
-	Params.FITINIT[1][6] = 0.6; //initV
+	Params.FITINIT[1][5] = 0.2; //initV
+	Params.FITINIT[1][6] = 0.2; //initV
 	Params.FITINIT[1][7] = 0.000000000001;				//initV //control
-	Params.FITINIT[1][8] = 0.007092; //initR
+	Params.FITINIT[1][8] = 0.000500; //initR
 	Params.FITINIT[1][9] = 0.0000000000000000001; //initR
 	Params.FITINIT[1][10] = 0.0000000000000000001; //initR
 	Params.FITINIT[1][11] = 0.0000000000000000001; //initR
@@ -119,10 +121,10 @@ if(reals==1){
 	Params.FITINIT[2][5] = 0.2; //initV
 	Params.FITINIT[2][6] = 0.2; //initV
 	Params.FITINIT[2][7] = 0.000000000001; 				//initV //control
-	Params.FITINIT[2][8] = 0.007092; //initR
-	Params.FITINIT[2][9] = 0.005922; //initR
-	Params.FITINIT[2][10] = 0.008845; //initR
-	Params.FITINIT[2][11] = 0.003426; //initR
+	Params.FITINIT[2][8] = 0.000023; //initR
+	Params.FITINIT[2][9] = 0.000500; //initR
+	Params.FITINIT[2][10] = 0.000500; //initR
+	Params.FITINIT[2][11] = 0.001500; //initR
 
 	//metapopulation three
 	Params.FITINIT[3][0] = initS_fit; //initS
@@ -133,43 +135,43 @@ if(reals==1){
 	Params.FITINIT[3][5] = 0.2; //initV
 	Params.FITINIT[3][6] = 0.2; //initV
 	Params.FITINIT[3][7] = 0.000000000001;				 //initV //control
-	Params.FITINIT[3][8] = 0.003084; //initR
-	Params.FITINIT[3][9] = 0.004200; //initR
-	Params.FITINIT[3][10] = 0.007814; //initR
-	Params.FITINIT[3][11] = 0.003009; //initR
+	Params.FITINIT[3][8] = 0.001000; //initR
+	Params.FITINIT[3][9] = 0.000725; //initR
+	Params.FITINIT[3][10] = 0.001000; //initR
+	Params.FITINIT[3][11] = 0.001000; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 36.800361; //initS
-	Params.FITINIT[4][4] = 0.275799; //initV
-	Params.FITINIT[4][8] = 	0.001113; //initR
+	Params.FITINIT[4][0] = 31.00000; //initS
+	Params.FITINIT[4][4] = 0.100496; //initV
+	Params.FITINIT[4][8] = 	0.000500; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 110.631706; //initS
-	Params.FITINIT[5][4] = 0.182471; //initV
+	Params.FITINIT[5][0] = 19.00000; //initS
+	Params.FITINIT[5][4] = 0.200000; //initV
 	Params.FITINIT[5][8] = 0.0000000000000000001; //initR
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 77.548836; //initS
-	Params.FITINIT[6][4] = 0.173089; //initV
-	Params.FITINIT[6][8] = 0.004435; //initR
+	Params.FITINIT[6][0] = 82.958713; //initS
+	Params.FITINIT[6][4] = 0.100000; //initV
+	Params.FITINIT[6][8] = 0.007677; //initR
 
 	//dispersal parameters
-	Params.con_mgr 		= 45.038833;
-	Params.a 			= 0.209932;
+	Params.con_mgr 		= 0.194919;
+	Params.a 			= 0.157528;
 	Params.lar_mgr 		= .9999;
 	Params.a2			= .00000000001;
 
 	//coinfection parameters
-	Params.coinf_V		= 0.077836;
-	Params.VFSus		= 21.232211;
+	Params.coinf_V		= 0.080427;
+	Params.VFSus		= 10.000000;
 
 	//stochasticity parameters
-	Params.Rsd_exp 		= 2.110050;
-	Params.Fsd_exp		= 2.770818;
-	Params.Rsd_obs		= 2.024175;
-	Params.Fsd_obs		= 2.375879;
+	Params.Rsd_exp 		= 0.600000;
+	Params.Fsd_exp		= 0.300000;
+	Params.Rsd_obs		= 0.803463;
+	Params.Fsd_obs		= 2.000000;
 
-	Params.muV			= 2.742669; 
+	Params.muV			= 2.072811; 
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -180,8 +182,8 @@ if(reals==1){
 
 	calls=10;					//number of stochastic simulations for each parameter and IC set //100-300
 
-	//for(j=1; j<=DATA_SETS; j++){
-		for(j=1; j<2; j++){
+	for(j=1; j<=DATA_SETS; j++){
+		//for(j=6; j<7; j++){
 			Params.j = j;
 
 			Params.miser_ticker = 1; //used to set initial adjustment
@@ -202,18 +204,9 @@ if(reals==1){
 			gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&lhood_meta,&meta_err); //call MISER, pop_lhood is output from .h (likelihood value)
 			gsl_monte_miser_free(s);
 
-			if(Params.miser2_flag == 1){
-				Params.lhood_adjust[dataset] = -bestlhood[dataset];
-				Params.miser2_flag == 0;
-
-				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-				gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&lhood_meta,&meta_err); //call MISER, pop_lhood is output from .h (likelihood value)
-				gsl_monte_miser_free(s);
-			}
-
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){
-				log_lhood_meta = 0;
+				log_lhood_meta = -9999; //very bad score
 			}
 			
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
@@ -254,7 +247,7 @@ for (round=0;round<numround;round++){
 		//if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48 ){ 
 		//if (a==8 | a==9 | a==10 | a==11 | a==45 | a==46 | a==47 | a==48){
 		//all
-		if (a == 0 | a == 8 | a == 20 | a == 21 | a == 22 | a == 23 | a == 32 | a == 33 | a == 34 | a == 35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 42 | a == 43 | a == 44 | a == 45 | a == 46 | a == 47 | a == 48 | a == 49 | a == 50 | a == 51 | a == 52 | a == 53 | a == 54 | a == 55){ 
+		if (a == 0 | a == 8 | a == 20 | a == 21 | a == 22 | a == 23 | a == 32 | a == 33 | a == 34 | a == 35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 42 | a == 43 | a == 44 | a == 45 | a == 46 | a == 49 | a == 50 | a == 51 | a == 52 | a == 53 | a == 54 | a == 55){ 
 		//observationals
 		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 | a == 44 | a == 49 | a == 50){   
 		if (round>0){		
@@ -459,10 +452,11 @@ for (round=0;round<numround;round++){
 		double meta_err=0;
 		double lhood_total=0;
 		double lhood_reps=0;
+	
 
 		calls=200;					//number of stochastic simulations for each parameter and IC set //100-300
 
-		for(j=1; j<2; j++){
+		for(j=1; j<DATA_SETS; j++){
 			Params.j = j;
 
 			Params.miser_ticker = 1; //used to set initial adjustment
@@ -483,24 +477,36 @@ for (round=0;round<numround;round++){
 			gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&lhood_meta,&meta_err); //call MISER, pop_lhood is output from .h (likelihood value)
 			gsl_monte_miser_free(s);
 
-			//re-do until best lhood score is found
-			while(Params.miser2_flag == 1){
-				Params.lhood_adjust[dataset] = -bestlhood[dataset];
-				Params.miser2_flag == 0;
+			//printf("I'm out\n"); //this one for greg
 
+			//printf("lhood = %lf\n", lhood_meta);
+			//printf("miser flag in meta = %i\n", Params.miser2_flag);
+
+			//re-do until best lhood score is found
+			while(Params.miser2_flag > 0){ //indicates that a better likelihood score (or a few) were found
+				//printf("FLAG TRIPPED! round two\n"); //this one for greg
+				Params.miser2_flag = 0;
+				//printf("FLAG TRIPPED! miser ticker = %i\n", Params.miser_ticker);
+				//printf("old adj = %lf\t new adj = %lf\n", Params.lhood_adjust[j], Params.bestlhood[j]);
+				//printf("bestlhood meta = %lf\t prev adj = %lf\n", Params.bestlhood[j], Params.lhood_adjust[j]); //this one for greg
+				Params.lhood_adjust[j] = -Params.bestlhood[j];
+				
 				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
 				gsl_monte_miser_integrate (&G,xl,xu,dim,calls,r_seed,s,&lhood_meta,&meta_err); //call MISER, pop_lhood is output from .h (likelihood value)
 				gsl_monte_miser_free(s);
+				//printf("a = %i\t repeat!\n", a);
 			}
 
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
-			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){
-				log_lhood_meta = 0;
+			if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //that means it was a really bad value
+			//printf("nan or inf adjustment didn't work\n");
+				log_lhood_meta = -9999; //shouldn't this be a really bad score? //a zero? //log(0) is undefined so I need to declare badness after it's logged via this catch
 			}
 			
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
 
 			new_posterior = total_loghood_metas + log_prior;
+			//printf("posterior = %lf\n", new_posterior);
 		}
 		if (new_posterior>best_posterior){ //compare likelihood //sum - one you just generated //local max - best you've seen
 			best_posterior=new_posterior;
@@ -515,11 +521,12 @@ for (round=0;round<numround;round++){
 		ltf_params[c]=localmax_params[c];
 	}
 	} //only params we want to fit
-	a++; //move to next parameter	
+	a++; //move to next parameter
+	//printf("a=%i\n", a);	
 	} //a
 
-	int print_len = 29;
-	int printlist[29] = {0,8,20,21,22,23,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,49,50,51,52,53,54,55};
+	int print_len = 27;
+	int printlist[27] = {0,8,20,21,22,23,32,33,34,35,36,37,38,39,40,42,43,44,45,46,49,50,51,52,53,54,55};
 	int index;
 	for(ii=0; ii<print_len; ii++){
 		index = printlist[ii];
@@ -529,6 +536,7 @@ for (round=0;round<numround;round++){
 	fprintf(fpv, "%lf\t", best_posterior);
 	//printf("final best posterior = %lf\n", best_posterior);
 	fprintf(fpv, "\n");
+	//printf("flag-flag = %i\n", flag_flag);
 }
 
 //fclose(fpl);

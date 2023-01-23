@@ -61,54 +61,51 @@ if (j==4 || j==5 || j==6){
 //printf("j = %i\t, VFSus = %lf\t, coinf_V = %lf\n", j, VFSus, coinf_V);
 //printf("muV=%lf\n", Params->muV);
 
+//heterogeneity
+double squareCVV = Params->CV*Params->CV;
+
 //dispersal
-int coni_dispersal_on = 0; //set to 0 for no dispersal
-double Cdisp[4] = {0, 0, 0, 0}; //net conidia dispersal
-//printf("VFSus = %lf\n",Params->VFSus);
+int coni_dispersal_on = 1; //set to 0 for no dispersal
+int subout; //indexing
+int subin; //indexing
+double netCout[4];
+double netCin[4];
 
-//printf("Did I find j from params? j = %i\n", j);
-// ------------------------------------------ ODEs -------------------------------------------- //
-
-int sub_index[num_sub];
-int max_class = m+n+7+m;
-sub_index[0] = 0; //treatment 1 index addition is zero
-for(sub=1; sub<num_sub; sub++){	//createsub array 
-	sub_index[sub] = sub_index[sub-1]+ max_class; //SH can maybe multiply 
+for(sub=0; sub<num_sub; sub++){
+	netCout[sub] = 0;
+	netCin[sub] = 0;
 }
+
+double disp;
+
+const int sub_index[4] = {0, 127, 254, 381};
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
 if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
-	if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+	if (j==1 || j==2 || j==3) { 
+
+	//only for datasets with subpopulations
 		//printf("I'm in the dispersal loop! j = %i\n", j);
-		int subout; //indexing
-		int subin; //indexing
-		double con_disp; //frac dispersing from subout to subin
-		double netdisp[4] = {0, 0, 0, 0};
 		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			for(subin = 0; subin < num_sub; subin++){
 				if(subout != subin){
-					con_disp = Params->con_mgr*exp(-Params->a*Params->DISTANCE[j][subout][subin]);
-					//printf("con_disp=%lf\n", con_disp);
-					//con_disp = 0;
-					netdisp[subout] = netdisp[subout] - con_disp*y[m+n+1+sub_index[subout]]; 
-					netdisp[subin] = netdisp[subin] + con_disp*y[m+n+1+sub_index[subout]]; 
-					//printf("netdispout[%i] = %e\t netdispin[%i] = %e\n", subout, netdisp[subout], subin, netdisp[subin]);
+					//printf("subout = %i\t subin = %i\n", subout, subin);
+					disp = y[m+n+1+sub_index[subout]]*Params->con_mgr*exp(-Params->a*Params->DISTANCE[j][subout][subin]);
+					//printf("disp=%e\n", disp);
+					//printf("dydt = %e\n", dydt[m+n+1+sub_index[sub]]);
+					netCout[subout] = netCout[subout] + disp;
+					netCin[subin] = netCin[subin] + disp;
 				}
-			}
+			} //add net in and net out within dydt equations below
 		}
-		for(sub=0; sub<num_sub; sub++){ //update conidia density
-			//printf("pre-disp C[%i]= %e\n", sub, C[sub]);
-			Cdisp[sub] = y[m+n+1+sub_index[sub]] + netdisp[sub];
-			//printf("j = %i, net C[%i]= %e\n", j, sub, Cdisp[sub]);
-		}
-	} 
+	}
 }
 
 for(sub=0; sub<num_sub; sub++){
 	//*******************SUSCEPTIBLE*********************
-	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]+Cdisp[sub]) + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
+	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*(y[m+n+1+sub_index[sub]]) + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
 	//printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]); //SH GREG CHECK; THIS ALWAYS = 0...
 	//getc(stdin);
 	//printf("%e\t %e\t %e\t %e\t %e\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub]);
@@ -135,7 +132,9 @@ for(sub=0; sub<num_sub; sub++){
 	}
 
 	//**********************Fungus cadavers (conidia)**************
-	dydt[m+n+1+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C - muF*y[m+n+1+sub_index[sub]];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
+	//conidia
+	dydt[m+n+1+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C - muF*y[m+n+1+sub_index[sub]] + netCin[sub] - netCout[sub];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
+	//resting spores
 	dydt[m+n+2+sub_index[sub]] = indexR*m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
 
 	//*************************VIRUS CADAVERS***********************

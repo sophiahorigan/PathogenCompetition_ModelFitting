@@ -19,11 +19,9 @@ float DotProduct (int Length, double *Holder, double *PCA)
 int main(void)
 {
 //printf("hello world");
-int linesearch = 1;
+int linesearch = 0;
 int mcmc = 0;
-int reals = 0;
-
-int flag_flag=0;
+int reals = 1;
 
 STRUCTURE Params;
 
@@ -58,9 +56,9 @@ r_seed=random_setup();
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-int searches = 10; //number of iterations for each specific parameter
+int searches = 10;
 int round;
-int numround = 5;
+int numround = 3;
 int calls;
 size_t dim;
 
@@ -96,82 +94,88 @@ if(reals==1){
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
 	
-	double initS_fit = 5.000010;
+	//double initS_fit = 5.000010;
 	//propose parameter values
 	//metapopulation one
-	Params.FITINIT[1][0] = initS_fit; //initS
-	Params.FITINIT[1][1] = initS_fit; //initS
-	Params.FITINIT[1][2] = initS_fit; //initS
-	Params.FITINIT[1][3] = initS_fit; //initS
-	Params.FITINIT[1][4] = 0.000000000001; 				//initV //fonly
-	Params.FITINIT[1][5] = 0.2; //initV
-	Params.FITINIT[1][6] = 0.2; //initV
-	Params.FITINIT[1][7] = 0.000000000001;				//initV //control
-	Params.FITINIT[1][8] = 0.000500; //initR
-	Params.FITINIT[1][9] = 0.0000000000000000001; //initR
-	Params.FITINIT[1][10] = 0.0000000000000000001; //initR
-	Params.FITINIT[1][11] = 0.0000000000000000001; //initR
+	Params.FITINIT[1][0] = 77.517635; //initS
+	Params.FITINIT[1][1] = 1.000010; //initS
+	Params.FITINIT[1][2] = 1.000010; //initS
+	Params.FITINIT[1][3] = 60.487330; //initS
+
+	Params.FITINIT[1][4] = 1e-10; 				//initV //fonly //fixed
+	Params.FITINIT[1][5] = 0.2; //initV	//fixed
+	Params.FITINIT[1][6] = 0.2; //initV	//fixed
+	Params.FITINIT[1][7] = 1e-10; 				//initV //control //fixed
+
+	Params.FITINIT[1][8] = 0.002753; //initR
+	Params.FITINIT[1][9] = 1e-15; //initR //vonly //fixed
+	Params.FITINIT[1][10] = 1e-15; //initR //fixed
+	Params.FITINIT[1][11] = 1e-15; //initR //control //fixed
 
 	//metapopulation two
-	Params.FITINIT[2][0] = initS_fit; //initS
-	Params.FITINIT[2][1] = initS_fit; //initS
-	Params.FITINIT[2][2] = initS_fit; //initS
-	Params.FITINIT[2][3] = initS_fit; //initS
-	Params.FITINIT[2][4] = 0.000000000001; 				//initV //fonly
-	Params.FITINIT[2][5] = 0.2; //initV
-	Params.FITINIT[2][6] = 0.2; //initV
-	Params.FITINIT[2][7] = 0.000000000001; 				//initV //control
-	Params.FITINIT[2][8] = 0.000023; //initR
-	Params.FITINIT[2][9] = 0.000500; //initR
-	Params.FITINIT[2][10] = 0.000500; //initR
-	Params.FITINIT[2][11] = 0.001500; //initR
+	Params.FITINIT[2][0] = 7.888910; //initS
+	Params.FITINIT[2][1] = 2.912275; //initS
+	Params.FITINIT[2][2] = 5.306946; //initS
+	Params.FITINIT[2][3] = 17.892288; //initS
+
+	Params.FITINIT[2][4] = 1e-10; 			//initV //fonly //fixed
+	Params.FITINIT[2][5] = 0.2; //initV //fixed
+	Params.FITINIT[2][6] = 0.2; //initV //fixed
+	Params.FITINIT[2][7] = 1e-10; 	//fixed
+
+	Params.FITINIT[2][8] = 0.003874; //initR
+	Params.FITINIT[2][9] = 0.005127;//initR
+	Params.FITINIT[2][10] = 0.001101; //initR
+	Params.FITINIT[2][11] = 0.000767; //initR
 
 	//metapopulation three
-	Params.FITINIT[3][0] = initS_fit; //initS
-	Params.FITINIT[3][1] = initS_fit; //initS
-	Params.FITINIT[3][2] = initS_fit; //initS
-	Params.FITINIT[3][3] = initS_fit; //initS
-	Params.FITINIT[3][4] = 0.000000000001; 				//initV //f only
-	Params.FITINIT[3][5] = 0.2; //initV
-	Params.FITINIT[3][6] = 0.2; //initV
-	Params.FITINIT[3][7] = 0.000000000001;				 //initV //control
-	Params.FITINIT[3][8] = 0.001000; //initR
-	Params.FITINIT[3][9] = 0.000725; //initR
-	Params.FITINIT[3][10] = 0.001000; //initR
-	Params.FITINIT[3][11] = 0.001000; //initR
+	Params.FITINIT[3][0] = 23.222506; //initS
+	Params.FITINIT[3][1] = 38.704336; //initS
+	Params.FITINIT[3][2] = 19.935813; //initS
+	Params.FITINIT[3][3] = 71.193444; //initS
+	
+	Params.FITINIT[3][4] = 1e-10; 				//initV //f only //fixed
+	Params.FITINIT[3][5] = 0.2; //initV //fixed
+	Params.FITINIT[3][6] = 0.2; //initV //fixed
+	Params.FITINIT[3][7] = 1e-10;				 //initV //control //fixed
+
+	Params.FITINIT[3][8] = 0.002670; //initR
+	Params.FITINIT[3][9] = 0.007229; //initR
+	Params.FITINIT[3][10] = 0.008428; //initR
+	Params.FITINIT[3][11] = 0.001467; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 31.00000; //initS
-	Params.FITINIT[4][4] = 0.100496; //initV
-	Params.FITINIT[4][8] = 	0.000500; //initR
+	Params.FITINIT[4][0] = 10.000010; //initS
+	Params.FITINIT[4][4] = 0.100000; //initV
+	Params.FITINIT[4][8] = 0.000500; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 19.00000; //initS
-	Params.FITINIT[5][4] = 0.200000; //initV
-	Params.FITINIT[5][8] = 0.0000000000000000001; //initR
+	Params.FITINIT[5][0] = 8.000010; //initS
+	Params.FITINIT[5][4] = 0.450000; //initV
+	Params.FITINIT[5][8] = 1e-15; //initR //fixed
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 82.958713; //initS
-	Params.FITINIT[6][4] = 0.100000; //initV
-	Params.FITINIT[6][8] = 0.007677; //initR
+	Params.FITINIT[6][0] = 127.196297; //initS
+	Params.FITINIT[6][4] = 0.477926; //initV
+	Params.FITINIT[6][8] = 0.000085; //initR
 
 	//dispersal parameters
-	Params.con_mgr 		= 0.194919;
-	Params.a 			= 0.157528;
-	Params.lar_mgr 		= .9999;
-	Params.a2			= .00000000001;
+	Params.con_mgr 		= 0.064027;
+	Params.a 			= 0.239177;
+	Params.lar_mgr 		= 0.484740;
+	Params.a2			= 0.324827;
 
 	//coinfection parameters
-	Params.coinf_V		= 0.080427;
-	Params.VFSus		= 10.000000;
+	Params.coinf_V		= 0.974978;
+	Params.VFSus		= 44.291905;
 
 	//stochasticity parameters
-	Params.Rsd_exp 		= 0.600000;
-	Params.Fsd_exp		= 0.300000;
-	Params.Rsd_obs		= 0.803463;
-	Params.Fsd_obs		= 2.000000;
+	Params.Rsd_exp 		= 1.668360;
+	Params.Fsd_exp		= 0.093596;
+	Params.Rsd_obs		= 1.082978;
+	Params.Fsd_obs		= 0.846732;
 
-	Params.muV			= 2.072811; 
+	Params.muV			= 0.39; //fixed
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -185,6 +189,8 @@ if(reals==1){
 	for(j=1; j<=DATA_SETS; j++){
 		//for(j=6; j<7; j++){
 			Params.j = j;
+
+			//printf("in j\n");
 
 			Params.miser_ticker = 1; //used to set initial adjustment
 
@@ -243,11 +249,9 @@ for (round=0;round<numround;round++){
 	a=0;
 
 	while (a<num_ltfparams){    
-		//experimental 
-		//if (a==0 | a==8 | a==9 | a==10 | a==11 | a==20 | a==21 | a==22 | a==23 | a==32 | a==33 | a==34 | a==35 | a==45 | a==46 | a==47 | a==48 ){ 
-		//if (a==8 | a==9 | a==10 | a==11 | a==45 | a==46 | a==47 | a==48){
 		//all
-		if (a == 0 | a == 8 | a == 20 | a == 21 | a == 22 | a == 23 | a == 32 | a == 33 | a == 34 | a == 35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 42 | a == 43 | a == 44 | a == 45 | a == 46 | a == 49 | a == 50 | a == 51 | a == 52 | a == 53 | a == 54 | a == 55){ 
+		//if (a == 0 | a == 8 | a == 20 | a == 21 | a == 22 | a == 23 | a == 32 | a == 33 | a == 34 | a == 35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 42 | a == 43 | a == 44 | a == 45 | a == 46 | a == 47 | a == 48 | a == 49 | a == 50 | a == 51 | a == 52 | a == 53 | a == 54 | a == 55){ 
+		if (a != 4 | a != 5 | a != 6 | a != 7 | a != 9 | a != 10 | a != 11 | a != 16 | a != 17 | a != 18 | a != 19 | a != 16 | a != 28 | a != 29 | a != 30 | a != 31 | a != 41 | a != 55){
 		//observationals
 		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 | a == 44 | a == 49 | a == 50){   
 		if (round>0){		
@@ -273,30 +277,30 @@ for (round=0;round<numround;round++){
 			//metapopulation one
 			Params.FITINIT[1][0] = ltf_params[0]; //initS
 			//printf("initS=%lf\n", ltf_params[0]);
-			Params.FITINIT[1][1] = ltf_params[0]; //initS
-			Params.FITINIT[1][2] = ltf_params[0]; //initS
-			Params.FITINIT[1][3] = ltf_params[0]; //initS
+			Params.FITINIT[1][1] = ltf_params[1]; //initS
+			Params.FITINIT[1][2] = ltf_params[2]; //initS
+			Params.FITINIT[1][3] = ltf_params[3]; //initS
 
-			Params.FITINIT[1][4] = 0.000000000001; 				//initV //fonly
+			Params.FITINIT[1][4] = 1e-10; 				//initV //fonly
 			Params.FITINIT[1][5] = 0.2; //initV
 			Params.FITINIT[1][6] = 0.2; //initV
-			Params.FITINIT[1][7] = 0.000000000001; 				//initV //control
+			Params.FITINIT[1][7] = 1e-10; 				//initV //control
 
 			Params.FITINIT[1][8] = ltf_params[8]; //initR //fonly
-			Params.FITINIT[1][9] = 0.0000000000000000000001; //initR //vonly //based on exp data
-			Params.FITINIT[1][10] = 0.0000000000000000000001; //initR //fv
-			Params.FITINIT[1][11] = 0.0000000000000000000001; //initR //control
+			Params.FITINIT[1][9] = 1e-15; //initR //vonly //based on exp data
+			Params.FITINIT[1][10] = 1e-15; //initR //fv
+			Params.FITINIT[1][11] = 1e-15; //initR //control
 
 			//metapopulation two
-			Params.FITINIT[2][0] = ltf_params[0]; //initS
-			Params.FITINIT[2][1] = ltf_params[0]; //initS
-			Params.FITINIT[2][2] = ltf_params[0]; //initS
-			Params.FITINIT[2][3] = ltf_params[0]; //initS
+			Params.FITINIT[2][0] = ltf_params[12]; //initS
+			Params.FITINIT[2][1] = ltf_params[13]; //initS
+			Params.FITINIT[2][2] = ltf_params[14]; //initS
+			Params.FITINIT[2][3] = ltf_params[15]; //initS
 
-			Params.FITINIT[2][4] = 0.000000000001; 				//initV //fonly
+			Params.FITINIT[2][4] = 1e-10; 				//initV //fonly
 			Params.FITINIT[2][5] = 0.2; //initV
 			Params.FITINIT[2][6] = 0.2; //initV
-			Params.FITINIT[2][7] = 0.000000000001; 				//initV //control
+			Params.FITINIT[2][7] = 1e-10; 				//initV //control
 
 			Params.FITINIT[2][8] = ltf_params[20]; //initR //fonly
 			Params.FITINIT[2][9] = ltf_params[21]; //initR //vonly
@@ -304,15 +308,15 @@ for (round=0;round<numround;round++){
 			Params.FITINIT[2][11] = ltf_params[23]; //initR //control
 
 			//metapopulation three
-			Params.FITINIT[3][0] = ltf_params[0]; //initS
-			Params.FITINIT[3][1] = ltf_params[0]; //initS
-			Params.FITINIT[3][2] = ltf_params[0]; //initS
-			Params.FITINIT[3][3] = ltf_params[0]; //initS
+			Params.FITINIT[3][0] = ltf_params[24]; //initS
+			Params.FITINIT[3][1] = ltf_params[25]; //initS
+			Params.FITINIT[3][2] = ltf_params[26]; //initS
+			Params.FITINIT[3][3] = ltf_params[27]; //initS
 
-			Params.FITINIT[3][4] = 0.000000000001; 				//initV //f only
+			Params.FITINIT[3][4] = 1e-10; 				//initV //f only
 			Params.FITINIT[3][5] = 0.2; //initV
 			Params.FITINIT[3][6] = 0.2; //initV
-			Params.FITINIT[3][7] = 0.000000000001;				 //initV //control
+			Params.FITINIT[3][7] = 1e-10;				 //initV //control
 
 			Params.FITINIT[3][8] = ltf_params[32]; //initR //fonly
 			Params.FITINIT[3][9] = ltf_params[33]; //initR //vonly
@@ -327,7 +331,7 @@ for (round=0;round<numround;round++){
 			//metapopultion five
 			Params.FITINIT[5][0] = ltf_params[39]; //initS
 			Params.FITINIT[5][4] = ltf_params[40]; //initV
-			Params.FITINIT[5][8] = 0.0000000000000000000001; //initR
+			Params.FITINIT[5][8] = 1e-15; //initR
 
 			//metapopultion six
 			Params.FITINIT[6][0] = ltf_params[42]; //initS
@@ -350,7 +354,7 @@ for (round=0;round<numround;round++){
 			Params.Rsd_obs		= ltf_params[53];
 			Params.Fsd_exp		= ltf_params[54];
 
-			Params.muV			= ltf_params[55];
+			Params.muV			= 0.39; //Fuller 2012
 			//printf("proposal muV=%lf\n", Params.muV);
 			}
 
@@ -452,9 +456,8 @@ for (round=0;round<numround;round++){
 		double meta_err=0;
 		double lhood_total=0;
 		double lhood_reps=0;
-	
 
-		calls=200;					//number of stochastic simulations for each parameter and IC set //100-300
+		calls=100;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		for(j=1; j<DATA_SETS; j++){
 			Params.j = j;
@@ -521,22 +524,25 @@ for (round=0;round<numround;round++){
 		ltf_params[c]=localmax_params[c];
 	}
 	} //only params we want to fit
-	a++; //move to next parameter
-	//printf("a=%i\n", a);	
+	a++; //move to next parameter	
 	} //a
-
-	int print_len = 27;
-	int printlist[27] = {0,8,20,21,22,23,32,33,34,35,36,37,38,39,40,42,43,44,45,46,49,50,51,52,53,54,55};
+	/*
+	//prints subset
+	int print_len = 29;
+	int printlist[29] = {0,8,20,21,22,23,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,49,50,51,52,53,54,55};
 	int index;
 	for(ii=0; ii<print_len; ii++){
 		index = printlist[ii];
 		fprintf(fpv, "%lf\t", ltf_params[index]);
+	}*/
+	//prints all
+	for(ii=0; ii<num_ltfparams; ii++){
+		fprintf(fpv, "%lf\t", ltf_params[ii]);
 	}
 
 	fprintf(fpv, "%lf\t", best_posterior);
 	//printf("final best posterior = %lf\n", best_posterior);
 	fprintf(fpv, "\n");
-	//printf("flag-flag = %i\n", flag_flag);
 }
 
 //fclose(fpl);

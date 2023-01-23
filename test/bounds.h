@@ -5,9 +5,9 @@ double high;
 
 //metapopulation one
 if (i==0)			{	low = 1e-5;			high = 100;		}	//initS fungus-only
-else if (i==1)		{	low = 70;			high = 140;		}	//initS virus-only
-else if (i==2)		{	low = 70;			high = 140;		}	//initS fungus-virus
-else if (i==3)		{	low = 70;			high = 140;		}	//initS control
+else if (i==1)		{	low = 1e-5;			high = 100;		}	//initS virus-only
+else if (i==2)		{	low = 1e-5;			high = 100;		}	//initS fungus-virus
+else if (i==3)		{	low = 1e-5;			high = 100;		}	//initS control
 
 else if (i==4)		{	low = 0;			high = 0.01;	}	//initV fungus-only
 else if (i==5)		{	low = 0;			high = 0.2;		}	//initV virus-only
@@ -20,10 +20,10 @@ else if (i==10)		{	low = 0;			high = 0.01;	}	//initR fungus-virus
 else if (i==11)		{	low = 0;			high = 0.01;	}	//initR control
 
 //metapopulation two
-else if (i==12)		{	low = 70;			high = 140;		}	//initS fungus-only
-else if (i==13)		{	low = 70;			high = 140;		}	//initS virus-only
-else if (i==14)		{	low = 70;			high = 140;		}	//initS fungus-virus
-else if (i==15)		{	low = 70;			high = 140;		}	//initS control
+else if (i==12)		{	low = 1e-5;			high = 100;		}	//initS fungus-only
+else if (i==13)		{	low = 1e-5;			high = 100;		}	//initS virus-only
+else if (i==14)		{	low = 1e-5;			high = 100;		}	//initS fungus-virus
+else if (i==15)		{	low = 1e-5;			high = 100;		}	//initS control
 
 else if (i==16)		{	low = 0;			high = 0.01;	}	//initV fungus-only
 else if (i==17)		{	low = 0;			high = 0.2;		}	//initV virus-only
@@ -36,10 +36,10 @@ else if (i==22)		{	low = 0;			high = 0.01;	}	//initR fungus-virus
 else if (i==23)		{	low = 0;			high = 0.01;	}	//initR control
 
 //metapopulation three
-else if (i==24)		{	low = 70;			high = 140;		}	//initS fungus-only
-else if (i==25)		{	low = 70;			high = 140;		}	//initS virus-only
-else if (i==26)		{	low = 70;			high = 140;		}	//initS fungus-virus
-else if (i==27)		{	low = 70;			high = 140;		}	//initS control
+else if (i==24)		{	low = 1e-5;			high = 100;		}	//initS fungus-only
+else if (i==25)		{	low = 1e-5;			high = 100;		}	//initS virus-only
+else if (i==26)		{	low = 1e-5;			high = 100;		}	//initS fungus-virus
+else if (i==27)		{	low = 1e-5;			high = 100;		}	//initS control
 
 else if (i==28)		{	low = 0;			high = 0.01;	}	//initV fungus-only
 else if (i==29)		{	low = 0;			high = 0.2;		}	//initV virus-only
@@ -52,38 +52,73 @@ else if (i==34)		{	low = 0;			high = 0.01;	}	//initR fungus-virus
 else if (i==35)		{	low = 0;			high = 0.01;	}	//initR control
 
 //metapopulation four
-else if (i==36)		{	low = 1;			high = 150;		} 	//initS
-else if (i==37)		{	low = 0;			high = 0.2;		} 	//initV
+else if (i==36)		{	low = 1e-5;			high = 150;		} 	//initS
+else if (i==37)		{	low = 0;			high = 0.5;		} 	//initV
 else if (i==38)		{	low = 0;			high = 0.01;	} 	//initR
 
 //metapopulation five
-else if (i==39)		{	low = 1;			high = 20;		} 	//initS
-else if (i==40)		{	low = 0;			high = 0.2;		} 	//initV
+else if (i==39)		{	low = 1e-5;			high = 20;		} 	//initS
+else if (i==40)		{	low = 0;			high = 0.5;		} 	//initV
 else if (i==41)		{	low = 0;			high = 0.01;	} 	//initR
 
 //metapopulation six
-else if (i==42)		{	low = 1;			high = 200;		} 	//initS
+else if (i==42)		{	low = 1e-5;			high = 200;		} 	//initS
 else if (i==43)		{	low = 0;			high = 0.5;		} 	//initV
 else if (i==44)		{	low = 0;			high = 0.01;	} 	//initR
 
-//dispersal
+//conidia dispersal
 else if (i==45)		{	low = 0;			high = 1;		} 	//con_mgr //rate of conidia dispersal
-else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter conidia
+else if (i==46)		{	low = 0;			high = .5;		}	//a //distance dispersal parameter conidia
+
+//larval dispersal
+//meta 1
 else if (i==47)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
-else if (i==48)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==48)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==49)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==50)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+
+else if (i==51)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==52)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==53)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==54)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+
+//meta 2
+else if (i==55)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==56)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==57)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==58)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+
+else if (i==59)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==60)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==61)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==62)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+
+//meta 3
+else if (i==63)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==64)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==65)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+else if (i==66)		{	low = 0;			high = 1;		}	//lar_mgr //rate of larval dispersal
+
+else if (i==67)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==68)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==69)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
+else if (i==70)		{	low = 0;			high = .5;		} 	//a2 //distance dispersal parameter larvae
 
 //coifection
-else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==50) 	{	low = 0;			high = 100;		}	//VFSus //enhanced susceptibility 
+else if (i==71) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==72) 	{	low = 0;			high = 50;		}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (i==51)		{	low = 0;			high = 2;		}	//Rsd_exp
-else if (i==52)		{	low = 0;			high = 2;		}	//Fsd_exp
-else if (i==53)		{	low = 0;			high = 2;		}	//Rsd_obs
-else if (i==54)		{	low = 0;			high = 2;		}	//Fsd_obs
+else if (i==73)		{	low = 0;			high = 2;		}	//Rsd_exp
+else if (i==74)		{	low = 0;			high = 2;		}	//Fsd_exp
+else if (i==75)		{	low = 0;			high = 2;		}	//Rsd_obs
+else if (i==76)		{	low = 0;			high = 2;		}	//Fsd_obs
 
 //virus 
-else if (i==55)		{	low = 0;			high = 3;		}	//decay rate
+else if (i==77)		{	low = 0;			high = 3;		}	//decay rate
+else if (i==78)		{	low = 0.5;			high = 4;		}	//heterogeneity
+
+else if (i==79)		{	low = 0;			high = 0.001;	} 	//fungus transmission //check this
 
 if		(j==1)	return low;
 else if (j==2)	return high;
@@ -157,24 +192,60 @@ else if (i==42)		{	step_size = 5;	}	//initS
 else if (i==43)		{	step_size = 0.05;	}  	//initV
 else if (i==44)		{	step_size = 0.0005;	}	//initR
 
-//dispersal
+//conidia dispersal
 else if (i==45)		{	step_size = 0.5;	}  	//con_mgr //rate of conidia dispersal
-else if (i==46)		{	step_size = 0.5;	} 	//a //distance dispersal parameter
-else if (i==47)		{	step_size = 0.5;	}	//lar_mgr //prob of dispersal
-else if (i==48)		{	step_size = 0.5;	}	//a2 //prob of dispersal
+else if (i==46)		{	step_size = 0.005;	} 	//a //distance dispersal parameter
+
+//larval dispersal
+//meta 1
+else if (i==47)		{	step_size = 0.5;		}	//lar_mgr //rate of larval dispersal
+else if (i==48)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+else if (i==49)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+else if (i==50)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+
+else if (i==51)		{	step_size = 0.005;		} 	//a2 //distance dispersal parameter larvae
+else if (i==52)		{	step_size = 0.005;		} 	//a2 //distance dispersal parameter larvae
+else if (i==53)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
+else if (i==54)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
+
+//meta 2
+else if (i==55)		{	step_size = 0.5;		}	//lar_mgr //rate of larval dispersal
+else if (i==56)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+else if (i==57)		{	step_size = 0.5;		}	//lar_mgr //rate of larval dispersal
+else if (i==58)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+
+else if (i==59)		{	step_size = 0.005;		} 	//a2 //distance dispersal parameter larvae
+else if (i==60)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
+else if (i==61)		{	step_size = 0.005;		} 	//a2 //distance dispersal parameter larvae
+else if (i==62)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
+
+//meta 3
+else if (i==63)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+else if (i==64)		{	step_size = 0.5;			}	//lar_mgr //rate of larval dispersal
+else if (i==65)		{	step_size = 0.5;		}	//lar_mgr //rate of larval dispersal
+else if (i==66)		{	step_size = 0.5;		}	//lar_mgr //rate of larval dispersal
+
+else if (i==67)		{	step_size = 0.005;		} 	//a2 //distance dispersal parameter larvae
+else if (i==68)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
+else if (i==69)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
+else if (i==70)		{	step_size = 0.005;	} 	//a2 //distance dispersal parameter larvae
 
 //coifection
-else if (i==49) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==50) 	{	step_size = 5;	}	//VFSus //enhanced susceptibility 
+else if (i==71) 	{	step_size = .01;	}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==72) 	{	step_size = 2;	}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (i==51)		{	step_size = .1;	}	//Rsd_exp
-else if (i==52)		{	step_size = .1;	}	//Fsd_exp
-else if (i==53)		{	step_size = .1;	}	//Rsd_obs
-else if (i==54)		{	step_size = .1;	}	//Fsd_obs
+else if (i==73)		{	step_size = .1;	}	//Rsd_exp
+else if (i==74)		{	step_size = .1;	}	//Fsd_exp
+else if (i==75)		{	step_size = .1;	}	//Rsd_obs
+else if (i==75)		{	step_size = .1;	}	//Fsd_obs
 
 //virus
-else if (i==55)		{	step_size = 0.1;	}	//virus decay
+else if (i==77)		{	step_size = 0.1;	}	//virus decay
+
+else if (i==78)		{	step_size = 0.2;	} 	//heterogeneity
+
+else if (i==79)		{	step_size = 0.00005;	}	//fungus transmission
 
 return step_size;
 }
@@ -247,25 +318,60 @@ else if (i==42)		{	low = 0;			high = 5000;	} 	//initS
 else if (i==43)		{	low = 0;			high = 1;		} 	//initV
 else if (i==44)		{	low = 0;			high = 1;		} 	//initR
 
-//dispersal
+//conidia dispersal
 else if (i==45)		{	low = 0;			high = 10000;	} 	//con_mgr //rate of conidia dispersal
 else if (i==46)		{	low = 0;			high = 1;		}	//a //distance dispersal parameter conidia
-else if (i==47)		{	low = 0;			high = 10000;	}	//lar_mgr //prob of dispersal
-else if (i==48)		{	low = 0;			high = 1;		}	//a2 //distance dispersal parameter larvae
 
+//larval dispersal
+//meta 1
+else if (i==47)		{	low = 0;			high = 10000;		}	//lar_mgr //rate of larval dispersal
+else if (i==48)		{	low = 0;			high = 10000;		}	//lar_mgr //rate of larval dispersal
+else if (i==49)		{	low = 0;			high = 10000;	}	//lar_mgr //rate of larval dispersal
+else if (i==50)		{	low = 0;			high = 10000;		}	//lar_mgr //rate of larval dispersal
+
+else if (i==51)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==52)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==53)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==54)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+
+//meta 2
+else if (i==55)		{	low = 0;			high = 10000;	}	//lar_mgr //rate of larval dispersal
+else if (i==56)		{	low = 0;			high = 10000;		}	//lar_mgr //rate of larval dispersal
+else if (i==57)		{	low = 0;			high = 10000;	}	//lar_mgr //rate of larval dispersal
+else if (i==58)		{	low = 0;			high = 10000;			}	//lar_mgr //rate of larval dispersal
+
+else if (i==59)		{	low = 0;			high = 1;			} 	//a2 //distance dispersal parameter larvae
+else if (i==60)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==61)		{	low = 0;			high = 1;			} 	//a2 //distance dispersal parameter larvae
+else if (i==62)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+
+//meta 3
+else if (i==63)		{	low = 0;			high = 10000;			}	//lar_mgr //rate of larval dispersal
+else if (i==64)		{	low = 0;			high = 10000;			}	//lar_mgr //rate of larval dispersal
+else if (i==65)		{	low = 0;			high = 10000;		}	//lar_mgr //rate of larval dispersal
+else if (i==66)		{	low = 0;			high = 10000;		}	//lar_mgr //rate of larval dispersal
+
+else if (i==67)		{	low = 0;			high = 1;			} 	//a2 //distance dispersal parameter larvae
+else if (i==68)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==69)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
+else if (i==70)		{	low = 0;			high = 1;		} 	//a2 //distance dispersal parameter larvae
 
 //coifection
-else if (i==49) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
-else if (i==50) 	{	low = 0;			high = 10000;	}	//VFSus //enhanced susceptibility 
+else if (i==71) 	{	low = 0;			high = 1;		}	//coinf_V //coinfecteds produce what proportion of OBs/conidia
+else if (i==72) 	{	low = 0;			high = 10000;	}	//VFSus //enhanced susceptibility 
 
 //stochasticity
-else if (i==51)		{	low = 0;			high = 10;		}	//Rsd_exp
-else if (i==52)		{	low = 0;			high = 10;		}	//Fsd_exp
-else if (i==53)		{	low = 0;			high = 10;		}	//Rsd_obs
-else if (i==54)		{	low = 0;			high = 10;		}	//Fsd_obs
+else if (i==73)		{	low = 0;			high = 10;		}	//Rsd_exp
+else if (i==74)		{	low = 0;			high = 10;		}	//Fsd_exp
+else if (i==75)		{	low = 0;			high = 10;		}	//Rsd_obs
+else if (i==76)		{	low = 0;			high = 10;		}	//Fsd_obs
 
 //virus
-else if (i==55)		{	low = 0;			high = 5;		} 	//virus decay rate
+else if (i==77)		{	low = 0;			high = 5;		} 	//virus decay rate
+
+else if (i==78) 	{	low = 0;			high = 10;		}	//heterogeneity
+
+else if (i==79) 	{	low = 0;			high = 1;		}	//fungus transmission
 
 if		(j==1)	return low;
 else if (j==2)	return high;
@@ -606,4 +712,3 @@ for (i=1;i<=num_adj_pars;i++)	{
 }
 
 }
-

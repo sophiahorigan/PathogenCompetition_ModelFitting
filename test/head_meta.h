@@ -38,7 +38,7 @@ int lhood_adj = 0;		//adjustment for likelihood in and out of log scale
 const double h = 0.01;		        // time step
 
 //double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
-double squareCVV=0.86*0.86;
+//double squareCVV=0.86*0.86;
 
 double exposetime = 16;
 double VFtime=10;
@@ -178,12 +178,17 @@ typedef struct
 	//dispersal
 	double con_mgr; //0
 	double a;		//1
-	double lar_mgr;	//2
-	double a2;
+	double lar_mgr[DATA_SETS][4];	//2
+	double a2[DATA_SETS][4];
 
 	//virus decay
 	double muV;
+	//heterogeneity
+	double CV;
+	//fungus transmission
+	double specific_nuF;
 
+	//coinfection
 	double VFSus;
 	double coinf_V;
 
@@ -197,7 +202,7 @@ typedef struct
 	double lhood_adjust[DATA_SETS+1];
 	double bestlhood[DATA_SETS+1];
 	int miser_ticker;
-	int miser2_flag;
+	double miser2_flag;
 
 
 }STRUCTURE;

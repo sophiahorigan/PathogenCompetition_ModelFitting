@@ -52,7 +52,7 @@ if (j==4 || j==5 || j==6) { // obs data
 	//printf("In loop two num_sub = %i\n", num_sub);
 }
 
-int larvae_dispersal_on = 0; //set to 0 for no dispersal
+int larvae_dispersal_on = 1; //set to 0 for no dispersal
 
 //printf("numsub = %i", num_sub);
 
@@ -75,9 +75,13 @@ double y_ode[DIM]; //**SH** this holds
 double rand_nuR[MAXT3];
 double rand_nuF[MAXT3];
 
+//to do-- fix these locally
+//separate fixed from fit parameters
+//remove excess unused code
 double ave_R = Params->PARS[50+pop];
 double specific_muF = Params->PARS[6];   //general intercept for MAX TEMP decay function for conidia
-double specific_nuF = Params->PARS[3];   //Site-specific infection rate for conidia
+//double specific_nuFF = Params->PARS[3];   //Site-specific infection rate for conidia
+//printf("specific_nuF = %lf\n", specific_nuFF); //was 0.000241
 double rain_P = Params->PARS[21];  //fit param used to scale accumulating rain.
 double rain_P2 = Params->PARS[26];  //fit param used to scale accumulating rain.
 double rain_P3 = Params->PARS[29];  //fit param used to scale accumulating rain.
@@ -227,6 +231,7 @@ if (j==4 || j==5 || j==6){
 	INITS[0] = Params->FITINIT[j][0];
 	INITV[0] = Params->FITINIT[j][4];
 	INITR[0] = Params->FITINIT[j][8];
+	//printf("j=%i\t S=%lf\t V=%lf\t R=%lf\n", j, INITS[0], INITV[0], INITR[0]);
 }
 
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
@@ -234,23 +239,27 @@ if (j==4 || j==5 || j==6){
 //single epizootic state params
 //printf("numsub = %i\n", num_sub);
 for(i=0; i<num_sub; i++){ 
-	S[i] = INITS[i];
-	V[i] = INITV[i]; 
-	C[i] = 0;
-	R[i] = INITR[i];
+	S[i] = INITS[i]; //host density
+	V[i] = 0; //virus cadavers
+	C[i] = 0; //conidia 
+	R[i] = INITR[i]; //resting spores
 	//printf("J = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
-
-	for (ii=1;ii<=n2;ii++){ //SH ASK GREG: WHY DOES THIS START AT 1
+	for (ii=1;ii<=n1;ii++){ //early virus infected
+		if (ii==1){
+			E_VF[i][ii] = INITV[i];
+		}
+		else{
+			E_VF[i][ii]=0; //initial virus infection set by experimental setup
+		}
+		//printf("sub = %i\t ii = %i\t EVF = %lf\n", i, ii, E_VF[i][ii]);
+	}
+	for (ii=1;ii<=n2;ii++){ //late virus infected
 		E_V[i][ii]=0;
 	}
-	for (ii=1;ii<=n1;ii++){
-		E_VF[i][ii]=0;
-	}
-	for (ii=1;ii<=gstepsF;ii++){
+	for (ii=1;ii<=gstepsF;ii++){ //fungus and coinfected
 		E_F[i][ii]=0;
 		E_FV[i][ii]=0;
 	}
-
 	IF[i]=0;
 	IV[i]=0;
 	IVF[i]=0;
@@ -355,26 +364,22 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	
 	//indexing variables
 	int sub;
-	int sub_index[num_sub];
-	int max_class = m+n+7+gstepsF;
-	sub_index[0] = 0; //treatment 1 index addition is zero
-	for(sub=1; sub<num_sub; sub++){	//create sub array 
-		sub_index[sub] = sub_index[sub-1]+ max_class; //SH can maybe multiply 
-		//printf("sub_index=%i", sub_index[sub]);
-	}
+	const int sub_index[4] = {0, 127, 254, 381};
 
 
 	// -------------------------- integrate until next stoppage event ---------------------------------- //
 
 	while (t<t_next)	{
 
-	//-------------------------------------- LARVAE DISPERSAL -------------------------------------------//
-						
-	if(larvae_dispersal_on == 1){ //turn off at declaration at top of script
+//---------------------- LARVAL DISPERSAL ----------------------------//
+	if(day-1<8){ //dispersal only occurs as first instars, 1 week
 		
-		if(day-1<8){ //dispersal only occurs as first instars, 1 week
+		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+		
+			if(larvae_dispersal_on == 1){
+			
 			//printf("day = %i\n", day-1);
-			if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+			
 				//indexing
 				int subout;
 				int subin;
@@ -386,44 +391,64 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 				double disp = 0;
 		
 				//initialize dispersal array
-				for(subin=0, subin<num_sub, subin++){
+				for(sub=0; sub<num_sub; sub++){
 					for(i=1;i<=n1;i++){
-						netVFout[subin][i] = 0;
-						netVFin[subin][i] = 0;
+						netVFout[sub][i] = 0;
+						netVFin[sub][i] = 0;
 					}
-					for (i=1;i<=n2;i++)	{
-						netVout[subin][i] = 0;
-						netVin[subin][i] = 0;
+					for (ii=1;ii<=n2;ii++)	{
+						netVout[sub][ii] = 0;
+						netVin[sub][ii] = 0;
+					}
 				}
-			
+
 				for(subout = 0; subout < num_sub; subout++){ //for i
+				//printf("subout loop subout = %i\n", subout);
 					//printf("subout = %i\n", subout);
 					for(subin = 0; subin < num_sub; subin++){ //for j
+					//printf("subin loop subin = %i\n", subin);
 						if(subout != subin){
+							//printf("subout = %i\t subin = %i\n", subout, subin);
 							for (i=1;i<=n1;i++)	{ //for each exposed class
-								disp = E_VF[subout]*Params->lar_mgr*exp(-Params->a2*Params->DISTANCE[j][subout][subin]);
-								netVFout[subout][i] = netVFout[subout][i] - disp;
+								disp = E_VF[subout][i]*Params->lar_mgr[j][subout]*exp(-Params->a2[j][subout]*Params->DISTANCE[j][subout][subin]);
+								//printf("j = %i\t subout = %i\t subin = %i\t distance = %i\n", j, subin, subout, Params->DISTANCE[j][subout][subin]);
+								//printf("Evf = %lf\t larmgr = %lf\t a = %lf\t distance = %i\t exp = %lf\n",E_VF[subout][i], Params->lar_mgr, Params->a2, Params->DISTANCE[j][subout][subin], exp(-Params->a2*Params->DISTANCE[j][subout][subin]));
+								//printf("disp out VF = %lf\n", disp);
+								//printf("j=%i\t subout=%i\t larmgr=%lf\t a2=%lf\n", j, subout, Params->lar_mgr[j][subout], Params->a2[j][subout]);
+								netVFout[subout][i] = netVFout[subout][i] + disp;
 								netVFin[subin][i] = netVFin[subin][i] + disp;
+								//printf("netvfout = %lf\t netfvin = %lf\n",netVFout[subout][i],netVFin[subin][i]);
+								//printf("n1 loop n1 = %i\n", i);
 							}
-							for (i=1;i<=n2;i++)	{
-								disp = E_V[subout]*Params->lar_mgr*exp(-Params->a2*Params->DISTANCE[j][subout][subin]);
-								netVout[subout][i] = netVout[subout][i] - disp;
-								netVin[subin][i] = netVin[subin][i] + disp;
+							for (ii=1;ii<=n2;ii++)	{
+								disp = E_V[subout][ii]*Params->lar_mgr[j][subout]*exp(-Params->a2[j][subout]*Params->DISTANCE[j][subout][subin]);
+								//printf("disp out V = %lf", disp);
+								netVout[subout][ii] = netVout[subout][ii] + disp;
+								netVin[subin][ii] = netVin[subin][ii] + disp;
+								//printf("netvout = %lf\t netvin = %lf\n",netVout[subout][i],netVin[subin][i]);
+								//printf("n2 loop n2 = %i\n", ii);
 							}
+						}
+						else{
+							//printf("done! subout = %i\t subin = %i\n", subin, subout);
 						}
 					}
 				}
 				for(sub=0; sub<num_sub; sub++){ //update larval density
+				//printf("UPDATES = %i\t subindex sub = %i\n", sub, sub_index[sub]);
+				//printf("made it in?\n");
 					for (i=1;i<=n1;i++)	{ //for each exposed class
 						E_VF[sub][i] = E_VF[sub][i] + netVFin[sub][i] - netVFout[sub][i];
+						//printf("EVF = %lf\n", E_VF[sub][i]);
 					}
 					for (i=1;i<=n2;i++)	{
 						E_V[sub][i] = E_V[sub][i] + netVin[sub][i] - netVout[sub][i];
+						//printf("EV = %lf\n", E_V[sub][i]);
 					}
 				}
 			} 
 		}
-	}	                        
+	}	                        	
 		
 		//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
 		//printf("day = %i\n", day);
@@ -433,12 +458,12 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 			//printf("y_ode[%i] = %e\n", sub_index[sub], y_ode[0+sub_index[sub]]);
 			y_ode[m+n+3+sub_index[sub]]=V[sub];
 			
-			for (i=1;i<=gstepsF;i++)	{
-				y_ode[i+sub_index[sub]]=E_F[sub][i];
-			}
 			for (i=1;i<=n1;i++)	{
 				y_ode[gstepsF+i+sub_index[sub]]=E_VF[sub][i];
-				//printf("sub = %i\t EVF = %lf\n", sub, E_VF[sub][i+sub_index[sub]]);
+				//printf("sub = %i\t i = %i\t EVF = %lf\n", sub, i, E_VF[sub][i+sub_index[sub]]);
+			}
+			for (i=1;i<=gstepsF;i++)	{
+				y_ode[i+sub_index[sub]]=E_F[sub][i];
 			}
 			for (i=1;i<=n2;i++)	{
 				y_ode[gstepsF+n1+i+sub_index[sub]]=E_V[sub][i];
@@ -470,7 +495,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
 
 
-	nuF2 = specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
+	nuF2 = Params->specific_nuF*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
 	if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
 	Params->nuF = (DD10/fourth_size)*nuF2;
 
@@ -512,9 +537,10 @@ for(k=0; k<DIM; k++){
 
 //update state variables
 	for(sub=0; sub<num_sub; sub++){
-		S[sub]=y_ode[0+sub_index[sub]]; //SH ASK GREG: FOR OBS SITE, THIS ISN'T GETTING UPDATED
+		S[sub]=y_ode[0+sub_index[sub]]; 
 		//printf("POSTODES[%i] = %e\n", sub, S[sub]);
 		C[sub]=y_ode[m+n+1+sub_index[sub]]; //fungus cadavers?
+		//printf("post ode C[%i\t] = %lf\n", sub, C[sub]);
 		V[sub]=y_ode[m+n+3+sub_index[sub]]; //virus cadavers?
 		//printf("sub = %i\t V = %lf\n",sub, V[sub]);
 		Fnext[sub]=y_ode[m+n+2+sub_index[sub]];			
@@ -541,13 +567,11 @@ for(k=0; k<DIM; k++){
 		for (i=1;i<=gstepsF;i++)	{
 			E_F[sub][i]=y_ode[i+sub_index[sub]];
 			IF[sub] += E_F[sub][i];
-			//printf("EF = %lf\t IF = %lf\n", E_F[sub][i], IF[sub]);
 		}
 
 		for (i=1;i<=n1;i++)	{ //early virus infections which can be coinfected
 			E_VF[sub][i]=y_ode[gstepsF+i+sub_index[sub]];
 			IVF[sub] += E_VF[sub][i];
-			//printf("E_VF = %lf\t IVF = %lf\n", E_VF[sub][i], IVF[sub]);
 		}
 
 		for (i=1;i<=n2;i++)	{
@@ -562,10 +586,7 @@ for(k=0; k<DIM; k++){
 			IFV[sub] += E_FV[sub][i];
 			//printf("j = %i\t sub = %i\t IF = %lf\t IV = %lf\t IVF = %lf\n",j, sub, IF[sub], IV[sub], IFV[sub]);
 		}
-		if(E_V[sub] < 0 || E_VF[sub] < 0 || E_FV[sub] < 0 || E_F[sub] < 0){
-			//printf("NEGATIVE EXPOSED CLASS!! ERROR!");
-		}
- 
+
 	}
 	//printf("day = %i\t j = %i\t sub = %i\t IF = %lf\t IV = %lf\t IVF = %lf\n",day, j, sub, IF[sub], IV[sub], IFV[sub]);
 

@@ -5,17 +5,11 @@ STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
 //variables constant across treatments, priors from CK 
-
-//printf("nuV=%lf\n", nuV); //CHECK
-
-
-double nuV 		= Params->nuV; //fitting //used to be 0.64
-
+double nuV		= Params->PARS[2]; //virus transmission
 double nuF		= Params->nuF;	//conidia transmission	//Params->PARS[3];
 double nuR		= Params->nuR;	//resting spore transmission
 
-double muF		= Params->muF;  
-
+double muF		= Params->muF;  //CK//  Using the site-specific muF that was loaded up in DDEVF14
 double lambdaV = 1/exposetime;
 double lambdaF = Params->PARS[18];		// decay rate of E_V and E_F
 VFPass = exposetime-1/Params->PARS[18];
@@ -91,19 +85,20 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
 	if (j==1 || j==2 || j==3) { 
 
+	//only for datasets with subpopulations
+		//printf("I'm in the dispersal loop! j = %i\n", j);
+		
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
-			
-			netCout[subout] = ((Params->m_c_sub[j][subout] * 2.0 * M_PI)/Params->a_c_pop) * y[m+n+1+sub_index[subout]];
-
 			for(subin = 0; subin < num_sub; subin++){
-
 				if(subout != subin){
-
-					netCin[subin] += y[m+n+1+sub_index[subout]] * Params->m_c_sub[j][subout] * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
-
+					//printf("subout = %i\t subin = %i\n", subout, subin);
+					disp = y[m+n+1+sub_index[subout]]*Params->con_mgr[j][subout]*exp(-Params->a[j][subout]*Params->DISTANCE[j][subout][subin]);
+					//printf("disp=%e\n", disp);
+					//printf("dydt = %e\n", dydt[m+n+1+sub_index[sub]]);
+					netCout[subout] = netCout[subout] + disp;
+					netCin[subin] = netCin[subin] + disp;
 				}
-
-			} 
+			} //add net in and net out within dydt equations below
 		}
 	}
 }

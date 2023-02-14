@@ -1,5 +1,4 @@
 #include "head_meta.h"
-#include <mpi.h>
 gsl_rng *r;
 //-----------------------Dot Product-----------------------//
 float DotProduct (int Length, double *Holder, double *PCA)
@@ -18,19 +17,10 @@ float DotProduct (int Length, double *Holder, double *PCA)
 
 int main(void)
 {
-
-//MPI Environment Setup
-MPI_Init(NULL, NULL);
-
-int world_rank;
-MPI_Comm_size(MPI_COMM_WORLD, &world_rank);
-int world_size;
-MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-
-
-int linesearch = 1;
+//printf("hello world");
+int linesearch = 0;
 int mcmc = 0;
-int reals = 0;
+int reals = 1;
 
 STRUCTURE Params;
 
@@ -39,7 +29,7 @@ int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is 
 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
 int i=0; int j;int ii; int jj; int k; int l; 
-int num_adj_pars = 107;			// number of adjustable parameters
+int num_adj_pars = 104;			// number of adjustable parameters
 int epi_length = 48;
 
 inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
@@ -64,14 +54,6 @@ r_seed=random_setup();
 
 //----------------------------------Set-Up Line Search------------------------//
 
-//MPI setup
-i = world_rank % DATA_SETS;
-site_curr[i]++;
-MPI_Reduce(&site_curr, &site_reps, sites, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); //taking info across cores and compiling for root //0 is the root node
-MPI_Bcast(site_reps, sites, MPI_INT, 0, MPI_COMM_WORLD); 
-
-double site_lhoods[site_reps[0]];
-
 //set initial likelihood adjustment values
 int searches = 8;
 int round;
@@ -79,10 +61,11 @@ int numround = 3;
 int calls;
 size_t dim;
 
-int num_ltfparams = 107;	//number of parameters to fit
-double ltf_params[107] = {0};      //arrays to hold different parameter values
-double init_ltfparams[107]={0};
+int num_ltfparams = 104;	//number of parameters to fit
+double ltf_params[104] = {0};      //arrays to hold different parameter values
+double init_ltfparams[104]={0};
 
+double log_prior=0;
 
 for (i=0;i<num_ltfparams;i++){ 											//give random initial value for each parameter
     double randn = gsl_rng_uniform_pos(r_seed);
@@ -92,15 +75,13 @@ for (i=0;i<num_ltfparams;i++){ 											//give random initial value for each p
 	//printf("i = %i\t, lft_params = %lf\n %lf\n",i, init_ltfparams[i]);
 }
 //CHECK
-double localmax_params[107]={0};         //Array to record param values for the local max likelihood in line search
+double localmax_params[104]={0};         //Array to record param values for the local max likelihood in line search
 int a,b,c;								//indexing loops
 double best_posterior;
 for (c=0;c<num_ltfparams;c++){			//initial parameters begin as 'best' parameters
     localmax_params[c]=ltf_params[c];
 }
 //calculate priors
-
-double log_prior=0;
 for (k=0; k<num_ltfparams; k++){
 	log_prior = log_prior + log(gsl_ran_flat_pdf(ltf_params[k], prior_bound(k,1), (prior_bound(k,2)+prior_bound(k,1))));
 	//printf("k = %i\t param = %lf\t log prior = %lf\n", k, ltf_params[k], log_prior);
@@ -111,160 +92,151 @@ if(reals==1){
 	char name1[50];
 	sprintf(name1, "model_realizations");
 	fpm=fopen(name1, "a+");
-
-	//need to update to reflect new parms below
+	
 	//double initS_fit = 5.000010;
 	//propose parameter values
 	//metapopulation one
-	Params.FITINIT[1][0] = 54.030224; //initS
-	Params.FITINIT[1][1] = 66.788937; //initS
-	Params.FITINIT[1][2] = 76.458414; //initS
-	Params.FITINIT[1][3] = 73.593371; //initS
+	Params.FITINIT[1][0] = 33.138370; //initS
+	Params.FITINIT[1][1] = 6.767543; //initS
+	Params.FITINIT[1][2] = 83.054664; //initS
+	Params.FITINIT[1][3] = 69.709637; //initS
 
 	Params.FITINIT[1][4] = 1e-10; 				//initV //fonly //fixed
-	Params.FITINIT[1][5] = 0.196060; //initV	//fixed
-	Params.FITINIT[1][6] = 0.030000; //initV	//fixed
+	Params.FITINIT[1][5] = 0.104500; //initV	//fixed
+	Params.FITINIT[1][6] = 0.005000; //initV	//fixed
 	Params.FITINIT[1][7] = 1e-10; 				//initV //control //fixed
 
-	Params.FITINIT[1][8] = 0.003035; //initR
+	Params.FITINIT[1][8] = 0.000220; //initR
 	Params.FITINIT[1][9] = 1e-15; //initR //vonly //fixed
 	Params.FITINIT[1][10] = 1e-15; //initR //fixed
 	Params.FITINIT[1][11] = 1e-15; //initR //control //fixed
 
 	//metapopulation two
-	Params.FITINIT[2][0] = 35.703720; //initS
-	Params.FITINIT[2][1] = 97.250289; //initS
-	Params.FITINIT[2][2] = 46.143597; //initS
-	Params.FITINIT[2][3] = 84.199819; //initS
+	Params.FITINIT[2][0] = 37.143666; //initS
+	Params.FITINIT[2][1] = 10.419834; //initS
+	Params.FITINIT[2][2] = 12.478500; //initS
+	Params.FITINIT[2][3] = 59.111362; //initS
 
 	Params.FITINIT[2][4] = 1e-10; 			//initV //fonly //fixed
-	Params.FITINIT[2][5] = 0.100906; //initV //fixed
-	Params.FITINIT[2][6] = 0.192021; //initV //fixed
+	Params.FITINIT[2][5] = 0.071529; //initV //fixed
+	Params.FITINIT[2][6] = 0.103659; //initV //fixed
 	Params.FITINIT[2][7] = 1e-10; 	//fixed
 
-	Params.FITINIT[2][8] = 0.003660; //initR
-	Params.FITINIT[2][9] = 0.001347;//initR
-	Params.FITINIT[2][10] = 0.000500; //initR
-	Params.FITINIT[2][11] = 0.002619; //initR
+	Params.FITINIT[2][8] = 0.000500; //initR
+	Params.FITINIT[2][9] = 0.001000;//initR
+	Params.FITINIT[2][10] = 0.002728; //initR
+	Params.FITINIT[2][11] = 0.001500; //initR
 
 	//metapopulation three
-	Params.FITINIT[3][0] = 28.352795; //initS
-	Params.FITINIT[3][1] = 0.000010; //initS
-	Params.FITINIT[3][2] = 85.363461; //initS
-	Params.FITINIT[3][3] = 100.000010; //initS
+	Params.FITINIT[3][0] = 8.572963; //initS
+	Params.FITINIT[3][1] = 3.000010; //initS
+	Params.FITINIT[3][2] = 3.000010; //initS
+	Params.FITINIT[3][3] = 31.897468; //initS
 	
 	Params.FITINIT[3][4] = 1e-10; 				//initV //f only //fixed
-	Params.FITINIT[3][5] = 0.153797; //initV //fixed
-	Params.FITINIT[3][6] = 	0.090877; //initV //fixed
+	Params.FITINIT[3][5] = 0.133687; //initV //fixed
+	Params.FITINIT[3][6] = 	0.137258; //initV //fixed
 	Params.FITINIT[3][7] = 1e-10;				 //initV //control //fixed
 
-	Params.FITINIT[3][8] = 0.002677; //initR
-	Params.FITINIT[3][9] = 0.002059; //initR
-	Params.FITINIT[3][10] = 0.005966; //initR
-	Params.FITINIT[3][11] = 0.002500; //initR
+	Params.FITINIT[3][8] = 0.003542; //initR
+	Params.FITINIT[3][9] = 0.001500; //initR
+	Params.FITINIT[3][10] = 0.003000; //initR
+	Params.FITINIT[3][11] = 0.003164; //initR
 
 	//metapopultion four
-	Params.FITINIT[4][0] = 96.261835; //initS
-	Params.FITINIT[4][4] = 0.474493; //initV
-	Params.FITINIT[4][8] = 0.000500; //initR
+	Params.FITINIT[4][0] = 37.74002; //initS
+	Params.FITINIT[4][4] = 0.500000; //initV
+	Params.FITINIT[4][8] = 0.001000; //initR
 
 	//metapopultion five
-	Params.FITINIT[5][0] = 14.000010; //initS
-	Params.FITINIT[5][4] = 0.451344; //initV
+	Params.FITINIT[5][0] = 20.00001; //initS
+	Params.FITINIT[5][4] = 0.500000; //initV
 	Params.FITINIT[5][8] = 1e-15; //initR //fixed
 
 	//metapopultion six
-	Params.FITINIT[6][0] = 162.164049; //initS
-	Params.FITINIT[6][4] = 0.250000; //initV
-	Params.FITINIT[6][8] = 0.002500; //initR
+	Params.FITINIT[6][0] = 24.203795; //initS
+	Params.FITINIT[6][4] = 0.066527; //initV
+	Params.FITINIT[6][8] = 0.000128; //initR
 
 	//conidia dispersal
 	//not used rn
-	Params.m_c_pop = 0;
-	Params.a_c_pop = 0.800527;
+	Params.con_mgr_meta = 0;
+	Params.a_meta 		= 0;
 
 	//larval dispersal
 	//meta 1
-	Params.m_l_sub[1][0] = 0.781594;
-	Params.m_l_sub[1][1] = 1.855741;
-	Params.m_l_sub[1][2] = 1.378539;
-	Params.m_l_sub[1][3] = 0.935666;
-	Params.a_l_sub[1][0] = 0;
-	Params.a_l_sub[1][1] = 0;
-	Params.a_l_sub[1][2] = 0;
-	Params.a_l_sub[1][3] = 0;
+	Params.lar_mgr[1][0] = 6.147232;
+	Params.lar_mgr[1][1] = 3.471786;
+	Params.lar_mgr[1][2] = 8.880998;
+	Params.lar_mgr[1][3] = 6.978765;
+	Params.a2[1][0]		 = 0.150204;
+	Params.a2[1][1]		 = 0.219154;
+	Params.a2[1][2]		 = 0.455310;
+	Params.a2[1][3]		 = 0.169328;
 	//meta2
-	Params.m_l_sub[2][0] = 1.545373;
-	Params.m_l_sub[2][1] = 1.545373;
-	Params.m_l_sub[2][2] = 0.581906;
-	Params.m_l_sub[2][3] = 1.351830;
-	Params.a_l_sub[2][0] = 0;
-	Params.a_l_sub[2][1] = 0;
-	Params.a_l_sub[2][2] = 0;
-	Params.a_l_sub[2][3] = 0;
+	Params.lar_mgr[2][0] = 4.263935;
+	Params.lar_mgr[2][1] = 1.252946;
+	Params.lar_mgr[2][2] = 8.500000;
+	Params.lar_mgr[2][3] = 9.865320;
+	Params.a2[2][0]		 = 0.084798;
+	Params.a2[2][1]		 = 0.389384;
+	Params.a2[2][2]		 = 0.050748;
+	Params.a2[2][3]		 = 0.314235;
 	//meta3
-	Params.m_l_sub[3][0] = 1.293619;
-	Params.m_l_sub[3][1] = 0.758273;
-	Params.m_l_sub[3][2] = 0.134728;
-	Params.m_l_sub[3][3] = 2.579375;
-	Params.a_l_sub[3][0] = 0;
-	Params.a_l_sub[3][1] = 0;
-	Params.a_l_sub[3][2] = 0;
-	Params.a_l_sub[3][3] = 0;
+	Params.lar_mgr[3][0] = 6.027171;
+	Params.lar_mgr[3][1] = 2.876126;
+	Params.lar_mgr[3][2] = 2.052709;
+	Params.lar_mgr[3][3] = 9.193171;
+	Params.a2[3][0]		 = 0.070667;
+	Params.a2[3][1]		 = 0.482351;
+	Params.a2[3][2]		 = 0.242535;
+	Params.a2[3][3]		 = 0.216797;
 
 	//coinfection parameters
-	Params.coinf_V		= 0.600248;
-	Params.VFSus		= 1.394869;
+	Params.coinf_V		= 0.876934;
+	Params.VFSus		= 0.180134;
 
 	//stochasticity parameters
-	Params.Rsd_exp 		= 0.845899;
-	Params.Fsd_exp		= 0.604433;
-	Params.Rsd_obs		= 1.856243;
-	Params.Fsd_obs		= 0.735096;
+	Params.Rsd_exp 		= 0.700000;
+	Params.Fsd_exp		= 1.005090;
+	Params.Rsd_obs		= 1.427976;
+	Params.Fsd_obs		= 1.231643;
 
 	//virus parameters
-	Params.muV			= 0.000000; 
-	Params.CV			= 1.621665;
+	Params.muV			= 1.796566; 
+	Params.CV			= 0.900000;
 
 	//fungus parameters
-	Params.specific_nuF = 	0.000105;
+	Params.specific_nuF = 	0.000100;
 
 	//conidia dispersal
 	//meta 1
-	Params.m_c_sub[1][0] = 1.567044;
-	Params.m_c_sub[1][1] = 2.287090;
-	Params.m_c_sub[1][2] = 2.015998;
-	Params.m_c_sub[1][3] = 0.535558;
-	Params.a_c_sub[1][0] = 0;
-	Params.a_c_sub[1][1] = 0;
-	Params.a_c_sub[1][2] = 0;
-	Params.a_c_sub[1][3] = 0;
+	Params.con_mgr[1][0] = 1.831447;
+	Params.con_mgr[1][1] = 4.921459;
+	Params.con_mgr[1][2] = 6.386421;
+	Params.con_mgr[1][3] = 1.000000;
+	Params.a[1][0]		 = 0.220853;
+	Params.a[1][1]		 = 0.423601;
+	Params.a[1][2]		 = 0.335907;
+	Params.a[1][3]		 = 0.043085;
 	//meta2
-	Params.m_c_sub[2][0] = 1.850321;
-	Params.m_c_sub[2][1] = 1.583992;
-	Params.m_c_sub[2][2] = 1.721929;
-	Params.m_c_sub[2][3] = 2.194414;
-	Params.a_c_sub[2][0] = 0;
-	Params.a_c_sub[2][1] = 0;
-	Params.a_c_sub[2][2] = 0;
-	Params.a_c_sub[2][3] = 0;
+	Params.con_mgr[2][0] = 5.016879;
+	Params.con_mgr[2][1] = 5.099071;
+	Params.con_mgr[2][2] = 9.436365;
+	Params.con_mgr[2][3] = 8.705916;
+	Params.a[2][0]		 = 0.176381;
+	Params.a[2][1]		 = 0.377310;
+	Params.a[2][2]		 = 0.227586;
+	Params.a[2][3]		 = 0.132327;
 	//meta3
-	Params.m_c_sub[3][0] = 1.282232;
-	Params.m_c_sub[3][1] = 1.465515;
-	Params.m_c_sub[3][2] = 0.923071;
-	Params.m_c_sub[3][3] = 1.828973;
-	Params.a_c_sub[3][0] = 0;
-	Params.a_c_sub[3][1] = 0;
-	Params.a_c_sub[3][2] = 0;
-	Params.a_c_sub[3][3] = 0;
-
-	//larval dispersal pop
-	Params.m_l_pop		 = 0;
-	Params.a_l_pop		 = 0.020000;
-	
-	//virus transmission
-	Params.nuV			 = 0.216586;
-	
+	Params.con_mgr[3][0] = 2.936037;
+	Params.con_mgr[3][1] = 7.817906;
+	Params.con_mgr[3][2] = 3.403540;
+	Params.con_mgr[3][3] = 4.920192;
+	Params.a[3][0]		 = 0.295129;
+	Params.a[3][1]		 = 0.310839;
+	Params.a[3][2]		 = 0.281712;
+	Params.a[3][3]		 = 0.253992;
 
 	//start realizations. In this case, calls = # realizations
 	double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -327,6 +299,9 @@ char name1[50];
 sprintf(name1, "model_realizations");
 fp1=fopen(name1, "a+");
 
+//char namel[50];
+//sprintf(namel, "lhood_s%i_r%i_%d", searches, numround, pid);
+//fpl=fopen(namel, "a+");
 
 ///////////////////////////////////////////////////LINE-SEARCH///////////////////////////////////////////////////
 for (round=0;round<numround;round++){
@@ -336,8 +311,10 @@ for (round=0;round<numround;round++){
 
 	while (a<num_ltfparams){    
 		//all
-		if (a != 4 | a != 7 | a != 9 | a != 10 | a != 11 | a != 16 | a != 19 | a != 28 | a != 31 | a != 41 | a!= 45 | a!= 51 | a!= 52 | a!= 53 | a!= 54 | a!= 59 | a!= 60 | a!= 61 | a!= 62 | a!= 67 | a!= 68 | a!= 69 | a!= 70 | a!= 84 | a!= 85 | a!= 86 | a!= 87 | a!= 92 | a!= 93 | a!= 94 | a!= 95 | a!= 100 | a!= 101 | a!= 102 | a!= 103 | a!= 104){
+		//if (a == 0 | a == 8 | a == 20 | a == 21 | a == 22 | a == 23 | a == 32 | a == 33 | a == 34 | a == 35 | a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 42 | a == 43 | a == 44 | a == 45 | a == 46 | a == 47 | a == 48 | a == 49 | a == 50 | a == 51 | a == 52 | a == 53 | a == 54 | a == 55){ 
+		if (a != 4 | a != 7 | a != 9 | a != 10 | a != 11 | a != 16 | a != 19 | a != 28 | a != 31 | a != 41 | a!= 45 | a!= 46){
 		//observationals
+		//if (a == 36 | a == 37 | a == 38 | a == 39 | a == 40 | a == 41 | a == 42 || a == 43 | a == 44 | a == 49 | a == 50){   
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step(a) * searches);
 			if(ltf_params[a] < ls_bound(a,1)){
@@ -423,44 +400,43 @@ for (round=0;round<numround;round++){
 
 		//conidia dispersal
 		//not fitting
-		Params.m_c_pop		= ltf_params[45];
-		Params.a_c_pop 		= ltf_params[46];
+		Params.con_mgr_meta = ltf_params[45];
+		Params.a_meta 		= ltf_params[46];
 
 		//larval dispersal
 		//meta 1
-		Params.m_l_sub[1][0] = ltf_params[47];
-		Params.m_l_sub[1][1] = ltf_params[48];
-		Params.m_l_sub[1][2] = ltf_params[49];
-		Params.m_l_sub[1][3] = ltf_params[50];
-		Params.a_l_sub[1][0] = ltf_params[51];
-		Params.a_l_sub[1][1] = ltf_params[52];
-		Params.a_l_sub[1][2] = ltf_params[53];
-		Params.a_l_sub[1][3] = ltf_params[54];
+		Params.lar_mgr[1][0] = ltf_params[47];
+		Params.lar_mgr[1][1] = ltf_params[48];
+		Params.lar_mgr[1][2] = ltf_params[49];
+		Params.lar_mgr[1][3] = ltf_params[50];
+		Params.a2[1][0]		 = ltf_params[51];
+		Params.a2[1][1]		 = ltf_params[52];
+		Params.a2[1][2]		 = ltf_params[53];
+		Params.a2[1][3]		 = ltf_params[54];
 		//meta2
-		Params.m_l_sub[2][0] = ltf_params[55];
-		Params.m_l_sub[2][1] = ltf_params[56];
-		Params.m_l_sub[2][2] = ltf_params[57];
-		Params.m_l_sub[2][3] = ltf_params[58];
-		Params.a_l_sub[2][0] = ltf_params[59];
-		Params.a_l_sub[2][1] = ltf_params[60];
-		Params.a_l_sub[2][2] = ltf_params[61];
-		Params.a_l_sub[2][3] = ltf_params[62];
+		Params.lar_mgr[2][0] = ltf_params[55];
+		Params.lar_mgr[2][1] = ltf_params[56];
+		Params.lar_mgr[2][2] = ltf_params[57];
+		Params.lar_mgr[2][3] = ltf_params[58];
+		Params.a2[2][0]		 = ltf_params[59];
+		Params.a2[2][1]		 = ltf_params[60];
+		Params.a2[2][2]		 = ltf_params[61];
+		Params.a2[2][3]		 = ltf_params[62];
 		//meta3
-		Params.m_l_sub[3][0] = ltf_params[63];
-		Params.m_l_sub[3][1] = ltf_params[64];
-		Params.m_l_sub[3][2] = ltf_params[65];
-		Params.m_l_sub[3][3] = ltf_params[66];
-		Params.a_l_sub[3][0] = ltf_params[67];
-		Params.a_l_sub[3][1] = ltf_params[68];
-		Params.a_l_sub[3][2] = ltf_params[69];
-		Params.a_l_sub[3][3] = ltf_params[70];
+		Params.lar_mgr[3][0] = ltf_params[63];
+		Params.lar_mgr[3][1] = ltf_params[64];
+		Params.lar_mgr[3][2] = ltf_params[65];
+		Params.lar_mgr[3][3] = ltf_params[66];
+		Params.a2[3][0]		 = ltf_params[67];
+		Params.a2[3][1]		 = ltf_params[68];
+		Params.a2[3][2]		 = ltf_params[69];
+		Params.a2[3][3]		 = ltf_params[70];
 
 		//coinfection parameters
 		Params.coinf_V		= ltf_params[71];
 		Params.VFSus		= ltf_params[72];
 
 		//stochasticity parameters
-		//maybe just one ?
 		Params.Rsd_exp 		= ltf_params[73];
 		Params.Fsd_exp		= ltf_params[74];
 		Params.Rsd_obs		= ltf_params[75];
@@ -474,41 +450,33 @@ for (round=0;round<numround;round++){
 		Params.specific_nuF	= ltf_params[79]; //fungus transmission
 
 		//Fungal dispersal
-		//cut fitting every a! keep fitting every mgr
 		//meta 1
-		Params.m_c_sub[1][0] = ltf_params[80];
-		Params.m_c_sub[1][1] = ltf_params[81];
-		Params.m_c_sub[1][2] = ltf_params[82];
-		Params.m_c_sub[1][3] = ltf_params[83];
-		Params.a_c_sub[1][0] = ltf_params[84];
-		Params.a_c_sub[1][1] = ltf_params[85];
-		Params.a_c_sub[1][2] = ltf_params[86];
-		Params.a_c_sub[1][3] = ltf_params[87];
+		Params.con_mgr[1][0] = ltf_params[80];
+		Params.con_mgr[1][1] = ltf_params[81];
+		Params.con_mgr[1][2] = ltf_params[82];
+		Params.con_mgr[1][3] = ltf_params[83];
+		Params.a[1][0]		 = ltf_params[84];
+		Params.a[1][1]		 = ltf_params[85];
+		Params.a[1][2]		 = ltf_params[86];
+		Params.a[1][3]		 = ltf_params[87];
 		//meta2
-		Params.m_c_sub[2][0] = ltf_params[88];
-		Params.m_c_sub[2][1] = ltf_params[89];
-		Params.m_c_sub[2][2] = ltf_params[90];
-		Params.m_c_sub[2][3] = ltf_params[91];
-		Params.a_c_sub[2][0] = ltf_params[92];
-		Params.a_c_sub[2][1] = ltf_params[93];
-		Params.a_c_sub[2][2] = ltf_params[94];
-		Params.a_c_sub[2][3] = ltf_params[95];
+		Params.con_mgr[2][0] = ltf_params[88];
+		Params.con_mgr[2][1] = ltf_params[89];
+		Params.con_mgr[2][2] = ltf_params[90];
+		Params.con_mgr[2][3] = ltf_params[91];
+		Params.a[2][0]		 = ltf_params[92];
+		Params.a[2][1]		 = ltf_params[93];
+		Params.a[2][2]		 = ltf_params[94];
+		Params.a[2][3]		 = ltf_params[95];
 		//meta3
-		Params.m_c_sub[3][0] = ltf_params[96];
-		Params.m_c_sub[3][1] = ltf_params[97];
-		Params.m_c_sub[3][2] = ltf_params[98];
-		Params.m_c_sub[3][3] = ltf_params[99];
-		Params.a_c_sub[3][0] = ltf_params[100];
-		Params.a_c_sub[3][1] = ltf_params[101];
-		Params.a_c_sub[3][2] = ltf_params[102];
-		Params.a_c_sub[3][3] = ltf_params[103];
-
-		//larval dispersal
-		//not fitting
-		Params.m_l_pop = ltf_params[104];
-		Params.a_l_pop = ltf_params[105];
-
-		Params.nuV     = ltf_params[106];
+		Params.con_mgr[3][0] = ltf_params[96];
+		Params.con_mgr[3][1] = ltf_params[97];
+		Params.con_mgr[3][2] = ltf_params[98];
+		Params.con_mgr[3][3] = ltf_params[99];
+		Params.a[3][0]		 = ltf_params[100];
+		Params.a[3][1]		 = ltf_params[101];
+		Params.a[3][2]		 = ltf_params[102];
+		Params.a[3][3]		 = ltf_params[103];
 
 			
 			//-------------------MISER CALCULATE LIKELIHOOD------------------------------//
@@ -570,11 +538,11 @@ for (round=0;round<numround;round++){
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
 
 			new_posterior = total_loghood_metas + log_prior;
-			printf("posterior = %lf\n", new_posterior);
+			//printf("posterior = %lf\n", new_posterior);
 		}
 		if (new_posterior>best_posterior){ //compare likelihood //sum - one you just generated //local max - best you've seen
 			best_posterior=new_posterior;
-			printf("best posterior = %lf\n", best_posterior);
+			//printf("best posterior = %lf\n", best_posterior);
 			for (c=0;c<num_ltfparams;c++){
 				localmax_params[c]=ltf_params[c]; //save best param set from each individual search
 			}
@@ -589,8 +557,8 @@ for (round=0;round<numround;round++){
 	} //a
 
 	//prints subset
-	int print_len = 71;
-	int printlist[71] = {0,1,2,3,5,6,8,12,13,14, 15,17,18,20,21,22,23,24,25,26, 27,29,30,32,33,34,35,36,37,38, 39,40,42,43,44,46,47,48,49,50, 55,56,57,58,63,64,65,66,71,72, 73,74,75,76,77,78,79,80,81,82, 83,88,89,90,91,96,97,98,99,105, 106};
+	int print_len = 92;
+	int printlist[92] = {0,1,2,3,5,6,8,12,13,14,15,17,18,20,21,22,23,24,25,26,27,29,30,32,33,34,35,36,37,38,39,40,42,43,44,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103};
 	int index;
 	for(ii=0; ii<print_len; ii++){
 		index = printlist[ii];
@@ -614,7 +582,7 @@ fclose(fp1); //model realizations
 
 ///////////////////////////////////////////////////MCMC///////////////////////////////////////////////////
 
-/*
+
 if(mcmc==1){ //not updated for new larval/fungal dispersal parms //or fungus transmission //or heterogeneity
 
 	int pid;
@@ -1060,7 +1028,7 @@ while (LoopNumber<=Realizations) {
 		}
 	}
 	fclose(fpm);
-}*/
+}
 
 return 0;
 }

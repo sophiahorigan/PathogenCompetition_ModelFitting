@@ -1,5 +1,4 @@
 #include "head_meta.h"
-#include <mpi.h>
 gsl_rng *r;
 //-----------------------Dot Product-----------------------//
 float DotProduct (int Length, double *Holder, double *PCA)
@@ -18,16 +17,7 @@ float DotProduct (int Length, double *Holder, double *PCA)
 
 int main(void)
 {
-
-//MPI Environment Setup
-MPI_Init(NULL, NULL);
-
-int world_rank;
-MPI_Comm_size(MPI_COMM_WORLD, &world_rank);
-int world_size;
-MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-
-
+//printf("hello world");
 int linesearch = 1;
 int mcmc = 0;
 int reals = 0;
@@ -64,14 +54,6 @@ r_seed=random_setup();
 
 //----------------------------------Set-Up Line Search------------------------//
 
-//MPI setup
-i = world_rank % DATA_SETS;
-site_curr[i]++;
-MPI_Reduce(&site_curr, &site_reps, sites, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD); //taking info across cores and compiling for root //0 is the root node
-MPI_Bcast(site_reps, sites, MPI_INT, 0, MPI_COMM_WORLD); 
-
-double site_lhoods[site_reps[0]];
-
 //set initial likelihood adjustment values
 int searches = 8;
 int round;
@@ -83,6 +65,7 @@ int num_ltfparams = 107;	//number of parameters to fit
 double ltf_params[107] = {0};      //arrays to hold different parameter values
 double init_ltfparams[107]={0};
 
+double log_prior=0;
 
 for (i=0;i<num_ltfparams;i++){ 											//give random initial value for each parameter
     double randn = gsl_rng_uniform_pos(r_seed);
@@ -99,8 +82,6 @@ for (c=0;c<num_ltfparams;c++){			//initial parameters begin as 'best' parameters
     localmax_params[c]=ltf_params[c];
 }
 //calculate priors
-
-double log_prior=0;
 for (k=0; k<num_ltfparams; k++){
 	log_prior = log_prior + log(gsl_ran_flat_pdf(ltf_params[k], prior_bound(k,1), (prior_bound(k,2)+prior_bound(k,1))));
 	//printf("k = %i\t param = %lf\t log prior = %lf\n", k, ltf_params[k], log_prior);
@@ -327,6 +308,9 @@ char name1[50];
 sprintf(name1, "model_realizations");
 fp1=fopen(name1, "a+");
 
+//char namel[50];
+//sprintf(namel, "lhood_s%i_r%i_%d", searches, numround, pid);
+//fpl=fopen(namel, "a+");
 
 ///////////////////////////////////////////////////LINE-SEARCH///////////////////////////////////////////////////
 for (round=0;round<numround;round++){

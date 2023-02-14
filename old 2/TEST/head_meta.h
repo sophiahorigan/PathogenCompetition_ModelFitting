@@ -176,20 +176,15 @@ typedef struct
 	double FITMETA[NUM_PARS];	//dispersal and coinfection parameters fit across all datasets
 
 	//dispersal
-	double m_c_pop; //0
-	double a_c_pop;		//1
+	double con_mgr_meta; //0
+	double a_meta;		//1
 
-	double m_l_pop;
-	double a_l_pop;
+	double con_mgr[DATA_SETS][4];	//2
+	double a[DATA_SETS][4];
 
-	double m_c_sub[DATA_SETS][4];	//2
-	double a_c_sub[DATA_SETS][4];
+	double lar_mgr[DATA_SETS][4];	//2
+	double a2[DATA_SETS][4];
 
-	double m_l_sub[DATA_SETS][4];	//2
-	double a_l_sub[DATA_SETS][4];
-
-	//virus transmission
-	//double nuV; //was 0.64 //apparently that's super high 
 	//virus decay
 	double muV;
 	//heterogeneity

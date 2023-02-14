@@ -377,15 +377,19 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
 		
 			if(larvae_dispersal_on == 1){
-
+			
+			//printf("day = %i\n", day-1);
+			
+				//indexing
 				int subout;
 				int subin;
-
 				double netVin[num_sub][n2]; //one for each subpop 0-3
 				double netVout[num_sub][n2]; //one for each subpop 0-3
 				double netVFout[num_sub][n1]; //one for each subpop 0-3
 				double netVFin[num_sub][n1]; //one for each subpop 0-3
-
+				//dummy param
+				double disp = 0;
+		
 				//initialize dispersal array
 				for(sub=0; sub<num_sub; sub++){
 					for(i=1;i<=n1;i++){
@@ -398,41 +402,48 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 					}
 				}
 
-				for(subout=0; subout<num_sub; subout++){
-
-					for (i=1;i<=n1;i++)	{ //for each exposed class
-
-						netVFout[subout][i] = ((Params->m_l_sub[j][subout] * 2.0 * M_PI)/Params->a_l_pop) * E_VF[subout][i];
-
-						for(subin=0; subin<num_sub; subin++){
-							if(subin!=subout){
-
-								netVFin[subin][i] += E_VF[subout][i]*Params->m_l_sub[j][subout]*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
-
+				for(subout = 0; subout < num_sub; subout++){ //for i
+				//printf("subout loop subout = %i\n", subout);
+					//printf("subout = %i\n", subout);
+					for(subin = 0; subin < num_sub; subin++){ //for j
+					//printf("subin loop subin = %i\n", subin);
+						if(subout != subin){
+							//printf("subout = %i\t subin = %i\n", subout, subin);
+							for (i=1;i<=n1;i++)	{ //for each exposed class
+								disp = E_VF[subout][i]*Params->lar_mgr[j][subout]*exp(-Params->a2[j][subout]*Params->DISTANCE[j][subout][subin]);
+								//printf("j = %i\t subout = %i\t subin = %i\t distance = %i\n", j, subin, subout, Params->DISTANCE[j][subout][subin]);
+								//printf("Evf = %lf\t larmgr = %lf\t a = %lf\t distance = %i\t exp = %lf\n",E_VF[subout][i], Params->lar_mgr, Params->a2, Params->DISTANCE[j][subout][subin], exp(-Params->a2*Params->DISTANCE[j][subout][subin]));
+								//printf("disp out VF = %lf\n", disp);
+								//printf("j=%i\t subout=%i\t larmgr=%lf\t a2=%lf\n", j, subout, Params->lar_mgr[j][subout], Params->a2[j][subout]);
+								netVFout[subout][i] = netVFout[subout][i] + disp;
+								netVFin[subin][i] = netVFin[subin][i] + disp;
+								//printf("netvfout = %lf\t netfvin = %lf\n",netVFout[subout][i],netVFin[subin][i]);
+								//printf("n1 loop n1 = %i\n", i);
+							}
+							for (ii=1;ii<=n2;ii++)	{
+								disp = E_V[subout][ii]*Params->lar_mgr[j][subout]*exp(-Params->a2[j][subout]*Params->DISTANCE[j][subout][subin]);
+								//printf("disp out V = %lf", disp);
+								netVout[subout][ii] = netVout[subout][ii] + disp;
+								netVin[subin][ii] = netVin[subin][ii] + disp;
+								//printf("netvout = %lf\t netvin = %lf\n",netVout[subout][i],netVin[subin][i]);
+								//printf("n2 loop n2 = %i\n", ii);
 							}
 						}
-					}
-					for (ii=1;ii<=n2;ii++)	{ //ii not i
-
-						netVout[subout][ii] += ((Params->m_l_sub[j][subout] * 2.0 * M_PI)/Params->a_l_pop) * E_V[subout][ii];
-
-						for(subin=0; subin<num_sub; subin++){
-
-							if(subin!=subout){
-								netVin[subin][ii] += E_V[subin][ii]*Params->m_l_sub[j][subout] * exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
-							}
+						else{
+							//printf("done! subout = %i\t subin = %i\n", subin, subout);
 						}
 					}
-
 				}
-
 				for(sub=0; sub<num_sub; sub++){ //update larval density
-
+				//printf("UPDATES = %i\t subindex sub = %i\n", sub, sub_index[sub]);
+				//printf("made it in?\n");
 					for (i=1;i<=n1;i++)	{ //for each exposed class
-						E_VF[sub][i] += (netVFin[sub][i] - netVFout[sub][i]);
+						E_VF[sub][i] = E_VF[sub][i] + netVFin[sub][i] - netVFout[sub][i];
+						//printf("EVF = %lf\n", E_VF[sub][i]);
 					}
 					for (i=1;i<=n2;i++)	{
-						E_V[sub][i] += (netVin[sub][i] - netVout[sub][i]);
+						E_V[sub][i] = E_V[sub][i] + netVin[sub][i] - netVout[sub][i];
+						//printf("EV = %lf\n", E_V[sub][i]);
 					}
 				}
 			} 
@@ -478,7 +489,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		*/
 
 	//******************************* Weather Stuff ******************************//
-	//Params->nuV = Params->PARS[2];
+	Params->nuV = Params->PARS[2];
 	DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days
 	if(DDtemp_now<0.0){DDtemp_now=0.0;}
 	DD10 = DD10 + DDtemp_now;			//CK// summing degree days over time
@@ -593,7 +604,7 @@ for(k=0; k<DIM; k++){
 		Params->MODEL[j][day-1+day_index[sub]][3] = IFV[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction coinfected 
 
 		//MODEL REALIZATION PRINTING
-		//fprintf(fpm, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
+		fprintf(fpm, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
 		//printf("%i\t %i\t %i\t %lf\t %lf\t %lf\t %lf\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
 	}
 	}

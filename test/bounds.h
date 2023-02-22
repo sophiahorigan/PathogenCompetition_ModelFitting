@@ -53,12 +53,12 @@ else if (i==35)		{	low = 0;			high = 0.01;	}	//initR control
 
 //metapopulation four
 else if (i==36)		{	low = 1e-5;			high = 150;		} 	//initS
-else if (i==37)		{	low = 0;			high = 0.5;		} 	//initV
+else if (i==37)		{	low = 0;			high = 1;		} 	//initV
 else if (i==38)		{	low = 0;			high = 0.01;	} 	//initR
 
 //metapopulation five
-else if (i==39)		{	low = 1e-5;			high = 20;		} 	//initS
-else if (i==40)		{	low = 0;			high = 0.5;		} 	//initV
+else if (i==39)		{	low = 1e-5;			high = 100;		} 	//initS
+else if (i==40)		{	low = 0;			high = 1;		} 	//initV
 else if (i==41)		{	low = 0;			high = 0.01;	} 	//initR
 
 //metapopulation six
@@ -115,7 +115,7 @@ else if (i==75)		{	low = 0;			high = 2;		}	//Rsd_obs
 else if (i==76)		{	low = 0;			high = 2;		}	//Fsd_obs
 
 //virus 
-else if (i==77)		{	low = 0;			high = 3;		}	//decay rate
+else if (i==77)		{	low = 0.05;			high = 1;		}	//decay rate
 else if (i==78)		{	low = 0.5;			high = 4;		}	//heterogeneity
 
 else if (i==79)		{	low = 0;			high = 0.001;	} 	//fungus transmission //check this
@@ -223,7 +223,7 @@ else if (i==37)		{	step_size = 0.05;	}	//initV
 else if (i==38)		{	step_size = 0.0005;	} 	//initR
 
 //metapopulation five
-else if (i==39)		{	step_size = 2;	}	//initS
+else if (i==39)		{	step_size = 5;	}	//initS
 else if (i==40)		{	step_size = 0.05;	} 	//initV
 else if (i==41)		{	step_size = 0.0005;	} 	//initR
 
@@ -281,7 +281,7 @@ else if (i==75)		{	step_size = .1;	}	//Rsd_obs
 else if (i==75)		{	step_size = .1;	}	//Fsd_obs
 
 //virus
-else if (i==77)		{	step_size = 0.1;	}	//virus decay
+else if (i==77)		{	step_size = 0.01;	}	//virus decay
 
 else if (i==78)		{	step_size = 0.2;	} 	//heterogeneity
 

@@ -73,7 +73,7 @@ MPI_Bcast(site_reps, sites, MPI_INT, 0, MPI_COMM_WORLD);
 double site_lhoods[site_reps[0]];
 
 //set initial likelihood adjustment values
-int searches = 8;
+int searches =10;
 int round;
 int numround = 3;
 int calls;
@@ -336,7 +336,7 @@ for (round=0;round<numround;round++){
 
 	while (a<num_ltfparams){    
 		//all
-		if (a != 4 | a != 7 | a != 9 | a != 10 | a != 11 | a != 16 | a != 19 | a != 28 | a != 31 | a != 41 | a!= 45 | a!= 51 | a!= 52 | a!= 53 | a!= 54 | a!= 59 | a!= 60 | a!= 61 | a!= 62 | a!= 67 | a!= 68 | a!= 69 | a!= 70 | a!= 84 | a!= 85 | a!= 86 | a!= 87 | a!= 92 | a!= 93 | a!= 94 | a!= 95 | a!= 100 | a!= 101 | a!= 102 | a!= 103 | a!= 104){
+		if (a != 4 | a != 7 | a != 9 | a != 10 | a != 11 | a != 16 | a != 19 | a != 28 | a != 31 | a != 41 | a!= 45 | a!= 51 | a!= 52 | a!= 53 | a!= 54 | a!= 59 | a!= 60 | a!= 61 | a!= 62 | a!= 67 | a!= 68 | a!= 69 | a!= 70 | a!= 77 | a!= 84 | a!= 85 | a!= 86 | a!= 87 | a!= 92 | a!= 93 | a!= 94 | a!= 95 | a!= 100 | a!= 101 | a!= 102 | a!= 103 | a!= 104){
 		//observationals
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step(a) * searches);
@@ -467,7 +467,7 @@ for (round=0;round<numround;round++){
 		Params.Fsd_exp		= ltf_params[76];
 
 		//virus parameters
-		Params.muV			= ltf_params[77]; //Fuller 2012 //virus decay
+		Params.muV			= 0.39; //Fuller 2012 //virus decay //0.39
 		Params.CV			= ltf_params[78]; //hetereogeneity to virus infection //previously 0.86
 
 		//fungus parameters
@@ -518,7 +518,7 @@ for (round=0;round<numround;round++){
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		calls=200;					//number of stochastic simulations for each parameter and IC set //100-300
+		calls=100;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		for(j=1; j<DATA_SETS; j++){
 			Params.j = j;
@@ -589,8 +589,8 @@ for (round=0;round<numround;round++){
 	} //a
 
 	//prints subset
-	int print_len = 71;
-	int printlist[71] = {0,1,2,3,5,6,8,12,13,14, 15,17,18,20,21,22,23,24,25,26, 27,29,30,32,33,34,35,36,37,38, 39,40,42,43,44,46,47,48,49,50, 55,56,57,58,63,64,65,66,71,72, 73,74,75,76,77,78,79,80,81,82, 83,88,89,90,91,96,97,98,99,105, 106};
+	int print_len = 70;
+	int printlist[70] = {0,1,2,3,5,6,8,12,13,14, 15,17,18,20,21,22,23,24,25,26, 27,29,30,32,33,34,35,36,37,38, 39,40,42,43,44,46,47,48,49,50, 55,56,57,58,63,64,65,66,71,72, 73,74,75,76,78,79,80,81,82, 83,88,89,90,91,96,97,98,99,105, 106};
 	int index;
 	for(ii=0; ii<print_len; ii++){
 		index = printlist[ii];

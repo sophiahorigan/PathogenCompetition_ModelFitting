@@ -1,4 +1,4 @@
-gsl_rng *random_setup(void)
+gsl_rng *random_setup(void) //somehow this proposes rands specific to param range
 {
 const gsl_rng_type *TT;
 long seedy;

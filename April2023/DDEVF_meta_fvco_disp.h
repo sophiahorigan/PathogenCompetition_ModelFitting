@@ -419,7 +419,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 					//SCALE OF MIGRATION
 					//Sout[subout] = ((Params->m_l_sub[j][subout] * 2.0 * M_PI)/Params->a_l_pop) * S[subout];
 					Sout[subout] = ((Params->m_l_pop * 2.0 * M_PI)/Params->a_l_pop) * S[subout];
-
+					printf("m = %lf\t a = %lf\n", Params->m_l_pop, Params->a_l_pop);
 
 					//susceptible larvae that arrive at another metapopulation
 					for(subin=0; subin<num_sub; subin++){
@@ -427,7 +427,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 
 							//SCALE OF MIGRATION
 							//Sin[subin] = S[subout]*Params->m_l_sub[j][subout]*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
-							Sin[subin] = S[subout]*Params->m_l_pop*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
+							Sin[subin] = Sout[subout]*Params->m_l_pop*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
 							//printf("distance[%i][%i][%i] = %i\n", j, subout, subin, Params->DISTANCE[j][subout][subin]);
 						}
 					}
@@ -444,7 +444,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 								//infected larvae that arrive at another metapopulation
 								//SCALE OF MIGRATION
 								//VFin[subin][i] += E_VF[subout][i]*Params->m_l_sub[j][subout]*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
-								VFin[subin][i] += E_VF[subout][i]*Params->m_l_pop*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
+								VFin[subin][i] += VFout[subout][i]*Params->m_l_pop*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
 							}
 						}
 					}
@@ -458,15 +458,15 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 							if(subin!=subout){
 								//SCALE OF MIGRATION
 								//Vin[subin][ii] += E_V[subin][ii]*Params->m_l_sub[j][subout] * exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
-								Vin[subin][ii] += E_V[subin][ii]*Params->m_l_pop * exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
+								Vin[subin][ii] += Vout[subin][ii]*Params->m_l_pop * exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
 							}
 						}
 					}
 				}
 				for(sub=0; sub<num_sub; sub++){ //update larval density
-
+					printf("preS = %e\n", S[sub]);
 					S[sub] += (Sin[sub] - Sout[sub]);
-					//printf("S = %e\t sub = %i\t sub in = %e\t subout = %e\n", S[sub], sub, Sin[sub], Sout[sub]);
+					printf("S = %e\t sub = %i\t sub in = %e\t subout = %e\n", S[sub], sub, Sin[sub], Sout[sub]);
 
 					for (i=1;i<=n1;i++)	{ //for each exposed class
 						E_VF[sub][i] += (VFin[sub][i] - VFout[sub][i]);

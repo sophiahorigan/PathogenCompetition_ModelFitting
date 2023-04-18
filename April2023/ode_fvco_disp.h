@@ -71,7 +71,7 @@ if (j==4 || j==5 || j==6){
 double squareCVV = Params->CV*Params->CV;
 
 //dispersal
-int coni_dispersal_on = 1; //set to 0 for no dispersal
+int coni_dispersal_on = 0; //set to 0 for no dispersal
 int subout; //indexing
 int subin; //indexing
 double netCout[4];
@@ -102,10 +102,9 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 				if(subout != subin){
 
 					//netCin[subin] += y[m+n+1+sub_index[subout]] * Params->m_c_sub[j][subout] * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
-					netCin[subin] += y[m+n+1+sub_index[subout]] * Params->m_c_pop * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
+					netCin[subin] += netCout[subout] * Params->m_c_pop * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
 
 				}
-
 			} 
 		}
 	}
@@ -117,6 +116,7 @@ for(sub=0; sub<num_sub; sub++){
 	//printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]); //SH GREG CHECK; THIS ALWAYS = 0...
 	//getc(stdin);
 	//printf("%e\t %e\t %e\t %e\t %e\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub]);
+	//printf("params nuF=%lf\t nuR = %lf\t Rsub=%lf\t nuV%lf\t squareCVV=%lf\n", nuF, nuR, R[sub], nuV, squareCVV);
 	//printf("%e\t %e\t %e\t %e\n", nuF, y[m+n+1+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]]);
 	
 	//getc(stdin);

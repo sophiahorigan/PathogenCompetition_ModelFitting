@@ -64,7 +64,7 @@ r_seed=random_setup();
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-int searches = 5;
+int searches = 10;
 int round;
 int numround = 3;
 int calls;
@@ -340,7 +340,7 @@ for (round=0;round<numround;round++){
 		//separate m's
 		//if (a == 8 | a == 20| a == 21| a == 22| a == 23| a == 32| a == 33| a == 34| a == 35| a == 36| a ==37| a == 38| a == 39| a == 40 | a == 42 | a == 43 | a == 44 | a == 46|  a == 47| a == 48| a == 49| a == 50| a == 55| a == 56| a == 57| a == 58| a == 63| a == 64| a == 65| a == 66| a == 71| a == 72| a == 73| a == 74| a == 78| a == 79| a == 80| a == 81| a == 82| a == 83| a == 88| a == 89| a == 90| a == 91| a == 96| a == 97| a == 98| a == 99| a == 105| a == 106){
 		//one m
-		if (a == 0 | a == 1 | a == 2 | a == 3 | a == 5 | a == 6 | a == 8 | a == 12 | a == 13 | a == 14 | a == 15| a == 17 | a == 18 | a == 20| a == 21| a == 22| a == 23 | a == 24 | a == 25 | a == 26 | a == 27 | a == 29 | a == 30| a == 32| a == 33| a == 34| a == 35 | a == 45 | a == 46  | a == 73 | a == 74 | a == 77 | a == 78 | a == 79 | a == 104 | a == 105 | a == 106){
+		if (a == 5 | a == 6 | a == 8 | a == 17 | a == 18 | a == 20 | a == 29 | a == 30 | a == 32 | a == 45 | a == 46  | a == 73 | a == 74 | a == 77 | a == 78 | a == 79 | a == 104 | a == 105 | a == 106){
 		if (round>0){		
 			ltf_params[a] = ltf_params[a] - (step_size[a] * searches);
 			//printf("ltf round 0=%lf\n", ltf_params[a]);
@@ -358,17 +358,12 @@ for (round=0;round<numround;round++){
 					//printf("hit upper bound i=%i\n", a);
 				}
 			}
-
-		//ltf_params[0] = 0;
-		//Send new parameter values into code
-		//printf("made it in\n");
-		//metapopulation one
 		
-		Params.FITINIT[1][0] = exp(ltf_params[0]); //initS
+		Params.FITINIT[1][0] = 100; //initS
 		//printf("initS=%lf\n", exp(ltf_params[0]));
-		Params.FITINIT[1][1] = exp(ltf_params[1]); //initS
-		Params.FITINIT[1][2] = exp(ltf_params[2]); //initS
-		Params.FITINIT[1][3] = exp(ltf_params[3]); //initS
+		Params.FITINIT[1][1] = 100; //initS
+		Params.FITINIT[1][2] = 100; //initS
+		Params.FITINIT[1][3] = 100; //initS
 
 		Params.FITINIT[1][4] = 1e-10; 				//initV //fonly
 		Params.FITINIT[1][5] = exp(ltf_params[5]); //initV
@@ -383,10 +378,10 @@ for (round=0;round<numround;round++){
 		Params.FITINIT[1][11] = 1e-15; //initR //control
 
 		//metapopulation two
-		Params.FITINIT[2][0] = exp(ltf_params[12]); //initS
-		Params.FITINIT[2][1] = exp(ltf_params[13]); //initS
-		Params.FITINIT[2][2] = exp(ltf_params[14]); //initS
-		Params.FITINIT[2][3] = exp(ltf_params[15]); //initS
+		Params.FITINIT[2][0] = 100; //initS
+		Params.FITINIT[2][1] = 100; //initS
+		Params.FITINIT[2][2] = 100; //initS
+		Params.FITINIT[2][3] = 100; //initS
 
 		Params.FITINIT[2][4] = 1e-10; 				//initV //fonly
 		Params.FITINIT[2][5] = exp(ltf_params[17]); //initV
@@ -394,15 +389,15 @@ for (round=0;round<numround;round++){
 		Params.FITINIT[2][7] = 1e-10; 				//initV //control
 
 		Params.FITINIT[2][8] = exp(ltf_params[20]); //initR //fonly
-		Params.FITINIT[2][9] = exp(ltf_params[21]); //initR //vonly
-		Params.FITINIT[2][10] = exp(ltf_params[22]); //initR //fv
-		Params.FITINIT[2][11] = exp(ltf_params[23]); //initR //control
+		Params.FITINIT[2][9] = exp(ltf_params[20]); //initR //vonly
+		Params.FITINIT[2][10] = exp(ltf_params[20]); //initR //fv
+		Params.FITINIT[2][11] = exp(ltf_params[20]); //initR //control
 
 		//metapopulation three
-		Params.FITINIT[3][0] = exp(ltf_params[24]); //initS
-		Params.FITINIT[3][1] = exp(ltf_params[25]); //initS
-		Params.FITINIT[3][2] = exp(ltf_params[26]); //initS
-		Params.FITINIT[3][3] = exp(ltf_params[27]); //initS
+		Params.FITINIT[3][0] = 100; //initS
+		Params.FITINIT[3][1] = 100; //initS
+		Params.FITINIT[3][2] = 100; //initS
+		Params.FITINIT[3][3] = 100; //initS
 
 		Params.FITINIT[3][4] = 1e-10; 				//initV //f only
 		Params.FITINIT[3][5] = exp(ltf_params[29]); //initV
@@ -410,9 +405,9 @@ for (round=0;round<numround;round++){
 		Params.FITINIT[3][7] = 1e-10;				 //initV //control
 
 		Params.FITINIT[3][8] = exp(ltf_params[32]); //initR //fonly
-		Params.FITINIT[3][9] = exp(ltf_params[33]); //initR //vonly
-		Params.FITINIT[3][10] = exp(ltf_params[34]); //initR //fv
-		Params.FITINIT[3][11] = exp(ltf_params[35]); //initR //control
+		Params.FITINIT[3][9] = exp(ltf_params[32]); //initR //vonly
+		Params.FITINIT[3][10] = exp(ltf_params[32]); //initR //fv
+		Params.FITINIT[3][11] = exp(ltf_params[32]); //initR //control
 
 		//metapopultion four
 		Params.FITINIT[4][0] = exp(ltf_params[36]); //initS
@@ -528,7 +523,18 @@ for (round=0;round<numround;round++){
 
 		Params.nuV     = exp(ltf_params[106]);
 		//printf("nuV= %lf\n",Params.nuV );
-			
+
+		printf("b=%i\n", b);
+
+		///ADD IN CHECK TO MAKE SURE THAT M and A DONT EQUAL MORE THAN 1
+		if(((Params.m_l_pop * 2 * M_PI)/Params.a_l_pop) > 1){
+			printf("it broke!\n");
+			break;
+		}
+		if(((Params.m_c_pop * 2 * M_PI)/Params.a_c_pop) > 1){
+			break;
+		}	
+
 			//-------------------MISER CALCULATE LIKELIHOOD------------------------------//
 		double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
 		double new_posterior=0;
@@ -536,7 +542,7 @@ for (round=0;round<numround;round++){
 		double lhood_total=0;
 		double lhood_reps=0;
 
-		calls=5;					//number of stochastic simulations for each parameter and IC set //100-300
+		calls=100;					//number of stochastic simulations for each parameter and IC set //100-300
 
 		//for(j=1; j<=DATA_SETS; j++){
 		for(j=1; j<4; j++){
@@ -608,8 +614,8 @@ for (round=0;round<numround;round++){
 	} //a
 
 	//prints subset
-	int print_len = 37;
-	int printlist[37] = {0,1,2,3,5,6,8,12,13,14, 15,17,18,20,21,22,23,24,25,26, 27,29,30,32,33,34,35,45,46,73, 74,77,78,79,104,105,106};
+	int print_len = 19;
+	int printlist[19] = {5,6,8,17,18,20,29,30,32,45, 46,73,74,77,78,79,104,105,106};
 	//int printlist[50] = {8, 20, 21, 22, 23, 32, 33, 34, 35, 36,  37, 38, 39, 40, 42, 43, 44, 46, 47, 48,   49, 50, 55, 56, 57, 58, 63, 64, 65, 66,  71, 72, 73, 74, 78, 79, 80, 81, 82, 83,  88, 89, 90, 91, 96, 97, 98, 99, 105, 106};
 	//int printlist[28] = {8, 20, 21, 22, 23, 32, 33, 34, 35, 36,  37, 38, 39, 40, 42, 43, 44, 45, 46, 71,  72, 73, 74, 78, 79, 104, 105, 106};
 

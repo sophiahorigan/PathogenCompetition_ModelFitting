@@ -17,56 +17,30 @@ float DotProduct (int Length, double *Holder, double *PCA)
 
 int main(void)
 {
-//printf("hello world");
+
 int linesearch = 1;
 int mcmc = 0;
 int reals = 0;
 
 STRUCTURE Params;
-/*
-int world_rank;
-int site = 6;
-int pp;
-for(world_rank=0; world_rank<=site; world_rank++){
-	pp = world_rank % site;
-	printf("world_rank = %i, site = %i, ii = %i\n", world_rank, site, pp);
-}
-*/
-
-int pro = 1;//atoi(argv[1]);						// pro and argv[1] are the inputs (argv[i] is the i^th input)
-//printf("Profile Parameter is %d\n",pro);	fflush(stdout);
 
 // ----------------------------------------Set Up-------------------------------------------------------------------- //
 int i=0; int j;int ii; int jj; int k; int l; 
 int num_adj_pars = 107;			// number of adjustable parameters
 int epi_length = 48;
 
-inputdata(&Params);				// gets Params.DATA[j][i][0-2] and Params.MAXT[i] from inputdata.h
-/*
-double lhood_meta; double log_lhood_meta;
-double meta_err;
-double lhood_total;
-double ave_lhood;
-*/
-// --------------------------------------- Name for Output Files ----------------------------------------------------- //
-char strFileName[99];					// from filenames.h
-GetString(pro,0,strFileName,98);		fflush(stdout);		//getc(stdin);
-FILE *mcmc_results;
+inputdata(&Params);				
 
-//char named[50];
-//sprintf(named, "daily_output");
-//fp1=fopen(named, "a+");
 // ---------------------------------------- Random Number Stuff ------------------------------------------------------ //
 gsl_rng *r_seed;
 r_seed=random_setup();
-//printf("Random Seed: %f\n", r_seed); //getc(stdin);
 
 //----------------------------------Set-Up Line Search------------------------//
 
 //set initial likelihood adjustment values
-int searches = 10;
+int searches = 1;
 int round;
-int numround = 3;
+int numround = 1;
 int calls;
 size_t dim;
 
@@ -108,7 +82,7 @@ if(reals==1){
 
 	char name1[50];
 	sprintf(name1, "model_realizations");
-	fpm=fopen(name1, "a+");
+	fpr=fopen(name1, "a+");
 
 	//need to update to reflect new parms below
 	//double initS_fit = 5.000010;
@@ -223,6 +197,7 @@ if(reals==1){
 	//virus parameters
 	Params.muV			= 0.006213; //fixed
 	Params.CV			= 1.180835;
+	Params.nuV			 = 0.049396;
 
 	//fungus parameters
 	Params.specific_nuF = 0.003361;
@@ -261,7 +236,7 @@ if(reals==1){
 	Params.a_l_pop		 = 0.149571;
 	
 	//virus transmission
-	Params.nuV			 = 0.049396;
+	
 	
 
 	//start realizations. In this case, calls = # realizations
@@ -307,7 +282,7 @@ if(reals==1){
 			new_posterior = total_loghood_metas + log_prior;
 			//printf("dataset = %i\t likelihood = %lf\n", j, new_posterior);
 	}
-	fclose(fpm); //TURN ON FP1 PRINT STATEMENT IN DDEVF
+	fclose(fpr); 
 
 }
 //----------------------------------------------------Print Output to File-------------------------------------------//
@@ -317,17 +292,9 @@ if(linesearch==1){
 int pid;
 pid=getpid();
 
-char namev[50];
-sprintf(namev, "allmeta_s%i_r%i_%d", searches, numround, pid);
-fpv=fopen(namev, "a+");
-
-char name1[50];
-sprintf(name1, "model_realizations");
-fpm=fopen(name1, "a+");
-
-//char namel[50];
-//sprintf(namel, "lhood_s%i_r%i_%d", searches, numround, pid);
-//fpl=fopen(namel, "a+");
+char namels[50];
+sprintf(namels, "allmeta_s%i_r%i_%d", searches, numround, pid);
+fpls=fopen(namels, "a+");
 
 ///////////////////////////////////////////////////LINE-SEARCH///////////////////////////////////////////////////
 for (round=0;round<numround;round++){
@@ -522,18 +489,7 @@ for (round=0;round<numround;round++){
 		Params.a_l_pop = exp(ltf_params[105]);
 
 		Params.nuV     = exp(ltf_params[106]);
-		//printf("nuV= %lf\n",Params.nuV );
-
-		printf("b=%i\n", b);
-
-		///ADD IN CHECK TO MAKE SURE THAT M and A DONT EQUAL MORE THAN 1
-		if(((Params.m_l_pop * 2 * M_PI)/Params.a_l_pop) > 1){
-			printf("it broke!\n");
-			break;
-		}
-		if(((Params.m_c_pop * 2 * M_PI)/Params.a_c_pop) > 1){
-			break;
-		}	
+		//printf("nuV= %lf\n",Params.nuV );	
 
 			//-------------------MISER CALCULATE LIKELIHOOD------------------------------//
 		double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
@@ -622,22 +578,21 @@ for (round=0;round<numround;round++){
 	int index;
 	for(ii=0; ii<print_len; ii++){
 		index = printlist[ii];
-		fprintf(fpv, "%lf\t", exp(ltf_params[index]));
+		fprintf(fpls, "%lf\t", exp(ltf_params[index]));
 	}
 	//prints all
 	/*
 	for(ii=0; ii<num_ltfparams; ii++){
-		fprintf(fpv, "%lf\t", ltf_params[ii]);
+		fprintf(fpls, "%lf\t", ltf_params[ii]);
 	}*/
 
-	fprintf(fpv, "%lf\t", best_posterior);
+	fprintf(fpls, "%lf\t", best_posterior);
 	//printf("final best posterior = %lf\n", best_posterior);
-	fprintf(fpv, "\n");
+	fprintf(fpls, "\n");
 }
 
 //fclose(fpl);
-fclose(fpv); //parameter values
-fclose(fpm); //model realizations
+fclose(fpls); //parameter values
 }
 
 ///////////////////////////////////////////////////MCMC///////////////////////////////////////////////////

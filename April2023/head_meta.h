@@ -29,113 +29,63 @@ char *strFileNameDate;
 #define DATA_SETS 6		        // number of epizootic data sets //one for each metapop
 #define DATA_SETS_WEATHER 1		// number of weather data sets
 #define NUM_METASUB 3			//number of metapopulations with subpopulations
-#define NUM_PARS 100		        // number of parameters to be passed from main to hood
-#define SIMU 64
-//#define DIM 15						// number of differential equations
-
-int lhood_adj = 0;		//adjustment for likelihood in and out of log scale
-
-const double h = 0.01;		        // time step
-
-//double muV		= 0.39;		//CK// FUNGUS ONLY MODEL.  MAKE SURE DECAY IS ZERO SO NEGATIVE VIRUS DOESN'T HAPPEN!!
-//double squareCVV=0.86*0.86;
-
-double exposetime = 16;
-double VFtime=10;
-double VFPass;
-
-//JL: Long-term survival rates for the pathogens and fecundity
-double phivirus=40;
-double gammavirus=0.01;
-double phifungus=0.25;
-double gammafungus=0.95;
-double psifungus=0.95;
-double eta=100;
-//double ltf_params[7]={10, 0.66,19.571092,21,1e-6,5.5,1}; //make sure not redundant
-double fecundity=74.6;
-
-//JL: Predation parameters
-double preda=0.967;           //Predation parameters, for host-pathogen-predator model
-double predb=0.14*0.39/0.64;
-
-//Enhanced susceptibility and coinfection parameters
-double VFSusF[15]={100,1.5,1.8,2,2.5,3,5,10,15,20,25,50,60,80,100};              //The hosts infected by the virus are more susceptible to the fungus (weaker immune system)
-double VFSus;
-double coinf_V; //The fraction of coinfected hosts (taken over by fungus) producing virus OB's
-
-
-//JL: Recording the status at the end of an epizootic
-double SusEnd;
-double InfFungusEnd=0;
-double InfVirusEnd=0;
-double InfFungusNext=0;
-double InfVirusNext=0;
-
-double InfFungusWeekbefore=0;
-double InfVirusWeekbefore=0;
-
-double InfFungusTwoWeekbefore=0;
-double InfVirusTwoWeekbefore=0;
-
-double InfFungusMonthbefore=0;
-double InfVirusMonthbefore=0;
-
-double InfFungusAdj=0;
-double InfVirusAdj=0;
-
-double VPass;          //variable to pass the value of initialV in each generation
+#define NUM_PARS 110		        // number of parameters to be passed from main to hood
 
 
 
-//SH global declaration of global file fp1 to print daily output into
-FILE *fp1; //realization output
-FILE *fpl; //line-search likelihood output
-FILE *fpv; //line-search parameter value output
-FILE *fpm; //mcmc output
+FILE *fpls; //line-search parameter value output
+FILE *fpr; //model realizations
 
-//double vinfected; //SH to hold daily fraction infected
-//double finfected; //SH add coinfected eventually
-//double survivors; //SH = IF/IV etc divided by initial host density
-//double total;
+//FIXED PARS
+const double h = 0.01;		      
+const double exposetime = 16; //what is this
+const double VFPass = 125.31; //check
 
+const int n = 20; //fungus exposed classes
+const int n1 = 0.39; //
+const int n2 = 19.61; //
+const int m = 50; //virus exposed classes
+const int DIM = 508;  
 
-double FakeWDATA[SIMU][5];
-int days[47]={365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 366, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 365, 366, 365, 365, 364}; //1973-2019
-//CK Structure for experimental data!!!
+const double specific_muF = 0.00962435749864498; //conidia decay rate
+const double Cend = 525.015699999847;
+const double DDstart = 100.157149999888;
+const double DDstop = 267.034499999981;
 
-struct dataset{  //  building the structure, to be declared later
-	int Date;
-	int Tree;
-	int Covered;
-	double total;
-	double fungus;
-};
+const int beta = 10;
+const int theta = 1;
+const double rain_P = 3.80285399989692;
+const double rain_P2 = 3.54725448752468;
+const double rain_P3 = 0.166585199947054;
+const double RH_P = 0.070488499999861;
+const double temp_P = 0.233982799999915;
 
-typedef struct
+const double fourth_size = 291.2745;
+
+const double epsilon = 1e-6;
+
+const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
+const double lambdaV = 1/16; //transmission rate between virus exposed classes
+
+const int sub_index[4] = {0, 127, 254, 381};
+
+//PLACEHOLDER VALUES
+const double size_C = 1; //1: host produce conidia
+const double indexR = 0; //1: host produce resting spores
+const double indexV = 0; //1: host produce virus
+
+typedef struct //FIT PARS
 {
-	double PARS[NUM_PARS];
+	//double PARS[NUM_PARS];
 
 	double nuV;
 	double nuF;
 	double nuR;
 	double muF;
-	double size_C;
-	double indexR;
-	double indexV;
 
-	double R_END[DATA_SETS+1];
-	double INITS[DATA_SETS+1];
-	double POPS[4];
 	double EV[400];
 	double EF[400];
-	double DAY_F[DATA_SETS+1];	    // day where fungal infection first happens
-	int MAXT[DATA_SETS+1];		    // number of days in data set (different for each data set)
-	int MAXT2[DATA_SETS+1];		    // number of days in EXPERIMENTAL data set (different for each EXPERIMENTAL data set)
-	int MAXT3[DATA_SETS+1];		    // number of days in WEATHER data set (different for each WEATHER data set)				   
-
-	//Data Arrays
-	//int EXPDATA[DATA_SETS+1][800][4];	// 3-dimensional array that holds all the EXPERIMENTAL data
-	//int OBSDATA[DATA_SETS+1][150][4];			    // 3-dimensional array that holds all the OBSERVATIONAL data
+	int MAXT3[DATA_SETS+1];		    // number of days in WEATHER data set (different for each WEATHER data set)	//rename			   
 
 	int DATA[DATA_SETS][1000][4]; // array that holds all data, exp and obs
 	double MODEL[DATA_SETS][1000][4]; // array for model output
@@ -145,33 +95,9 @@ typedef struct
 
 	//indexing and dispersal params
 	int numsub;
-	double poptotal;
 
 	int j; //dataset number
 
-	//SH Epizootic Data
-	double test_data[1000][36];
-
-	double AcceptedVect[NUM_PARS];
-	double LoopVect[NUM_PARS];
-
-	double parm_low[NUM_PARS];
-	double parm_high[NUM_PARS];
-	double parm_step[NUM_PARS];
-
-	double MLE[NUM_PARS];
-	double MLE_host[DATA_SETS+1];
-	double MLE_initR[DATA_SETS+1];
-
-	double best_initS[DATA_SETS+1];
-	double best_initR[DATA_SETS+1];
-
-	int parm_inc;
-	int th_id;
-	int pop;
-
-	//Sophia fitting
-	//parameter array
 	double FITINIT[DATA_SETS][NUM_PARS]; 	//initial conditions across subpopulations
 	double FITMETA[NUM_PARS];	//dispersal and coinfection parameters fit across all datasets
 
@@ -188,9 +114,6 @@ typedef struct
 	double m_l_sub[DATA_SETS][4];	//2
 	double a_l_sub[DATA_SETS][4];
 
-	//virus transmission
-	//double nuV; //was 0.64 //apparently that's super high 
-	//virus decay
 	double muV;
 	//heterogeneity
 	double CV;
@@ -219,9 +142,7 @@ typedef struct
 
 #include "data_input.h"
 #include "random_setup.h"
-#include "filenames.h"
 #include "bounds.h"
-#include "prob_dists.h"
 #include "ode_fvco_disp.h"
 #include "DDEVF_meta_fvco_disp.h"
 #include "lhood_meta.h"

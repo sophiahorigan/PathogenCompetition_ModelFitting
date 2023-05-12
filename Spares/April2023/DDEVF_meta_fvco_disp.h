@@ -27,7 +27,7 @@ if (j==4 || j==5 || j==6) { // obs data
 	num_sub = Params->numsub;
 }
 
-int larvae_dispersal_on = 1; //set to 0 for no dispersal
+int larvae_dispersal_on = 0; //set to 0 for no dispersal
 
 
 
@@ -470,7 +470,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		IV[sub]=0;
 		IVF[sub]=0;
 		IFV[sub]=0;
-		printf("POST ODE sub = %i\t S = %e\t C = %e\t V = %e\n", sub, S[sub], C[sub], V[sub]);
+		//printf("POST ODE j = %i\t sub = %i\t S = %e\t C = %e\t V = %e\n", j, sub, S[sub], C[sub], V[sub]);
 
 	}
 		

@@ -7,15 +7,16 @@ Params = (STRUCTURE*) Paramstuff;
 //FIT PARAMETERS
 double nuV 		= Params->nuV; //fitting //used to be 0.64
 double nuF		= Params->nuF;	//conidia transmission
-
+double muV		= Params->muV; //virus decay
+double VFSus	= Params->VFSus; //enhanced susceptibility
+double squareCVV = Params->CV*Params->CV; //heterogeneity
 
 //WEATHER CALCULATED VALUES
 double nuR		= Params->nuR;	//resting spore transmission
-double muF		= Params->muF;  
+double muF		= Params->muF;  //conidia decay
 
+//INDEXING
 int j = Params->j; //dataset
-
-//indexing
 int i;
 int num_sub = Params->numsub;
 //printf("fast ode num_sub = %i\n", num_sub);
@@ -24,58 +25,98 @@ int sub;
 double S0[4];
 double R[4];
 
-//coinfection variables
-//we don't want coinfection to play a part in our experimental data
-double VFSus;
-double coinf_V;
-
 if (j==1 || j==2 || j==3){
 	for(i=0; i<num_sub; i++){
 		S0[i] = Params->FITINIT[j][i];
 		R[i] = Params->FITINIT[j][i+num_sub+num_sub];
-		//printf("S0 = %lf\t R = %lf\n", S0[i], R[i]);
-		VFSus = 0;
-		coinf_V = 0;
 	}
 }
 if (j==4 || j==5 || j==6){
 	S0[0] = Params->FITINIT[j][0];
 	R[0] = Params->FITINIT[j][8];
-	//printf("S0 = %lf\t R = %lf\n", S0[0], R[0]);
-	VFSus = Params->VFSus;
-	coinf_V = Params->coinf_V;
 }
 
-//printf("j = %i\t, VFSus = %lf\t, coinf_V = %lf\n", j, VFSus, coinf_V);
-//printf("muV=%lf\n", Params->muV);
-
-//heterogeneity
-double squareCVV = Params->CV*Params->CV;
-
-//dispersal
-int coni_dispersal_on = 0; //set to 0 for no dispersal
 int subout; //indexing
 int subin; //indexing
 double Cout[4];
 double Cin[4];
 double netC[4];
+double a_c[4][4];
+double m_c[4][4];
 
-for(sub=0; sub<num_sub; sub++){
-	Cout[sub] = 0;
-	Cin[sub] = 0;
-	netC[4] = 0;
-}
+//DISPERSAL FITTING
+int coni_dispersal_on = 0; //set to 0 for no dispersal
+//a
+int a_c_pop_fit = 1; //set to 1 for pop level a 
+int a_c_meta_fit = 0; //set to 1 for meta level a
+int a_c_sub_fit = 0; //set to 1 for sub level a
+//m
+int m_c_pop_fit = 1; //set to 1 for pop level m
+int m_c_meta_fit = 0; //set to 1 for meta level m 
+int m_c_sub_fit = 0; //set to 1 for sub level m
+
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
 if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
+	for(sub=0; sub<num_sub; sub++){
+		Cout[sub] = 0;
+		Cin[sub] = 0;
+		netC[sub] = 0;
+	}
+	//COMPETING MODELS
+	//a
+	if (a_c_pop_fit == 1){
+		for(i=1; i<=3; i++){
+			for(sub=0;sub<num_sub;sub++){
+				a_c[i][sub] = Params->a_c_pop; //one value for entire population 
+			}
+		}
+	}
+	if (a_c_meta_fit == 1){
+		for(i=1; i<=3; i++){
+			for(sub=0;sub<num_sub;sub++){
+				a_c[i][sub] = Params->a_c_meta[i]; //one value for each metapopulation 
+			}
+		}
+	}
+	if (a_c_sub_fit == 1){
+		for(i=1; i<=3; i++){
+			for(sub=0;sub<num_sub;sub++){
+				a_c[i][sub] = Params->a_c_sub[i][sub]; //one value for each subpopulation 
+			}
+		}
+	}	
+	//m
+	if (m_c_pop_fit == 1){
+		for(i=1; i<=3; i++){
+			for(sub=0;sub<num_sub;sub++){
+				m_c[i][sub] = Params->m_c_pop; //one value for entire population 
+			}
+		}
+	}
+	if (m_c_meta_fit == 1){
+		for(i=1; i<=3; i++){
+			for(sub=0;sub<num_sub;sub++){
+				m_c[i][sub] = Params->m_c_meta[i]; //one value for each metapopulation 
+			}
+		}
+	}
+	if (m_c_sub_fit == 1){
+		for(i=1; i<=3; i++){
+			for(sub=0;sub<num_sub;sub++){
+				m_c[i][sub] = Params->m_c_sub[i][sub]; //one value for each subpopulation 
+			}
+		}
+	}	
+	//BEGIN DISPERSAL
 	if (j==1 || j==2 || j==3) { 
 
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			
 			//SCALE OF MIGRATION
 			//netCout[subout] = ((Params->m_c_sub[j][subout] * 2.0 * M_PI)/Params->a_c_pop) * y[m+n+1+sub_index[subout]];
-			Cout[subout] = exp(-Params->a_c_pop*10) * y[m+n+1+sub_index[subout]]; //r = 10m
+			Cout[subout] = exp(-a_c[j][subout]*10) * y[m+n+1+sub_index[subout]]; //r = 10m
 			//printf("sub=%i\t Cout=%lf\t C=%lf\n", subout, Cout[subout], y[m+n+1+sub_index[subout]]);
 			//printf("IN DISPERSAL sub=%i\t C=%e\n", subout, y[m+n+1+sub_index[subout]]);
 
@@ -84,7 +125,7 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 				if(subout != subin){
 
 					//netCin[subin] += y[m+n+1+sub_index[subout]] * Params->m_c_sub[j][subout] * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
-					Cin[subin] += Cout[subout] * Params->m_c_pop * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
+					Cin[subin] += Cout[subout] * m_c[j][subout] * exp(-a_c[j][subout]*Params->DISTANCE[j][subout][subin]);
 
 				}
 			} 
@@ -99,28 +140,38 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 			}
 		}
 	}	
+	if (j==4 || j==5 || j==6) { //no dispersal in observational populations
+
+		for(subout = 0; subout < num_sub; subout++){
+
+			netC[sub] = 0;
+		}
+
+	}
 }
 
 for(sub=0; sub<num_sub; sub++){
 	//*******************SUSCEPTIBLE*********************
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
-	printf("subindex[sub]=%i\t dydt[0]=%e\n", sub_index[sub], dydt[0+sub_index[sub]]);
-	printf("%e\t %e\t %e\t %e\t %e\n", y[0+sub_index[sub]], y[m+n+1+sub_index[sub]], y[0+sub_index[sub]], y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub]);
-	printf("params nuF=%e\t nuR = %e\t Rsub=%lf\t nuV%lf\t squareCVV=%lf\n", nuF, nuR, R[sub], nuV, squareCVV);
-	//printf("%e\t %e\t %e\t %e\n", nuF, y[m+n+1+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]]);
-	getc(stdin);
-	//getc(stdin);
+
 	//***********************FUNGUS-INFECTED**********************
-	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R[sub]*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]];
-	for(i=2; i <= m; i++){
-		dydt[i+sub_index[sub]]=m*lambdaF*(y[i-1+sub_index[sub]] -y[i+sub_index[sub]]);
+	//first fungus class (susceptibles and virus-infected)
+	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R[sub]*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]]; //fungus infected susceptibles
+	for(i=1;i<=n1;i++){ //fungus infected virus-infected 
+		dydt[1+sub_index[sub]] += (nuF*y[m+n+1] + nuR*R[sub])*y[m+i+sub_index[sub]]*VFSus;
 	}
+	
+	for(i=2; i <= m; i++){ //fungus exposed classes
+		dydt[i+sub_index[sub]]=m*lambdaF*(y[(i-1)+sub_index[sub]] -y[i+sub_index[sub]]);
+		//printf("sub = %i\t i=%i\t previousclass = %e\t moving= %e\n", sub, i, y[i-1+sub_index[sub]], y[i+sub_index[sub]]);
+	}
+	//getc(stdin);
 
 	//**********************VIRUS-INFECTED************************
 	//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
 	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
 	for (i=2;i<=n1;i++){
-		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+i-1+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]]+ nuR*R[sub])*VFSus;
+		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+(i-1)+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]]+ nuR*R[sub])*VFSus;
 	}
 
 	//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
@@ -129,32 +180,20 @@ for(sub=0; sub<num_sub; sub++){
 		dydt[m+n1+i+sub_index[sub]]=n*lambdaV*(y[m+n1+i-1+sub_index[sub]]-y[m+n1+i+sub_index[sub]]);
 	}
 
-	//**********************Fungus cadavers (conidia)**************
-	//conidia
-	dydt[m+n+1+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C - muF*y[m+n+1+sub_index[sub]] + netC[sub];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
-	//printf("sub = %i\t conidia = %e\n", sub, dydt[m+n+1+sub_index[sub]]);
-	//printf("term 1 = %e\t, term 2 = %e\n", m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]])*size_C,  muF*(y[m+n+1+sub_index[sub]]+netC[sub]));
-	//printf("m=%lf\t lambdaF=%e\t big one = %e\t ymsub = %e\t 1-coinfV=%lf\t ymnmsub=%e\t sizec=%lf\n", m, lambdaF, (y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]), y[m+sub_index[sub]],(1-coinf_V), y[m+n+6+m+sub_index[sub]], size_C);
-	//getc(stdin);
-	//resting spores
-	dydt[m+n+2+sub_index[sub]] = indexR*m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
+	//**********************CONIDIA*****************
+	dydt[m+n+1+sub_index[sub]] = m*lambdaF*y[m+sub_index[sub]]*size_C - muF*y[m+n+1+sub_index[sub]] + netC[sub];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)
 
-	//*************************VIRUS CADAVERS***********************
-	dydt[m+n+3+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V-Params->muV*y[m+n+3+sub_index[sub]];  //Class of cadavers infected by virus
-	dydt[m+n+4+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V;
-	dydt[m+n+5+sub_index[sub]] = m*lambdaF*(y[m+sub_index[sub]]+(1-coinf_V)*y[m+n+6+m+sub_index[sub]]);
-	dydt[m+n+6+sub_index[sub]] = indexV*(n*lambdaV*y[m+n+sub_index[sub]]+m*lambdaF*y[m+n+6+m+sub_index[sub]]*coinf_V);
+	//**********************RESTING SPORES FOR NEXT EPIZOOTIC*****************
+	dydt[m+n+2+sub_index[sub]] = indexR*m*lambdaF*y[m+sub_index[sub]];
 
-	//*******************COINFECTION******************
-	//Recording the hosts already infected with virus and taken over by the fungus
-	dydt[m+n+6+1+sub_index[sub]] = (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+1+sub_index[sub]]*VFSus- m*lambdaF*y[m+n+6+1+sub_index[sub]];
-	//printf("sub = %i\t nuf = %lf\t C = %lf\t nuR = %lf\t R = %lf\t V = %lf\t VFSUS = %lf\n", sub, nuF, y[m+n+1+sub_index[sub]], nuR, R[sub], y[m+1+sub_index[sub]], Params->VFSus);
-	for (i=2;i<=n1;i++){
-		dydt[m+n+6+1+sub_index[sub]] += (nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*y[m+i+sub_index[sub]]*VFSus;
-	}
-	for(i=2; i <= m; i++){
-		dydt[m+n+6+i+sub_index[sub]]=m*lambdaF*(y[m+n+6+i-1+sub_index[sub]] -y[m+n+6+i+sub_index[sub]]);
-	}
+	//*************************VIRUS***********************
+	dydt[m+n+3+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]] - muV*y[m+n+3+sub_index[sub]];  //Class of cadavers infected by virus
+	
+	//*************************VIRUS KILL?***********************
+	dydt[m+n+4+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]];
+	
+	//*************************FUNGUS KILL?***********************
+	dydt[m+n+5+sub_index[sub]] = m*lambdaF*y[m+sub_index[sub]];
 	
 }
 

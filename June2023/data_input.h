@@ -9,7 +9,6 @@ Params = (STRUCTURE*) Paramstuff;
 // loads the data into a matrix and finds the number of weeks in the data set
 int Sdata[MAX_WEEKS]; int Vdata[MAX_WEEKS]; int Fdata[MAX_WEEKS]; int FVdata[MAX_WEEKS]; int Ddata[MAX_WEEKS]; int Cdata[MAX_WEEKS]; int D2data[MAX_WEEKS];
 int Ddata2[MAX_WEEKS2]; double Rain[MAX_WEEKS2]; double MaxT[MAX_WEEKS2]; double MinT[MAX_WEEKS2]; double AveT[MAX_WEEKS2]; double MaxRH[MAX_WEEKS2]; double MinRH[MAX_WEEKS2]; double AveRH[MAX_WEEKS2];
-//double fakeday[SIMU]; double fakerain[SIMU]; double fakemaxt[SIMU]; double fakeavet[SIMU]; double fakerh[SIMU];
 int weeks;	int i; int j; int q;
 int num_weeks[DATA_SETS+1];			// used for output to file
 int num_weeks2[DATA_SETS+1];			//CK// used for output to file
@@ -18,15 +17,6 @@ int total_days=0;					// the number of days summed over all data sets (for MISER
 
 int d1[MAX_WEEKS]; int d2[MAX_WEEKS]; int d3[MAX_WEEKS]; int d4[MAX_WEEKS]; //distance array input
 double dp1[MAX_WEEKS]; double dp2[MAX_WEEKS]; double dp3[MAX_WEEKS]; double dp4[MAX_WEEKS]; //prob of larval disp 
-
-//SH Need to figure out
-//Params->DATA = i3tensor(0,20,0,MAX_WEEKS,0,5);
-//Params->EXPDATA = i3tensor(0,20,0,MAX_WEEKS,0,5);  //CK// May need to check this.  Not sure what i3tensor does...
-//Params->WDATA = i3tensor(0,20,0,MAX_WEEKS2,0,8);  //SH// Need to ensure this is correct
-
-//printf("just after WDATA...\n");
-//Params->CCDATA = d3tensor(0,100,0,MAX_WEEKS2,0,4);  //CK// May need to check this.  Not sure what i3tensor does...
-//JL: Change the second number of d3tensor (=number of years)
 
 double rain;
 double maxT;
@@ -139,10 +129,11 @@ for (j=1;j<=DATA_SETS;j++)	{
 	ftp_data=fopen(file,"r");
 	if (ftp_data==0)	{printf("file %d open error \n",j);		getc(stdin);	}
 
-	while (fscanf(ftp_data,"%i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i])!= EOF)			{
+	while (fscanf(ftp_data,"%i %i %i %i \n",&Sdata[i],&Vdata[i],&Fdata[i],&FVdata[i])!= EOF)			{
 	//block one
 		//printf("%i, I am here!!", j);
-		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i];  
+		Params->DATA[j][i][0]=Sdata[i]; Params->DATA[j][i][1]=Vdata[i]; Params->DATA[j][i][2]=Fdata[i]; Params->DATA[j][i][3]=FVdata[i];
+		//printf("%i\t %i\t %i\t %i\t %i\n",j, Params->DATA[j][i][0],Params->DATA[j][i][1], Params->DATA[j][i][2], Params->DATA[j][i][3]);
 
 	weeks++; i++;
 }

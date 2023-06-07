@@ -2,7 +2,6 @@ double DDEVF(void *Paramstuff, double *RandNumsPass ,size_t dim,int pop,int maxy
 
 {
 
-printf("start DDEVF\n");
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
@@ -27,14 +26,14 @@ if (j==4 || j==5 || j==6) { // obs data
 	num_sub = Params->numsub;
 }
 
-int larvae_dispersal_on = 0; //set to 0 for no dispersal
+int larvae_dispersal_on = 1; //set to 0 for no dispersal
 //a
 int a_l_pop_fit = 1; //set to 1 for pop level a 
 int a_l_meta_fit = 0; //set to 1 for meta level a
 int a_l_sub_fit = 0; //set to 1 for sub level a
 //m
-int m_l_pop_fit = 1; //set to 1 for pop level m
-int m_l_meta_fit = 0; //set to 1 for meta level m 
+int m_l_pop_fit = 0; //set to 1 for pop level m
+int m_l_meta_fit = 1; //set to 1 for meta level m 
 int m_l_sub_fit = 0; //set to 1 for sub level m
 
 
@@ -95,8 +94,6 @@ double IV[num_sub]; double IF[num_sub]; double IVF[num_sub]; double IFV[num_sub]
 //exposed class declaratoin
 double E_V[num_sub][n2+1]; double E_F[num_sub][n+1]; double E_VF[num_sub][n1+1]; double E_FV[num_sub][n+1]; //CHECK
 
-
-
 // ----------------------------------- CONIDIA BLOOMING TIMES --------------------------------------- //
 
 R_start=hatch; //SH Resting spores start blooming from start day
@@ -114,8 +111,6 @@ while(DD10 <= DDstop){
 }
 
 DD10=0.0;
-
-
 
 // ---------------------------- INITIALIZE POPULATION SIZES ------------------------------- //
 
@@ -152,7 +147,7 @@ if (j==4 || j==5 || j==6){
 for(i=0; i<num_sub; i++){ 
 	S[i] = INITS[i]; //host density
 	//printf("S[%i] = %lf\n", i, S[i]);
-	V[i] = 0; //virus cadavers
+	V[i] = INITV[i]; //virus cadavers
 	C[i] = 0; //conidia 
 	R[i] = INITR[i]; //resting spores
 	//printf("J = %i\t, INITIAL CONDITIONS: S=%lf\t, V=%lf\t, R=%lf\n",j, num_sub, S[i], V[i], R[i]);
@@ -326,6 +321,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
 							a_l[i][sub] = Params->a_l_pop; //one value for entire population 
+							//printf("here, a_l[i][sub]=%lf\n", a_l[i][sub]);
 						}
 					}
 				}
@@ -348,6 +344,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
 							m_l[i][sub] = Params->m_l_pop; //one value for entire population 
+							//printf("here, m_l[i][sub]=%lf\n", m_l[i][sub]);
 						}
 					}
 				}
@@ -369,14 +366,14 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 				for(subout=0; subout<num_sub; subout++){
 					//susceptible larvae dispersing
 					Sout[subout] = exp(-a_l[j][subout]*10) * S[subout];
-					//printf("m = %lf\t a = %lf\n", Params->m_l_pop, Params->a_l_pop);
+					//printf("a = %lf\n", a_l[j][subout]);
 
 					//susceptible larvae that arrive at another metapopulation
 					for(subin=0; subin<num_sub; subin++){
 						if(subin!=subout){
 
 							Sin[subin] = Sout[subout]*m_l[j][subout]*exp(-a_l[j][subout]*Params->DISTANCE[j][subout][subin]);
-							//printf("distance[%i][%i][%i] = %i\n", j, subout, subin, Params->DISTANCE[j][subout][subin]);
+							printf("subout = %i\t m = %lf\n", m_l[j][subout]);
 						}
 					}
 
@@ -390,7 +387,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 							if(subin!=subout){
 								//infected larvae that arrive at another metapopulation
 								//SCALE OF MIGRATION
-								//VFin[subin][i] += E_VF[subout][i]*Params->m_l_sub[j][subout]*exp(-Params->a_l_pop*Params->DISTANCE[j][subout][subin]);
 								VFin[subin][i] += VFout[subout][i]*m_l[j][subout]*exp(-a_l[j][subout]*Params->DISTANCE[j][subout][subin]);
 							}
 						}
@@ -429,26 +425,27 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		}
 	}	                        	
 		
-		//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
-		for(sub=0; sub<num_sub; sub++){ 
-			y_ode[0+sub_index[sub]]=S[sub];	//SUSCEPTIBLE
+	//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
+	for(sub=0; sub<num_sub; sub++){ 
+		y_ode[0+sub_index[sub]]=S[sub];	//SUSCEPTIBLE
 
-			for (i=1;i<=m;i++)	{ //FUNGUS INFECTED 
-				y_ode[i+sub_index[sub]]=E_F[sub][i];
-			}
-			for (i=1;i<=n1;i++)	{ //EARLY INFECTED VIRUS
-				y_ode[m+i+sub_index[sub]]=E_VF[sub][i];
-			} 
-			for (i=1;i<=n2;i++)	{ //LATE INFECTED VIRUS
-				y_ode[m+n1+i+sub_index[sub]]=E_V[sub][i];
-			}
-			y_ode[m+n+1+sub_index[sub]]=C[sub];	//CONIDIA
-			y_ode[m+n+2+sub_index[sub]]=Fnext[sub];
-			y_ode[m+n+3+sub_index[sub]]=V[sub]; //OBS
-			y_ode[m+n+4+sub_index[sub]]=Vkill[sub];
-			y_ode[m+n+5+sub_index[sub]]=Fkill[sub];
+		for (i=1;i<=m;i++)	{ //FUNGUS INFECTED 
+			y_ode[i+sub_index[sub]]=E_F[sub][i];
 		}
-		
+		for (i=1;i<=n1;i++)	{ //EARLY INFECTED VIRUS
+			y_ode[m+i+sub_index[sub]]=E_VF[sub][i];
+		} 
+		for (i=1;i<=n2;i++)	{ //LATE INFECTED VIRUS
+			y_ode[m+n1+i+sub_index[sub]]=E_V[sub][i];
+		}
+		y_ode[m+n+1+sub_index[sub]]=C[sub];	//CONIDIA
+		y_ode[m+n+2+sub_index[sub]]=Fnext[sub];
+		y_ode[m+n+3+sub_index[sub]]=V[sub]; //OBS
+		//printf("v in daily update = %lf\n",y_ode[m+n+3+sub_index[sub]]);
+		y_ode[m+n+4+sub_index[sub]]=Vkill[sub];
+		y_ode[m+n+5+sub_index[sub]]=Fkill[sub];
+	}
+	
 
 	//******************************* Weather Stuff ******************************//
 	DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days
@@ -492,6 +489,7 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 		S[sub]=y_ode[0+sub_index[sub]]; //SUSCEPTIBLES
 		C[sub]=y_ode[m+n+1+sub_index[sub]]; //CONIDIA
 		V[sub]=y_ode[m+n+3+sub_index[sub]]; //OBS
+		//printf("day = %i\t sub = %i\t cadaver density = %lf\n", day, sub,V[sub] );
 		Fnext[sub]=y_ode[m+n+2+sub_index[sub]];			
 		Vkill[sub]=y_ode[m+n+4+sub_index[sub]];
 		Fkill[sub]=y_ode[m+n+5+sub_index[sub]];			
@@ -520,7 +518,6 @@ while (t_0<MAXT3+h)	{    //CK// change MAXT to MAXT2 to let it go to the end of 
 	}
 
 //*******************************PRINT MODEL OUTPUT**************************//
-printf("end DDEVF\n");
 		//LOOP THROUGH ARRAYS
 	int day_index[4] = {0, 47, 95, 143}; //to append 48 day epizootics //probably a better way to do this
 	
@@ -530,8 +527,8 @@ printf("end DDEVF\n");
 		Params->MODEL[j][day-1+day_index[sub]][1] = (IV[sub]+IVF[sub])/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected V 
 		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(y_ode[0+sub_index[sub]]+IV[sub]+IF[sub]+IVF[sub]+IFV[sub]); //Saving daily fraction infected F
 		//MODEL REALIZATION PRINTING
-		//fprintf(fpr, "%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
-		//printf("%i\t %i\t %i\t %e\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2], Params->MODEL[j][day-1+day_index[sub]][3]);
+		fprintf(fpr, "%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
+		//printf("%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
 	}
 }
 

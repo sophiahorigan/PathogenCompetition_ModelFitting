@@ -41,26 +41,26 @@ else if (i==24)		{	low = -4.6;			high = -1.2;		}  // a_c_sub
 else if (i==25)		{	low = -4.6;			high = -1.2;		}  // a_c_sub
 else if (i==26)		{	low = -4.6;			high = -1.2;		}  // a_c_sub
 
-else if (i==27)		{	low = -8.5;			high = 1.16;	} //m_c_pop
+else if (i==27)		{		low = -8.5;			high = -0.0001;		} //m_c_pop
 
-else if (i==28)		{	low = -8.5;			high = 1.16;	} //m_c_meta1
-else if (i==29)		{	low = -8.5;			high = 1.16;	} //m_c_meta2
-else if (i==30)		{	low = -8.5;			high = 1.16;	} //m_c_meta3
+else if (i==28)		{		low = -8.5;			high = -0.0001;	} //m_c_meta1
+else if (i==29)		{		low = -8.5;			high = -0.0001;	} //m_c_meta2
+else if (i==30)		{		low = -8.5;			high = -0.0001;	} //m_c_meta3
 
-else if (i==31)		{	low = -8.5;			high = 1.16;	} //m_c_sub //meta1
-else if (i==32)		{	low = -8.5;			high = 1.16;	} //m_c_sub
-else if (i==33)		{	low = -8.5;			high = 1.16;	} //m_c_sub
-else if (i==34)		{	low = -8.5;			high = 1.16;	} //m_c_sub
+else if (i==31)		{		low = -8.5;			high = -0.0001;		} //m_c_sub //meta1
+else if (i==32)		{		low = -8.5;			high = -0.0001;	} //m_c_sub
+else if (i==33)		{		low = -8.5;			high = -0.0001;		} //m_c_sub
+else if (i==34)		{		low = -8.5;			high = -0.0001;	} //m_c_sub
 
-else if (i==35)		{	low = -8.5;			high = 1.16;	} //m_c_sub //meta2
-else if (i==36)		{	low = -8.5;			high = 1.16;	} //m_c_sub
-else if (i==37)		{	low = -8.5;			high = 1.16;	} //m_c_sub
-else if (i==38)		{	low = -8.5;			high = 1.16;	} //m_c_sub
+else if (i==35)		{		low = -8.5;			high = -0.0001;		} //m_c_sub //meta2
+else if (i==36)		{		low = -8.5;			high = -0.0001;	} //m_c_sub
+else if (i==37)		{		low = -8.5;			high = -0.0001;		} //m_c_sub
+else if (i==38)		{		low = -8.5;			high = -0.0001;		} //m_c_sub
 
-else if (i==39)		{	low = -8.5;			high = 1.16;	} //m_c_sub //meta3
-else if (i==40)		{	low = -8.5;			high = 1.16;	} //m_c_sub
-else if (i==41)		{	low = -8.5;			high = 1.16;	} //m_c_sub
-else if (i==42)		{	low = -8.5;			high = 1.16;	} //m_c_sub
+else if (i==39)		{		low = -8.5;			high = -0.0001;	} //m_c_sub //meta3
+else if (i==40)		{	low = -8.5;			high = -0.0001;		} //m_c_sub
+else if (i==41)		{	low = -8.5;			high = -0.0001;		} //m_c_sub
+else if (i==42)		{		low = -8.5;			high = -0.0001;	} //m_c_sub
 
 
 else if (i==43)		{	low = -4.6;			high = -1.2;		}  // a_l_pop
@@ -84,26 +84,26 @@ else if (i==56)		{	low = -4.6;			high = -1.2;		}  // a_l_sub
 else if (i==57)		{	low = -4.6;			high = -1.2;		}  // a_l_sub
 else if (i==58)		{	low = -4.6;			high = -1.2;		}  // a_l_sub
 
-else if (i==59)		{	low = -8.5;			high = 1.16;	} //m_l_pop
+else if (i==59)		{	low = -8.5;			high = -0.0001;	} //m_l_pop
 
-else if (i==60)		{	low = -8.5;			high = 1.16;	} //m_l_meta1
-else if (i==61)		{	low = -8.5;			high = 1.16;	} //m_l_meta2
-else if (i==62)		{	low = -8.5;			high = 1.16;	} //m_l_meta3
+else if (i==60)		{		low = -8.5;			high = -0.0001;	} //m_l_meta1
+else if (i==61)		{		low = -8.5;			high = -0.0001;	} //m_l_meta2
+else if (i==62)		{		low = -8.5;			high = -0.0001;	} //m_l_meta3
 
-else if (i==63)		{	low = -8.5;			high = 1.16;	} //m_l_sub //meta1
-else if (i==64)		{	low = -8.5;			high = 1.16;	} //m_l_sub
-else if (i==65)		{	low = -8.5;			high = 1.16;	} //m_l_sub
-else if (i==66)		{	low = -8.5;			high = 1.16;	} //m_l_sub
+else if (i==63)		{		low = -8.5;			high = -0.0001;		} //m_l_sub //meta1
+else if (i==64)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
+else if (i==65)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
+else if (i==66)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
 
-else if (i==67)		{	low = -8.5;			high = 1.16;	} //m_l_sub //meta2
-else if (i==68)		{	low = -8.5;			high = 1.16;	} //m_l_sub
-else if (i==69)		{	low = -8.5;			high = 1.16;	} //m_l_sub
-else if (i==70)		{	low = -8.5;			high = 1.16;	} //m_l_sub
+else if (i==67)		{		low = -8.5;			high = -0.0001;		} //m_l_sub //meta2
+else if (i==68)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
+else if (i==69)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
+else if (i==70)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
 
-else if (i==71)		{	low = -8.5;			high = 1.16;	} //m_l_sub //meta3
-else if (i==72)		{	low = -8.5;			high = 1.16;	} //m_l_sub
-else if (i==73)		{	low = -8.5;			high = 1.16;	} //m_l_sub
-else if (i==74)		{	low = -8.5;			high = 1.16;	} //m_l_sub
+else if (i==71)		{		low = -8.5;			high = -0.0001;	} //m_l_sub //meta3
+else if (i==72)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
+else if (i==73)		{		low = -8.5;			high = -0.0001;	} //m_l_sub
+else if (i==74)		{		low = -8.5;			high = -0.0001;		} //m_l_sub
 
 //metapopulation four
 else if (i==75)		{	low = 0;			high = 5;		} 	//initS //1-148

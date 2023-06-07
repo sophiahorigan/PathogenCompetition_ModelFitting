@@ -41,9 +41,9 @@ const double h = 0.01;
 const double exposetime = 16; //what is this
 const double VFPass = 125.31; //check
 
-const int n = 20; //fungus exposed classes
-const int n1 = 0.39; //
-const int n2 = 19.61; //
+const int n = 27; //fungus exposed classes
+const int n1 = 10; //
+const int n2 = 17; //
 const int m = 50; //virus exposed classes
 const int DIM = 508;  
 
@@ -65,7 +65,7 @@ const double fourth_size = 291.2745;
 const double epsilon = 1e-6;
 
 const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
-const double lambdaV = 1/16; //transmission rate between virus exposed classes
+const double lambdaV = 0.0625; //transmission rate between virus exposed classes
 
 const int sub_index[4] = {0, 127, 254, 381};
 

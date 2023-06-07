@@ -12,7 +12,7 @@ Params = (STRUCTURE*) Paramstuff;
 int i=0;int ii; int jj; int k; int l;
 int num_adj_pars=29;			// number of adjustable parameters //get rid of this structure, only there to make sure best pars get set
 int pop;
-int epi_length = 48;
+int epi_length = 48; //CHANGE
 
 
 //---------------------Write over the initial params with known fit params --------------------------//
@@ -32,8 +32,8 @@ int dataset;
 dataset = Params->j;
 
 //printf("pop= %i\t year=%i\t dataset=%i\n", pop, year, dataset);
-DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
 
+DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
 
 
 int m = 0; int n; double lhood_sub = 0; double lhood_meta = 0; double lhood_meta2;
@@ -41,59 +41,60 @@ if (dataset==1 || dataset==2 || dataset==3) { //three block sites with subpopula
 	while (m < epi_length*4){
 		for (n = 0; n < epi_length; n++){
 			if(Params->DATA[dataset][m][0] != -1){
-				if(Params->DATA[dataset][m-1][1] == -2){ //virus infection
-					//printf("binomial V \n");
-					//virus infected data, virus infected model, total population (S+V)
-					lhood_sub += log(gsl_ran_binomial_pdf(Params->DATA[dataset][m][1], Params->MODEL[dataset][m][1], Params->DATA[dataset][m][1]+Params->DATA[dataset][m][0]));
-					//printf("DATA S=%i\t V=%i\t F=%i\t FV=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2], Params->DATA[dataset][m][3]);
-					//printf("MODEL S=%e\t V=%e\t F=%e\t FV=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2], Params->MODEL[dataset][m][3]);
-					//printf("lhood sub = %lf\n", lhood_sub);
+				if(Params->MODEL[dataset][m][1] > dummy){ //if virus = 1
+					Params->MODEL[dataset][m][1] -= 2*epsilon; //take 2* epsilon off
+					Params->MODEL[dataset][m][0] += epsilon; //give 1 epsilon to susceptible
+					Params->MODEL[dataset][m][2] += epsilon; //give 1 epsilon to fungus
+					//printf("post-adjustment, V tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//getc(stdin);
+				}
+			
+				if(Params->MODEL[dataset][m][2] > dummy){ //if fungus = 1
+					Params->MODEL[dataset][m][2] -= 2*epsilon; //take 2* epsilon off
+					Params->MODEL[dataset][m][0] += epsilon; //give 1 epsilon to susceptible
+					Params->MODEL[dataset][m][1] += epsilon; //give 1 epsilon to virus
+					//printf("post-adjustment, F tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//printf("woohoo!");
+					//getc(stdin);
 				}
 
-				if(Params->DATA[dataset][m-1][1] == -3){ //fungus infection
-					//printf("binomial F \n");
-					//fungus infected data, fungus infected model, total population (S+F)
-					lhood_sub += log(gsl_ran_binomial_pdf(Params->DATA[dataset][m][2], Params->MODEL[dataset][m][2], Params->DATA[dataset][m][2]+Params->DATA[dataset][m][0]));
-					//printf("DATA S=%i\t V=%i\t F=%i\t FV=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2], Params->DATA[dataset][m][3]);
-					//printf("MODEL S=%e\t V=%e\t F=%e\t FV=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2], Params->MODEL[dataset][m][3]);
-					//printf("lhood sub = %lf\n", lhood_sub);
+				if(Params->MODEL[dataset][m][0] > dummy){ //if susceptible = 1
+					Params->MODEL[dataset][m][0] -= 2*epsilon; //take 2* epsilon off
+					Params->MODEL[dataset][m][0] += epsilon; //give 1 epsilon to susceptible
+					Params->MODEL[dataset][m][2] += epsilon; //give 1 epsilon to virus
+					//printf("post-adjustment, F tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//printf("woohoo!");
+					//getc(stdin);
 				}
 
-				//use multinomial for A) no infection, b) fungus and virus infection
-				if(Params->DATA[dataset][m-1][1] == -1){ 
-					//printf("multinomial\n");
-					if(Params->MODEL[dataset][m][1] > dummy){ //if virus = 1
-						Params->MODEL[dataset][m][1] -= 2*epsilon; //take 2* epsilon off
-						Params->MODEL[dataset][m][0] += epsilon; //give 1 epsilon to susceptible
-						Params->MODEL[dataset][m][2] += epsilon; //give 1 epsilon to fungus
-						//printf("post-adjustment, V tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
-						//getc(stdin);
-					}
-				
-					if(Params->MODEL[dataset][m][2] > dummy){ //if fungus = 1
-						Params->MODEL[dataset][m][2] -= 2*epsilon; //take 2* epsilon off
-						Params->MODEL[dataset][m][0] += epsilon; //give 1 epsilon to susceptible
-						Params->MODEL[dataset][m][1] += epsilon; //give 1 epsilon to virus
-						//printf("post-adjustment, F tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
-						//printf("woohoo!");
-						//getc(stdin);
-					}
-
-					if(Params->MODEL[dataset][m][0] < 1 - dummy){ //if susceptible = 0
-						Params->MODEL[dataset][m][0] += epsilon; //add epsilon 
-						//not taken from others to prevent negative numbers
-						//printf("post-adjustment, S tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
-						//printf("woohoo!");
-						//getc(stdin);
-					}
-					if(Params->DATA[dataset][m][0] != -1){
-					//calculate likelihood
-					lhood_sub += gsl_ran_multinomial_lnpdf(4, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
-					//printf("DATA S=%i\t V=%i\t F=%i\t FV=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2], Params->DATA[dataset][m][3]);
-					//printf("MODEL S=%e\t V=%e\t F=%e\t FV=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2], Params->MODEL[dataset][m][3]);
-					//printf("lhood sub = %lf\n", lhood_sub);
-					}
+				if(Params->MODEL[dataset][m][0] < 1 - dummy){ //if susceptible = 0
+					Params->MODEL[dataset][m][0] += epsilon; //add epsilon 
+					//not taken from others to prevent negative numbers
+					//printf("post-adjustment, S tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//printf("woohoo!");
+					//getc(stdin);
 				}
+
+				if(Params->MODEL[dataset][m][1] < 1 - dummy){ //if virus = 0
+					Params->MODEL[dataset][m][1] += epsilon; //add epsilon 
+					//not taken from others to prevent negative numbers
+					//printf("post-adjustment, V tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//printf("woohoo!");
+					//getc(stdin);
+				}
+
+				if(Params->MODEL[dataset][m][2] < 1 - dummy){ //if fungus = 0
+					Params->MODEL[dataset][m][2] += epsilon; //add epsilon 
+					//not taken from others to prevent negative numbers
+					//printf("post-adjustment, V tripped. S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//printf("woohoo!");
+					//getc(stdin);
+				}
+				//calculate likelihood
+				lhood_sub += gsl_ran_multinomial_lnpdf(3, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
+				//printf("DATA S=%i\t V=%i\t F=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2]);
+				//printf("MODEL S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+				//printf("lhood sub = %lf\n", lhood_sub);
 			} 
 			m++;
 		} 
@@ -197,8 +198,8 @@ lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
 //printf("miser ticker = %i\t miser flag = %i\n", Params->miser_ticker, Params->miser2_flag);
 
 lhood_meta2 = exp(lhood_meta2);
-
 //printf("exp lhood adj = %lf\n", lhood_meta2);
 //printf("done\n");
+
 return lhood_meta2;
 }

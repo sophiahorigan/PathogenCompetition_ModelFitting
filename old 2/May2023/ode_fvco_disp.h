@@ -55,15 +55,15 @@ int m_c_pop_fit = 1; //set to 1 for pop level m
 int m_c_meta_fit = 0; //set to 1 for meta level m 
 int m_c_sub_fit = 0; //set to 1 for sub level m
 
+for(sub=0; sub<num_sub; sub++){
+	Cout[sub] = 0;
+	Cin[sub] = 0;
+	netC[sub] = 0;
+}
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
 if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
-	for(sub=0; sub<num_sub; sub++){
-		Cout[sub] = 0;
-		Cin[sub] = 0;
-		netC[sub] = 0;
-	}
 	//COMPETING MODELS
 	//a
 	if (a_c_pop_fit == 1){
@@ -153,7 +153,7 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 for(sub=0; sub<num_sub; sub++){
 	//*******************SUSCEPTIBLE*********************
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
-
+	//printf("dydt = %e\t ")
 	//***********************FUNGUS-INFECTED**********************
 	//first fungus class (susceptibles and virus-infected)
 	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R[sub]*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]]; //fungus infected susceptibles
@@ -170,15 +170,26 @@ for(sub=0; sub<num_sub; sub++){
 	//**********************VIRUS-INFECTED************************
 	//First group of classes exposed to virus, which can be infected by fungus and going into exposed classes for fungus
 	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+3+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]]-y[m+1+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])*VFSus;
+	//printf("sub = %i\t V1=%e\n", sub, dydt[m+1+sub_index[sub]]);
+	//printf("%lf\t %lf\t %lf\t %lf\t %lf\t %lf\t %lf\n", y[0+sub_index[sub]], nuV, y[m+n+3+sub_index[sub]], y[0+sub_index[sub]]/S0[sub],squareCVV, n*lambdaV*y[m+1+sub_index[sub]], y[m+1+sub_index[sub]]*nuF*y[m+n+1+sub_index[sub]],  nuR*R[sub]*VFSus);
+	//printf("n1=%i\n", n1);
 	for (i=2;i<=n1;i++){
 		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+(i-1)+sub_index[sub]]-y[m+i+sub_index[sub]])-y[m+i+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]]+ nuR*R[sub])*VFSus;
+		//printf("sub = %i\t V[%i]=%e\n", sub, i, dydt[m+i+sub_index[sub]]);
+		//printf("%i\t %lf\t %lf\t %lf\t %lf\n", n, lambdaV, y[m+(i-1)+sub_index[sub]], y[m+i+sub_index[sub]], y[m+i+sub_index[sub]]*nuF*y[m+n+1+sub_index[sub]]);
+		//getc(stdin);
 	}
+	//getc(stdin);
 
 	//Second group of classes exposed to virus, which cannot be infected by fungus, and generate virus for the next epizootic
 	dydt[m+n1+1+sub_index[sub]]=n*lambdaV*y[m+n1+sub_index[sub]]-n*lambdaV*y[m+n1+1+sub_index[sub]];
+	//printf("sub = %i\t V2=%e\n", sub, dydt[m+n1+1+sub_index[sub]]);
+	//printf("%i\t %lf\t  %lf\t  %lf\n",n, lambdaV, y[m+n1+sub_index[sub]], y[m+n1+1+sub_index[sub]]);
 	for (i=2;i<=n2;i++){
 		dydt[m+n1+i+sub_index[sub]]=n*lambdaV*(y[m+n1+i-1+sub_index[sub]]-y[m+n1+i+sub_index[sub]]);
+		//printf("sub = %i\t V[%i]=%e\n", sub, i, dydt[m+n1+i+sub_index[sub]]);
 	}
+	//getc(stdin);
 
 	//**********************CONIDIA*****************
 	dydt[m+n+1+sub_index[sub]] = m*lambdaF*y[m+sub_index[sub]]*size_C - muF*y[m+n+1+sub_index[sub]] + netC[sub];  //Conidia class!  Transission from final exposed class (m) to conidia class (m+1)

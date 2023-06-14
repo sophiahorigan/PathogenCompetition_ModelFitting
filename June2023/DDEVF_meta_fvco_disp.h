@@ -27,17 +27,6 @@ if (j==4 || j==5 || j==6) { // obs data
 	num_sub = Params->numsub;
 }
 
-int larvae_dispersal_on = 0; //set to 0 for no dispersal
-//a
-int a_l_pop_fit = 1; //set to 1 for pop level a 
-int a_l_meta_fit = 0; //set to 1 for meta level a
-int a_l_sub_fit = 0; //set to 1 for sub level a
-//m
-int m_l_pop_fit = 0; //set to 1 for pop level m
-int m_l_meta_fit = 1; //set to 1 for meta level m 
-int m_l_sub_fit = 0; //set to 1 for sub level m
-
-
 
 //-------------------------------------- PARAMETER DECLARATION -------------------------------------------//
 double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
@@ -275,7 +264,7 @@ while (t_0<MAXT3+h)	{
 		
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
 		
-			if(larvae_dispersal_on == 1){
+			if(larval_dispersal == 1){
 
 				int subout;
 				int subin;
@@ -286,8 +275,8 @@ while (t_0<MAXT3+h)	{
 				double Sout[num_sub]; 
 				double Sin[num_sub]; 
 
-				double a_l[4][4];
-				double m_l[4][4];
+				double l_a[4][4];
+				double l_m[4][4];
 
 				//initialize dispersal array
 				for(sub=0; sub<num_sub; sub++){
@@ -303,77 +292,75 @@ while (t_0<MAXT3+h)	{
 
 				//COMPETING MODELS
 				//a
-				if (a_l_pop_fit == 1){
+				if (l_a_pop_fit == 1){
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
-							a_l[i][sub] = Params->a_l_pop; //one value for entire population 
+							l_a[i][sub] = Params->l_a_pop; //one value for entire population 
 							//printf("here, a_l[i][sub]=%lf\n", a_l[i][sub]);
 						}
 					}
 				}
-				if (a_l_meta_fit == 1){
+				if (l_a_meta_fit == 1){
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
-							a_l[i][sub] = Params->a_l_meta[i]; //one value for each metapopulation 
+							l_a[i][sub] = Params->l_a_meta[i]; //one value for each metapopulation 
 						}
 					}
 				}
-				if (a_l_sub_fit == 1){
+				if (l_a_sub_fit == 1){
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
-							a_l[i][sub] = Params->a_l_sub[i][sub]; //one value for each subpopulation 
+							l_a[i][sub] = Params->l_a_sub[i][sub]; //one value for each subpopulation 
 						}
 					}
 				}	
 				//m
-				if (m_l_pop_fit == 1){
+				if (l_m_pop_fit == 1){
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
-							m_l[i][sub] = Params->m_l_pop; //one value for entire population 
-							//printf("here, m_l[i][sub]=%lf\n", m_l[i][sub]);
+							l_m[i][sub] = Params->l_m_pop; //one value for entire population 
 						}
 					}
 				}
-				if (m_l_meta_fit == 1){
+				if (l_m_meta_fit == 1){
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
-							m_l[i][sub] = Params->m_l_meta[i]; //one value for each metapopulation 
+							l_m[i][sub] = Params->l_m_meta[i]; //one value for each metapopulation 
 						}
 					}
 				}
-				if (m_l_sub_fit == 1){
+				if (l_m_sub_fit == 1){
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
-							m_l[i][sub] = Params->m_l_sub[i][sub]; //one value for each subpopulation 
+							l_m[i][sub] = Params->l_m_sub[i][sub]; //one value for each subpopulation 
 						}
 					}
 				}	
 
 				for(subout=0; subout<num_sub; subout++){
 					//susceptible larvae dispersing
-					Sout[subout] = exp(-a_l[j][subout]*10) * S[subout];
+					Sout[subout] = exp(-l_a[j][subout]*10) * S[subout];
 					//printf("a = %lf\n", a_l[j][subout]);
 
 					//susceptible larvae that arrive at another metapopulation
 					for(subin=0; subin<num_sub; subin++){
 						if(subin!=subout){
 
-							Sin[subin] = Sout[subout]*m_l[j][subout]*exp(-a_l[j][subout]*Params->DISTANCE[j][subout][subin]);
-							printf("subout = %i\t m = %lf\n", m_l[j][subout]);
+							Sin[subin] = Sout[subout]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 						}
 					}
 
 					for (i=1;i<=n;i++)	{ //for each exposed class
 						//infected larvae dispersing
 						//SCALE OF MIGRATION
-						Vout[subout][i] += exp(-a_l[j][subout]*10) * E_V[subout][i];
+						Vout[subout][i] += exp(-l_a[j][subout]*10) * E_V[subout][i];
 
 						for(subin=0; subin<num_sub; subin++){
 
 							if(subin!=subout){
 								//infected larvae that arrive at another metapopulation
 								//SCALE OF MIGRATION
-								Vin[subin][i] += Vout[subout][i]*m_l[j][subout]*exp(-a_l[j][subout]*Params->DISTANCE[j][subout][subin]);
+								Vin[subin][i] += Vout[subout][i]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 							}
 						}
 					}
@@ -474,12 +461,22 @@ while (t_0<MAXT3+h)	{
 	int day_index[4] = {0, 47, 95, 143}; //to append 48 day epizootics //probably a better way to do this
 	//CHANGE remove zeros
 	for(sub=0; sub<num_sub; sub++){	
-
+		//FRACTIONS 
+		/*
 		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction uninfected S 
 		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected V 
 		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected F
+		*/
+		//ABSOLUTE VALUES
+		/*
+		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(S[sub]+IV[sub]+IF[sub]);
+		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(S[sub]+IV[sub]+IF[sub]);
+		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(S[sub]+IV[sub]+IF[sub]); 
+		*/
 		//MODEL REALIZATION PRINTING
-		//fprintf(fpr, "%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
+		if(reals==1){
+			fprintf(fpr, "%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
+		}
 		//printf("%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
 	}
 }

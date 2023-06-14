@@ -36,6 +36,34 @@ char *strFileNameDate;
 FILE *fpls; //line-search parameter value output
 FILE *fpr; //model realizations
 
+//ROUTINES
+int linesearch;
+int reals;
+int mcmc;
+
+//LARVAL DISPERSAL
+int larval_dispersal;
+//a
+int l_a_pop_fit; //set to 1 for pop level a 
+int l_a_meta_fit; //set to 1 for meta level a
+int l_a_sub_fit; //set to 1 for sub level a
+//m
+int l_m_pop_fit; //set to 1 for pop level m
+int l_m_meta_fit; //set to 1 for meta level m 
+int l_m_sub_fit; //set to 1 for sub level m
+
+//CONIDIA DISPERSAL
+int conidia_dispersal; //set to 0 for no dispersal
+//a
+int c_a_pop_fit; //set to 1 for pop level a 
+int c_a_meta_fit; //set to 1 for meta level a
+int c_a_sub_fit; //set to 1 for sub level a
+//m
+int c_m_pop_fit; //set to 1 for pop level m
+int c_m_meta_fit; //set to 1 for meta level m 
+int c_m_sub_fit; //set to 1 for sub level m
+
+
 //FIXED PARS
 const double h = 0.01;		      
 const double exposetime = 16; //what is this
@@ -95,23 +123,23 @@ typedef struct //FIT PARS
 	double FITMETA[NUM_PARS];	//dispersal and coinfection parameters fit across all datasets
 
 	//dispersal
-	double m_c_pop; //0
-	double a_c_pop;		//1
+	double c_m_pop; //0
+	double c_a_pop;		//1
 
-	double m_l_pop;
-	double a_l_pop;
+	double l_m_pop;
+	double l_a_pop;
 
-	double m_c_meta[DATA_SETS];
-	double a_c_meta[DATA_SETS];
+	double c_m_meta[DATA_SETS];
+	double c_a_meta[DATA_SETS];
 
-	double m_l_meta[DATA_SETS];
-	double a_l_meta[DATA_SETS];
+	double l_m_meta[DATA_SETS];
+	double l_a_meta[DATA_SETS];
 
-	double m_c_sub[DATA_SETS][4];	//2
-	double a_c_sub[DATA_SETS][4];
+	double c_m_sub[DATA_SETS][4];	//2
+	double c_a_sub[DATA_SETS][4];
 
-	double m_l_sub[DATA_SETS][4];	//2
-	double a_l_sub[DATA_SETS][4];
+	double l_m_sub[DATA_SETS][4];	//2
+	double l_a_sub[DATA_SETS][4];
 
 	double muV;
 	//heterogeneity

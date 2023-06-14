@@ -40,19 +40,8 @@ int subin; //indexing
 double Cout[4];
 double Cin[4];
 double netC[4];
-double a_c[4][4];
-double m_c[4][4];
-
-//DISPERSAL FITTING
-int coni_dispersal_on = 0; //set to 0 for no dispersal
-//a
-int a_c_pop_fit = 1; //set to 1 for pop level a 
-int a_c_meta_fit = 0; //set to 1 for meta level a
-int a_c_sub_fit = 0; //set to 1 for sub level a
-//m
-int m_c_pop_fit = 1; //set to 1 for pop level m
-int m_c_meta_fit = 0; //set to 1 for meta level m 
-int m_c_sub_fit = 0; //set to 1 for sub level m
+double c_a[4][4];
+double c_m[4][4];
 
 for(sub=0; sub<num_sub; sub++){
 	Cout[sub] = 0;
@@ -61,50 +50,50 @@ for(sub=0; sub<num_sub; sub++){
 }
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
-if(coni_dispersal_on == 1){ //turn off at declaration at top of script
+if(conidia_dispersal == 1){ //turn off at declaration at top of script
 
 	//COMPETING MODELS
 	//a
-	if (a_c_pop_fit == 1){
+	if (c_a_pop_fit == 1){
 		for(i=1; i<=3; i++){
 			for(sub=0;sub<num_sub;sub++){
-				a_c[i][sub] = Params->a_c_pop; //one value for entire population 
+				c_a[i][sub] = Params->c_a_pop; //one value for entire population 
 			}
 		}
 	}
-	if (a_c_meta_fit == 1){
+	if (c_a_meta_fit == 1){
 		for(i=1; i<=3; i++){
 			for(sub=0;sub<num_sub;sub++){
-				a_c[i][sub] = Params->a_c_meta[i]; //one value for each metapopulation 
+				c_a[i][sub] = Params->c_a_meta[i]; //one value for each metapopulation 
 			}
 		}
 	}
-	if (a_c_sub_fit == 1){
+	if (c_a_sub_fit == 1){
 		for(i=1; i<=3; i++){
 			for(sub=0;sub<num_sub;sub++){
-				a_c[i][sub] = Params->a_c_sub[i][sub]; //one value for each subpopulation 
+				c_a[i][sub] = Params->c_a_sub[i][sub]; //one value for each subpopulation 
 			}
 		}
 	}	
 	//m
-	if (m_c_pop_fit == 1){
+	if (c_m_pop_fit == 1){
 		for(i=1; i<=3; i++){
 			for(sub=0;sub<num_sub;sub++){
-				m_c[i][sub] = Params->m_c_pop; //one value for entire population 
+				c_m[i][sub] = Params->c_m_pop; //one value for entire population 
 			}
 		}
 	}
-	if (m_c_meta_fit == 1){
+	if (c_m_meta_fit == 1){
 		for(i=1; i<=3; i++){
 			for(sub=0;sub<num_sub;sub++){
-				m_c[i][sub] = Params->m_c_meta[i]; //one value for each metapopulation 
+				c_m[i][sub] = Params->c_m_meta[i]; //one value for each metapopulation 
 			}
 		}
 	}
-	if (m_c_sub_fit == 1){
+	if (c_m_sub_fit == 1){
 		for(i=1; i<=3; i++){
 			for(sub=0;sub<num_sub;sub++){
-				m_c[i][sub] = Params->m_c_sub[i][sub]; //one value for each subpopulation 
+				c_m[i][sub] = Params->c_m_sub[i][sub]; //one value for each subpopulation 
 			}
 		}
 	}	
@@ -114,8 +103,7 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 		for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 			
 			//SCALE OF MIGRATION
-			//netCout[subout] = ((Params->m_c_sub[j][subout] * 2.0 * M_PI)/Params->a_c_pop) * y[m+n+1+sub_index[subout]];
-			Cout[subout] = exp(-a_c[j][subout]*10) * y[m+n+1+sub_index[subout]]; //r = 10m
+			Cout[subout] = exp(-c_a[j][subout]*10) * y[m+n+1+sub_index[subout]]; //r = 10m
 			//printf("sub=%i\t Cout=%lf\t C=%lf\n", subout, Cout[subout], y[m+n+1+sub_index[subout]]);
 			//printf("IN DISPERSAL sub=%i\t C=%e\n", subout, y[m+n+1+sub_index[subout]]);
 
@@ -123,8 +111,7 @@ if(coni_dispersal_on == 1){ //turn off at declaration at top of script
 
 				if(subout != subin){
 
-					//netCin[subin] += y[m+n+1+sub_index[subout]] * Params->m_c_sub[j][subout] * exp(-Params->a_c_pop*Params->DISTANCE[j][subout][subin]);
-					Cin[subin] += Cout[subout] * m_c[j][subout] * exp(-a_c[j][subout]*Params->DISTANCE[j][subout][subin]);
+					Cin[subin] += Cout[subout] * c_m[j][subout] * exp(-c_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 
 				}
 			} 

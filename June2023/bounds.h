@@ -5,15 +5,15 @@ double high;
 
 if (i==0)			{	low = 0;			high = 5;		}	//initS //1-148
 
-else if (i==1)		{	low = -11.5;			high = -4.6;		}	//initR meta 1 //0-0.01
-else if (i==2)		{	low = -11.5;			high = -4.6;		}	//initR meta 2 //0-0.01
-else if (i==3)		{	low = -11.5;			high = -4.6;		}	//initR meta 3 //0-0.01
+else if (i==1)		{	low = -11.5;			high = -5.5;		}	//initR meta 1 //0-0.004
+else if (i==2)		{	low = -11.5;			high = -5.5;		}	//initR meta 2 //0-0.004
+else if (i==3)		{	low = -11.5;			high = -5.5;		}	//initR meta 3 //0-0.004
 
-else if (i==4)		{	low = -11.5;			high = -4.6;		}	//Fuller 2012 //virus decay //0.39
+else if (i==4)		{	low = -11.5;			high = -4.6;		}	//Fuller 2012 //virus decay //0.39 //muV
 else if (i==5)		{	low = -1.2;			high = 1;		}	//virus heterogeneity
-else if (i==6)		{	low = -8.5;			high = -2.3;		}  //virus transmission //0.0002 - 0.1
+else if (i==6)		{	low = -4.6;			high = -0.0001;		}  //virus transmission //0.01 - 1
 
-else if (i==7)		{	low = -11.5;			high = -4.6;		} 	//fungus transmission //0.00001 - 
+else if (i==7)		{	low = -11.5;			high = -5.5;		} 	//fungus transmission //0.00001 - 0.004
 
 else if (i==8)		{	low = -4.6;			high = 4;		}	//VFSus //enhanced susceptibility //0-100
 

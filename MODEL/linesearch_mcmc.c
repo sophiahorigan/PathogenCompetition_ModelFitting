@@ -6,9 +6,9 @@ float DotProduct (int Length, double *Holder, double *PCA)
   double answer = 0;
 
   int i;
-  for(i=0;i<Length;i++)
+  for(i=0;i<Length;i++){
     answer += PCA[i]*Holder[i];   //JL: Used in the reconstruction of parameter values from PCA
-
+  }
   return(answer);
 
 }
@@ -18,7 +18,7 @@ float DotProduct (int Length, double *Holder, double *PCA)
 int main(int argc, char *argv[])
 {
 if(argc!=3){
-	printf("Requires 3 arguments: .c name, model #, algorithm #");
+	printf("Requires 3 arguments: .c name, model #, algorithm #\n");
 }
 
 STRUCTURE Params;
@@ -36,7 +36,6 @@ int VERBOSE = 0;
 int TEST = 1;
 
 // --------------------------------------------------Set Up-------------------------------------------------------------------- //
-
 
 //ALGORITHM
 if(algorithm==1){
@@ -62,11 +61,11 @@ for(int i=0;i<92;i++){
 }
 //TEST MODE
 if(VERBOSE==1){
-	LScalls=100; Rcalls=10; Mcalls=100; Realizations=2000;
+	LScalls=100; Rcalls=10; Mcalls=100; Realizations=200000;
 	numround=5;searches=10;
 }
 if(TEST==1){
-	LScalls=5; Rcalls=10; Mcalls=5; Realizations=10;
+	LScalls=5; Rcalls=10; Mcalls=5; Realizations=10000;//Reals needs to be num params *2 to get all params
 	numround=1;searches=1;
 }
 
@@ -76,8 +75,6 @@ double ltf_params[92] = {0};
 double init_ltfparams[92] = {0};
 double step_size[92] = {0};
 double temp[92] = {0};
-
-double log_prior = 0;
 
 for (int i=0;i<num_ltfparams;i++){
     double randn = gsl_rng_uniform_pos(r_seed);
@@ -94,10 +91,6 @@ double total_loghood_metas;
 for (c=0;c<num_ltfparams;c++){			//initial parameters begin as 'best' parameters
     localmax_params[c]=ltf_params[c];
 }
-//calculate priors
-for (int k=0; k<num_ltfparams; k++){
-	log_prior = log_prior + log(gsl_ran_flat_pdf(exp(ltf_params[k]), prior_bound(k,1), (prior_bound(k,2)+prior_bound(k,1))));
-}
 
 ///////////////////////////////////////////////////LINE-SEARCH///////////////////////////////////////////////////
 if(linesearch==1){
@@ -110,6 +103,7 @@ fpls=fopen(namels, "a+");
 
 for (int round=0;round<numround;round++){
 	best_posterior=-66666666666666;
+	double log_prior = 0;
 	a=0;
 	int i=0;
 
@@ -130,6 +124,11 @@ for (int round=0;round<numround;round++){
 						ltf_params[a] = ls_bound(a,2);
 					}
 				}
+
+			//calculate priors for this parameter set
+			for (int k=0; k<num_ltfparams; k++){
+				log_prior = log_prior + log(gsl_ran_flat_pdf(exp(ltf_params[k]), prior_bound(k,1), (prior_bound(k,2)+prior_bound(k,1))));
+			}
 			//********FIXED PARAMS***********
 			//INITIAL CONDITIONS
 			//meta1
@@ -362,7 +361,6 @@ for (int round=0;round<numround;round++){
 	int index;
 	for(int ii=0; ii<num_ltfparams; ii++){
 		if(fit[ii]==1){
-			printf("printing param %i\n", ii);
 			fprintf(fpls, "%lf\t", exp(ltf_params[ii]));
 		}
 	}
@@ -411,18 +409,19 @@ if(reals==1){
 
 		//************FIT PARAMS*******************
 		//S -- pop fit
-		Params.FITINIT[1][0] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[1][1] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[1][2] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[1][3] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[2][0] = exp(ltf_params[0]); //initS  
-		Params.FITINIT[2][1] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[2][2] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[2][3] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[3][0] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[3][1] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[3][2] = exp(ltf_params[0]); //initS 
-		Params.FITINIT[3][3] = exp(ltf_params[0]); //initS 
+		double INITS = 14.225506;
+		Params.FITINIT[1][0] = INITS; //initS 
+		Params.FITINIT[1][1] = INITS; //initS 
+		Params.FITINIT[1][2] = INITS; //initS 
+		Params.FITINIT[1][3] = INITS; //initS 
+		Params.FITINIT[2][0] = INITS; //initS  
+		Params.FITINIT[2][1] = INITS; //initS 
+		Params.FITINIT[2][2] = INITS; //initS 
+		Params.FITINIT[2][3] = INITS; //initS 
+		Params.FITINIT[3][0] = INITS; //initS 
+		Params.FITINIT[3][1] = INITS; //initS 
+		Params.FITINIT[3][2] = INITS; //initS 
+		Params.FITINIT[3][3] = INITS; //initS 
 
 		//INIT R
 		//POP
@@ -433,33 +432,33 @@ if(reals==1){
 		Params.r_meta[3] = exp(ltf_params[4]);;
 		//SUB
 		//meta1
-		Params.FITINIT[1][8] = exp(ltf_params[5]); //initR
+		Params.FITINIT[1][8] = 0.000117; //initR
 		//meta2
-		Params.FITINIT[2][8] = exp(ltf_params[6]); //initR //fonly 
-		Params.FITINIT[2][9] = exp(ltf_params[7]); //initR //vonly 
-		Params.FITINIT[2][10] = exp(ltf_params[8]); //initR //fv
-		Params.FITINIT[2][11] = exp(ltf_params[9]); //initR //control
+		Params.FITINIT[2][8] = 0.003638; //initR //fonly 
+		Params.FITINIT[2][9] = 0.000499; //initR //vonly 
+		Params.FITINIT[2][10] = 0.000186; //initR //fv
+		Params.FITINIT[2][11] = 0.000819; //initR //control
 		//meta3
-		Params.FITINIT[3][8] = exp(ltf_params[10]); //initR //fonly
-		Params.FITINIT[3][9] = exp(ltf_params[11]); //initR //vonly
-		Params.FITINIT[3][10] = exp(ltf_params[12]); //initR //fv
-		Params.FITINIT[3][11] = exp(ltf_params[13]); //initR //control
+		Params.FITINIT[3][8] = 0.003474; //initR //fonly
+		Params.FITINIT[3][9] = 0.000676; //initR //vonly
+		Params.FITINIT[3][10] = 0.000885; //initR //fv
+		Params.FITINIT[3][11] = 0.001840; //initR //control
 
 		//VIRUS //3
-		Params.muV			= 0.000040; //Fuller 2012 //virus decay //0.39
-		Params.CV			= 0.375311; //hetereogeneity to virus infection //previously 0.86
-		Params.nuV    		= 0.069059; //virus transmission
+		Params.muV			= 0.002468; //Fuller 2012 //virus decay //0.39
+		Params.CV			= 0.714249; //hetereogeneity to virus infection //previously 0.86
+		Params.nuV    		= 0.171005; //virus transmission
 
 		//FUNGUS //1
-		Params.specific_nuF	= 0.000068; //fungus transmission
+		Params.specific_nuF	= 0.000193; //fungus transmission
 
 		//STOCHASTICITY //2
-		Params.R_stoch 		= 1.356527;
-		Params.F_stoch		= 0.888823;
+		Params.R_stoch 		= 0.164369;
+		Params.F_stoch		= 2.909235;
 
 		//CONIDIA DISPERSAL
 		//c_a - pop //1
-		Params.c_a_pop = exp(ltf_params[20]);
+		Params.c_a_pop = 0.933624;
 		//c_a - meta //3
 		Params.c_a_meta[1] = exp(ltf_params[21]);
 		Params.c_a_meta[2] = exp(ltf_params[22]);
@@ -481,7 +480,7 @@ if(reals==1){
 		Params.c_a_sub[3][2] = exp(ltf_params[34]);
 		Params.c_a_sub[3][3] = exp(ltf_params[35]);
 		//c_m - pop //1
-		Params.c_m_pop		= exp(ltf_params[36]); 
+		Params.c_m_pop		= 0.175929; 
 		//c_m - meta //3
 		Params.c_m_meta[1]	= exp(ltf_params[37]);
 		Params.c_m_meta[2]	= exp(ltf_params[38]);
@@ -505,7 +504,7 @@ if(reals==1){
 
 		//LARVAL DISPERSAL
 		//l_a - pop //1
-		Params.l_a_pop = exp(ltf_params[52]);
+		Params.l_a_pop = 0.097772;
 		//l_a - meta //3
 		Params.l_a_meta[1] = exp(ltf_params[53]);
 		Params.l_a_meta[2] = exp(ltf_params[54]);
@@ -527,7 +526,7 @@ if(reals==1){
 		Params.l_a_sub[3][2] = exp(ltf_params[66]);
 		Params.l_a_sub[3][3] = exp(ltf_params[67]);
 		//l_m - pop //1
-		Params.l_m_pop		= exp(ltf_params[68]); 
+		Params.l_m_pop		= 0.896363; 
 		//l_m - meta //3
 		Params.l_m_meta[1]	= exp(ltf_params[69]);
 		Params.l_m_meta[2]	= exp(ltf_params[70]);
@@ -569,8 +568,8 @@ if(reals==1){
 	double lhood_total=0;
 	double lhood_reps=0;
 
-	//for(j=1; j<=3; j++){
-	for(int j=4; j<=6; j++){
+	for(int j=1; j<=3; j++){
+	//for(int j=4; j<=6; j++){
 		Params.j = j;
 
 		Params.miser_ticker = 1; Params.miser2_flag = 0;
@@ -593,7 +592,7 @@ if(reals==1){
 		
 		total_loghood_metas = total_loghood_metas + log_lhood_meta;
 
-		new_posterior = total_loghood_metas + log_prior;
+		new_posterior = total_loghood_metas; //NOT INCLUDING PRIOR //THAT IS A PROBLEM, FIGURE OUT HOW TO DEAL WITH IT LATER
 	}
 	//}
 	fclose(fpr); 
@@ -608,6 +607,7 @@ if(mcmc==1){
 
 	//FITTING ROUTINE
 	int NumberOfParams = NumFitParams(model);    
+	//printf("numfitparams = %i\n", NumberOfParams);
 
 	//FILE OUTPUT
 	int pid;
@@ -671,7 +671,7 @@ if(mcmc==1){
 
 	int ParCnt2 = NumberOfParams;
 
-	double SigmaInflation=1.20;
+	double SigmaInflation=.75;
 
 	double sigma[NumberOfParams];
 
@@ -679,58 +679,81 @@ if(mcmc==1){
 
 
 //---------------------------------Read in PCA-----------------------------------//
-//MOVE READING IN PCA TO DATA_INPUT.H, then can make the file size flexible
-//UPDATE MCMC FOR SKIP FIT
+
 	FILE *file;
 
-	file=fopen("PCAsd_0.txt", "r");          //Reading in the standard deviations of PCA.
+	file=fopen("PCAsd_21.txt", "r");          //Reading in the standard deviations of PCA.
 	for (a=0; a<(NumberOfParams); a++)
 	{
 		fscanf(file, "%lf\n", &SDpca[a]);
-		//printf("%lf\n", SDpca[a]);
+		printf("%i\t %lf\n", a, SDpca[a]);
 	}
 	fclose(file);
 
 
-	file=fopen("PCArotations_0.txt", "r");   //Reading in the rotations (coefficients between PC's and parameters)
+	file=fopen("PCArotations_21.txt", "r");   //Reading in the rotations (coefficients between PC's and parameters)
 	for (a=0; a<(NumberOfParams*NumberOfParams); a++)
 	{
 		fscanf(file, "%lf\n", &Coefficients[a]);
-		//printf("%lf\n", Coefficients[a]);
+		printf("%i\t %lf\n", a, Coefficients[a]);
 	}
 	fclose(file);
 
-	file=fopen("PCAscale_0.txt", "r");        //Reading in the scales to reconstruct parameter values from PC's.
+	file=fopen("PCAscale_21.txt", "r");        //Reading in the scales to reconstruct parameter values from PC's.
 	for (a=0; a<NumberOfParams; a++)
 	{
 		fscanf(file, "%lf\n", &Scale[a]);
-		//printf("%lf\n", Scale[a]);
+		printf("%i\t %lf\n", a, Scale[a]);
 	}
 	fclose(file);
 
-	file=fopen("PCAcenter_0.txt", "r");       //Reading in the centers of parameters. Used in the reconstruction of parameters.
+	file=fopen("PCAcenter_21.txt", "r");       //Reading in the centers of parameters. Used in the reconstruction of parameters.
 
 	for (a=0; a<NumberOfParams; a++)
 	{
 		fscanf(file, "%lf\n", &Center[a]);
-		//printf("%lf\n", Center[a]);
+		printf("%i\t %lf\n", a, Center[a]);
 	}
 	fclose(file);
 
-//-------------------------generate PCs---------------------//
+//-------------------------generate initial PCs---------------------//
 //start out by inflating variance to make overdispersed, then see if var goes down with time.
 		//as variance goes down, that's evidence that chains are converging
 	for(a=0; a<NumberOfParams; a++){
-		sigma[a]=SigmaInflation*SDpca[a];
+		sigma[a]=SigmaInflation*SDpca[a]; //not converted out of log space?? all others are
 		//printf("%lf\n", sigma[a]);
 	}
 
-
-	for (a=0; a<NumberOfParams; a++){
-		PC[a]=gsl_ran_gaussian (r, sigma[a]);    //CK//  PC contains current set of PC values
+	for (a=0; a<NumberOfParams; a++){ 
+		PC[a]=gsl_ran_gaussian (r, sigma[a]);    
 		//printf("%lf\n", PC[a]);
 	}
-	//getc(stdin);
+
+//----------------------check initial PC values-------------------//
+	for (a=0;a<NumberOfParams; a++)								//Back transform PC's into model parameters
+	{
+		for (b=0; b<NumberOfParams; b++){
+			Holder[b]=Coefficients[a*NumberOfParams+b];         //Store the coefficients between a certain parameter and all the PC's
+		}
+
+		//reconstruct PCA into parameter values
+		PCAparams[a]=exp(DotProduct(ParCnt2, Holder, PC)*Scale[a]+Center[a]);            //Reconstruct the parameter value after tweaking one PC
+
+		while(PCAparams[a] < prior_bound_mcmc(model,a,1) || PCAparams[a] > prior_bound_mcmc(model,a,2)){ //if out of bounds...
+			printf("out of bounds initial PC proposal for param %i\n", a);
+			printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n", PCAparams[a],prior_bound_mcmc(model, a,1),prior_bound_mcmc(model, a,2));
+			//draw a new value for that PC
+			PC[a]=gsl_ran_gaussian (r, sigma[a]); //???? what is this though
+			printf("PCa = %lf\t sigmaa=%lf\n", PC[a], sigma[a]);
+			//and reconstruct
+			PCAparams[a]=exp(DotProduct(ParCnt2, Holder, PC)*Scale[a]+Center[a]); 
+			printf("parcnt2 = %i\t dot prod = %lf\t scale = %lf\t center = %lf\n", ParCnt2, DotProduct(ParCnt2, Holder, PC), Scale[a], Center[a]);
+		}
+		printf("param %i accepted\n", a);
+		printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n",PCAparams[a],prior_bound_mcmc(model, a,1),prior_bound_mcmc(model, a,2));
+		getc(stdin);
+	}
+	printf("inital PCAs set\n");
 
 //------------------------begin loop---------------------------------//
 while (LoopNumber<=Realizations) {     
@@ -739,6 +762,7 @@ while (LoopNumber<=Realizations) {
 
 		Case=LoopNumber%NumberOfParams;					//Determines which PC to change
 		//printf("CASE = %i\n");
+		//printf("numbrparams=%i\n", NumberOfParams);
 
 		for (a=0; a<NumberOfParams; a++) 
 		{
@@ -762,67 +786,79 @@ while (LoopNumber<=Realizations) {
 		    //printf("%f\n", PC[a]);
 		    //printf("PCAparams: %e\n", PCAparams[a]);  
 			//getc(stdin);
+		}
+		//CHECK IF PARAM IS IN BOUNDS
+		while(PCAparams[Case] < prior_bound_mcmc(model,Case,1) || PCAparams[Case] > prior_bound_mcmc(model,Case,2)){ //try 5 new ones then just move on.
+			//printf("BOUND ERROR param %i not in bounds\n", Case);
+			//printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n",PCAparams[Case],prior_bound_mcmc(model, Case,1),prior_bound_mcmc(model, Case,2));
+			//draw a new value for that PC
+			PC[Case]=gsl_ran_gaussian (r, sigma[Case]);
+			//and reconstruct
+			PCAparams[Case]=exp(DotProduct(ParCnt2, Holder, PC)*Scale[Case]+Center[Case]); 
+		}
+		//printf("FIXED param %i within bounds\n", Case);
+		//printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n",PCAparams[Case],prior_bound_mcmc(model, Case,1),prior_bound_mcmc(model, Case,2));
 
+		//---------------------- Priors ------------------------//
+		double log_prior_Old=0;
+		double log_prior_New=0;
+		for (a=0;a<NumberOfParams; a++){
+			log_prior_Old = log_prior_Old + log(gsl_ran_flat_pdf(exp(PCAparams[a]), prior_bound_mcmc(model, a,1), (prior_bound_mcmc(model, a,2)+prior_bound_mcmc(model, a,1))));
+			log_prior_New = log_prior_New + log(gsl_ran_flat_pdf(exp(Old_Params[a]), prior_bound_mcmc(model, a,1), (prior_bound_mcmc(model, a,2)+prior_bound_mcmc(model, a,1))));
 		}
 
-		LogJumpToNew= -log(gsl_ran_gaussian_pdf(PC[Case], sigma[Case]));		//Metropolis sampling step: LATER YOU WILL USE THIS TO CORRECT FOR PROPOSAL
+		//-------------------- Metropolis sampling step ------------//
+		LogJumpToNew= -log(gsl_ran_gaussian_pdf(PC[Case], sigma[Case])); //LATER YOU WILL USE THIS TO CORRECT FOR PROPOSAL
 		LogJumpToOld= -log(gsl_ran_gaussian_pdf(Old_PC[Case], sigma[Case]));
-
-		//------------------assign new parameter values----------------------//
 		
-		//mcmc_assign_new(model);
-		if(model==0){ //OBS PRIORS //14
-		//CORE SET
-			Params.muV			= PCAparams[0]; //virus decay
-			Params.CV			= PCAparams[1];//hetereogeneity to virus infection 
-			Params.nuV    		= PCAparams[2]; //virus transmission
-			Params.specific_nuF	= PCAparams[3]; //fungus transmissison
-			Params.R_stoch 		= PCAparams[4];
-			Params.F_stoch		= PCAparams[5];
-			//meta 4
-			Params.FITINIT[4][0] = PCAparams[6]; //initS
-			Params.FITINIT[4][4] = PCAparams[7]; //initV
-			Params.FITINIT[4][8] = PCAparams[8]; //initR
-			//meta5
-			Params.FITINIT[5][0] = PCAparams[9]; //initS
-			Params.FITINIT[5][4] = PCAparams[10]; //initV
-			//meta6
-			Params.FITINIT[6][0] = PCAparams[11];//initS
-			Params.FITINIT[6][4] = PCAparams[12]; //initV
-			Params.FITINIT[6][8] = PCAparams[13]; //initR
+		//-------------------MISER likelihood NEW------------------------------//
+		if(model==21){
+			//---assign new parameter values---//
+			Params.FITINIT[1][0] = PCAparams[0];
+			Params.FITINIT[1][1] = PCAparams[0];
+			Params.FITINIT[1][2] = PCAparams[0]; 
+			Params.FITINIT[1][3] = PCAparams[0]; 
+			Params.FITINIT[2][0] = PCAparams[0]; 
+			Params.FITINIT[2][1] = PCAparams[0];
+			Params.FITINIT[2][2] = PCAparams[0];
+			Params.FITINIT[2][3] = PCAparams[0];
+			Params.FITINIT[3][0] = PCAparams[0]; 
+			Params.FITINIT[3][1] = PCAparams[0]; 
+			Params.FITINIT[3][2] = PCAparams[0];
+			Params.FITINIT[3][3] = PCAparams[0];
+			//meta1
+			Params.FITINIT[1][8] = PCAparams[1];
+			//meta2
+			Params.FITINIT[2][8] = PCAparams[2];
+			Params.FITINIT[2][9] = PCAparams[3]; 
+			Params.FITINIT[2][10] = PCAparams[4];
+			Params.FITINIT[2][11] = PCAparams[5];
+			//meta1
+			Params.FITINIT[3][8] = PCAparams[6];
+			Params.FITINIT[3][9] = PCAparams[7];
+			Params.FITINIT[3][10] = PCAparams[8];
+			Params.FITINIT[3][11] = PCAparams[9];
+			//CORE SET
+			Params.muV			= PCAparams[10]; //virus decay
+			Params.CV			= PCAparams[11]; //hetereogeneity to virus infection 
+			Params.nuV    		= PCAparams[12]; //virus transmission
+			Params.specific_nuF	= PCAparams[13]; //fungus transmissison
+			Params.R_stoch 		= PCAparams[14];
+			Params.F_stoch		= PCAparams[15];
+			//dispersal
+			Params.c_a_pop = PCAparams[16];
+			Params.c_m_pop = PCAparams[17];
+			Params.l_a_pop = PCAparams[18];
+			Params.l_m_pop = PCAparams[19];
 		}
-		//-------------------assign old parameter values-----------------------//
-		
-		//mcmc_assign_old(model);
-		if(model==0){ //OBS PRIORS //14
-		//CORE SET
-			Params.muV			= Old_Params[0]; //virus decay
-			Params.CV			= Old_Params[1];//hetereogeneity to virus infection 
-			Params.nuV    		= Old_Params[2]; //virus transmission
-			Params.specific_nuF	= Old_Params[3]; //fungus transmissison
-			Params.R_stoch 		= Old_Params[4];
-			Params.F_stoch		= Old_Params[5];
-			//meta 4
-			Params.FITINIT[4][0] = Old_Params[6]; //initS
-			Params.FITINIT[4][4] = Old_Params[7]; //initV
-			Params.FITINIT[4][8] = Old_Params[8]; //initR
-			//meta5
-			Params.FITINIT[5][0] = Old_Params[9]; //initS
-			Params.FITINIT[5][4] = Old_Params[10]; //initV
-			//meta6
-			Params.FITINIT[6][0] = Old_Params[11];//initS
-			Params.FITINIT[6][4] = Old_Params[12]; //initV
-			Params.FITINIT[6][8] = Old_Params[13]; //initR
-		}			
 
-		//-------------------MISER likelihood new------------------------------//
 		double lhood_meta=0; double log_lhood_meta=0; double total_loghood_metas = 0;
 		double new_posterior=0;
 		double meta_err=0;
 		double lhood_total=0;
 		double lhood_reps=0;	
 
-		for(int j=4; j<=6; j++){ //??? DO I WANT TO USE MY TICKER ALGORITHM HERE
+		for(int j=1; j<=3; j++){ 
 
 			Params.miser_ticker = 1; Params.miser2_flag = 0; 
 			
@@ -855,18 +891,59 @@ while (LoopNumber<=Realizations) {
 
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
 			LogNewPosterior = 0.0;
-			LogNewPosterior = total_loghood_metas + log_prior;
+			LogNewPosterior = total_loghood_metas + log_prior_New;
 		}//j
 		
 		if(LoopNumber==1){ //Initial calcualtion to get the ball rolling on likelihood comparison
-			//-------------------MISER likelihood old------------------------------//
+
+			//-------------------MISER likelihood OLD------------------------------//
+			if(model==21){
+				//---assign old parameter vaues---//
+				Params.FITINIT[1][0] = Old_Params[0];
+				Params.FITINIT[1][1] = Old_Params[0];
+				Params.FITINIT[1][2] = Old_Params[0]; 
+				Params.FITINIT[1][3] = Old_Params[0]; 
+				Params.FITINIT[2][0] = Old_Params[0]; 
+				Params.FITINIT[2][1] = Old_Params[0];
+				Params.FITINIT[2][2] = Old_Params[0];
+				Params.FITINIT[2][3] = Old_Params[0];
+				Params.FITINIT[3][0] = Old_Params[0]; 
+				Params.FITINIT[3][1] = Old_Params[0]; 
+				Params.FITINIT[3][2] = Old_Params[0];
+				Params.FITINIT[3][3] = Old_Params[0];
+				//meta1
+				Params.FITINIT[1][8] = Old_Params[1];
+				//meta2
+				Params.FITINIT[2][8] = Old_Params[2];
+				Params.FITINIT[2][9] = Old_Params[3]; 
+				Params.FITINIT[2][10] = Old_Params[4];
+				Params.FITINIT[2][11] = Old_Params[5];
+				//meta1
+				Params.FITINIT[3][8] = Old_Params[6];
+				Params.FITINIT[3][9] = Old_Params[7];
+				Params.FITINIT[3][10] = Old_Params[8];
+				Params.FITINIT[3][11] = Old_Params[9];
+				//CORE SET
+				Params.muV			= Old_Params[10]; //virus decay
+				Params.CV			= Old_Params[11];//hetereogeneity to virus infection 
+				Params.nuV    		= Old_Params[12]; //virus transmission
+				Params.specific_nuF	= Old_Params[13]; //fungus transmissison
+				Params.R_stoch 		= Old_Params[14];
+				Params.F_stoch		= Old_Params[15];
+				//dispersal
+				Params.c_a_pop = Old_Params[16];
+				Params.c_m_pop = Old_Params[17];
+				Params.l_a_pop = Old_Params[18];
+				Params.l_a_pop = Old_Params[19];
+			}
+
 			lhood_meta=0; log_lhood_meta=0; total_loghood_metas = 0;
 			new_posterior=0;
 			meta_err=0;
 			lhood_total=0;
 			lhood_reps=0;
 
-			for(int j=4; j<=6; j++){ //??? DO I WANT TO USE MY TICKER ALGORITHM HERE
+			for(int j=1; j<=3; j++){
 
 				Params.miser_ticker = 1; Params.miser2_flag = 0; 
 				
@@ -899,7 +976,7 @@ while (LoopNumber<=Realizations) {
 
 				total_loghood_metas = total_loghood_metas + log_lhood_meta;
 				LogOldPosterior = 0.0;
-				LogOldPosterior = total_loghood_metas + log_prior;
+				LogOldPosterior = total_loghood_metas + log_prior_Old;
 			}//j
 
 		}
@@ -912,14 +989,53 @@ while (LoopNumber<=Realizations) {
 
 		if (ProbOfAcceptance>1 || gsl_rng_uniform_pos (r) < ProbOfAcceptance){   //ACCEPT PASS 1
 
-			//-------------------MISER likelihood old------------------------------// //DOUBLE CHECK
+			//-------------------MISER likelihood OLD------------------------------//
+			if(model==21){
+				//---assign old parameter vaues---//
+				Params.FITINIT[1][0] = Old_Params[0];
+				Params.FITINIT[1][1] = Old_Params[0];
+				Params.FITINIT[1][2] = Old_Params[0]; 
+				Params.FITINIT[1][3] = Old_Params[0]; 
+				Params.FITINIT[2][0] = Old_Params[0]; 
+				Params.FITINIT[2][1] = Old_Params[0];
+				Params.FITINIT[2][2] = Old_Params[0];
+				Params.FITINIT[2][3] = Old_Params[0];
+				Params.FITINIT[3][0] = Old_Params[0]; 
+				Params.FITINIT[3][1] = Old_Params[0]; 
+				Params.FITINIT[3][2] = Old_Params[0];
+				Params.FITINIT[3][3] = Old_Params[0];
+				//meta1
+				Params.FITINIT[1][8] = Old_Params[1];
+				//meta2
+				Params.FITINIT[2][8] = Old_Params[2];
+				Params.FITINIT[2][9] = Old_Params[3]; 
+				Params.FITINIT[2][10] = Old_Params[4];
+				Params.FITINIT[2][11] = Old_Params[5];
+				//meta1
+				Params.FITINIT[3][8] = Old_Params[6];
+				Params.FITINIT[3][9] = Old_Params[7];
+				Params.FITINIT[3][10] = Old_Params[8];
+				Params.FITINIT[3][11] = Old_Params[9];
+				//CORE SET
+				Params.muV			= Old_Params[10]; //virus decay
+				Params.CV			= Old_Params[11];//hetereogeneity to virus infection 
+				Params.nuV    		= Old_Params[12]; //virus transmission
+				Params.specific_nuF	= Old_Params[13]; //fungus transmissison
+				Params.R_stoch 		= Old_Params[14];
+				Params.F_stoch		= Old_Params[15];
+				//dispersal
+				Params.c_a_pop = Old_Params[16];
+				Params.c_m_pop = Old_Params[17];
+				Params.l_a_pop = Old_Params[18];
+				Params.l_m_pop = Old_Params[19];
+			}
 			lhood_meta=0; log_lhood_meta=0; total_loghood_metas = 0;
 			new_posterior=0;
 			meta_err=0;
 			lhood_total=0;
 			lhood_reps=0;
 
-			for(int j=4; j<=6; j++){ //??? DO I WANT TO USE MY TICKER ALGORITHM HERE
+			for(int j=1; j<=3; j++){ //??? DO I WANT TO USE MY TICKER ALGORITHM HERE
 
 				Params.miser_ticker = 1; Params.miser2_flag = 0; 
 				
@@ -947,12 +1063,12 @@ while (LoopNumber<=Realizations) {
 				
 				log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 				if(isnan(log_lhood_meta) || isinf(log_lhood_meta)){ //change to zero of inf or nan, only update lhood adj if not
-					log_lhood_meta = -9999;
+					log_lhood_meta = -9999999;
 				}
 
 				total_loghood_metas = total_loghood_metas + log_lhood_meta;
 				LogOldPosterior = 0.0;
-				LogOldPosterior = total_loghood_metas + log_prior;
+				LogOldPosterior = total_loghood_metas + log_prior_Old;
 			}//j
 			if (ProbOfAcceptance>1 || gsl_rng_uniform_pos (r) < ProbOfAcceptance){ //ACCEPT FINAL
 
@@ -968,7 +1084,6 @@ while (LoopNumber<=Realizations) {
 				}
 				//printf("Rejected\n");
 			}
-		
 		}
 		else{ //REJECTED PASS 1
 			for (a=0; a<NumberOfParams; a++){
@@ -978,14 +1093,15 @@ while (LoopNumber<=Realizations) {
 		}
 
 		// ------------------------------------------ output results to file  --------------------------------------- //
-		if (LoopNumber % 10 == 0)   	//CK// output results every 10 loops (probably not best plan but we'll see)
-		{
-			//printf("printing! loop number = %i\n", LoopNumber);
+
+		if (LoopNumber % 10 == 0){ //printing every 10
+			printf("printing!\n");
 			for(int ii=0; ii<NumberOfParams; ii++){
 				fprintf(fpm, "%lf\t", PCAparams[ii]);
 			}
-			fprintf(fpm, "\n");
-			//fflush(stdout);
+		fprintf(fpm, "\n");
+		fflush(stdout);
+		fflush(fpm);
 		}
 	}
 	fclose(fpm);

@@ -5,5 +5,5 @@
 #PBS -V
 
 for (( i=0; i<$1;i++)); do
-	echo `sbatch run.sbatch`	
+	echo `sbatch run.sbatch $2 $3`	
 done

@@ -143,7 +143,7 @@ double low;
 double high;
 
 //metapopulation one
-if (i==0)			{	low = 0;			high = 5000;    }	//initS 
+if (i==0)			{	low = 0;			high = 500;    }	//initS 
 //INIT R
 //pop
 else if (i==1)		{	low = 0;			high = 1;		}	//initR 
@@ -170,8 +170,8 @@ else if (i==16)	    {	low = 0; 			high = 	10;	    }	//virus transmission
 //FUNGUS PARAM
 else if (i==17) 	{	low = 0;			high = 1;		}	//fungus transmission
 //STOCHASTICITY
-else if (i==18)		{	low = 0;			high = 10;		}	//Rsd_exp
-else if (i==19)		{	low = 0;			high = 10;		}	//Fsd_exp
+else if (i==18)		{	low = 0;			high = 3;		}	//Rsd_exp
+else if (i==19)		{	low = 0;			high = 3;		}	//Fsd_exp
 //CONIDIA DISPERSAL
 else if (i==20)		{	low = 0;			high = 100;	    } 	//c_a_pop
 

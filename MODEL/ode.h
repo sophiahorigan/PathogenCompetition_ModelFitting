@@ -6,7 +6,9 @@ Params = (STRUCTURE*) Paramstuff;
 
 //FIT PARAMETERS
 double nuV 		= Params->nuV; //fitting //used to be 0.64
+//printf("nuV=%lf\t", nuV);
 double nuF		= Params->nuF;	//conidia transmission
+//printf("nuF=%lf\t", nuF);
 double muV		= Params->muV; //virus decay
 double squareCVV = Params->CV*Params->CV; //heterogeneity
 
@@ -50,7 +52,7 @@ for(sub=0; sub<num_sub; sub++){
 }
 
 //-------------------------------------- CONIDIA DISPERSAL -------------------------------------------//
-if(conidia_dispersal == 1){ //turn off at declaration at top of script
+if(conidia_dispersal == 1){ 
 
 	//COMPETING MODELS
 	//a
@@ -105,7 +107,6 @@ if(conidia_dispersal == 1){ //turn off at declaration at top of script
 			//SCALE OF MIGRATION
 			Cout[subout] = exp(-c_a[j][subout]*10) * y[m+n+1+sub_index[subout]]; //r = 10m
 			//printf("sub=%i\t Cout=%lf\t C=%lf\n", subout, Cout[subout], y[m+n+1+sub_index[subout]]);
-			//printf("IN DISPERSAL sub=%i\t C=%e\n", subout, y[m+n+1+sub_index[subout]]);
 
 			for(subin = 0; subin < num_sub; subin++){
 
@@ -119,12 +120,10 @@ if(conidia_dispersal == 1){ //turn off at declaration at top of script
 		for(sub=0; sub<num_sub; sub++){ //update conidia density
 
 			netC[sub] += (Cin[sub] - Cout[sub]);
+			//netC[sub] = 0; //TEST, TURNING DISPERSAL OFF
 
-			if((y[m+n+1+sub_index[sub]])<0){
-				//printf("TOO MUCH DISPERSAL! NEGATIVE CONIDIA POPULATIONS.");
-				//printf("sub=%i\t C=%e\t netC=%e\n", sub, y[m+n+1+sub_index[sub]], netC[sub]);
-			}
 		}
+		
 	}	
 	if (j==4 || j==5 || j==6) { //no dispersal in observational populations
 
@@ -139,25 +138,39 @@ if(conidia_dispersal == 1){ //turn off at declaration at top of script
 for(sub=0; sub<num_sub; sub++){
 	//*******************SUSCEPTIBLE*********************
 	dydt[0+sub_index[sub]]  = -y[0+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub])-y[0+sub_index[sub]]*nuV*y[m+n+2+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV);
-
+	//printf("S=%lf\n", dydt[0+sub_index[sub]]);
+	//printf("initS = %lf\t fungus infected = %lf\t virus infected = %lf\n", y[0+sub_index[sub]], -y[0+sub_index[sub]]*(nuF*y[m+n+1+sub_index[sub]] + nuR*R[sub]),  y[0+sub_index[sub]]*nuV*y[m+n+2+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV));
 	//***********************FUNGUS-INFECTED**********************
 	dydt[1+sub_index[sub]]  = nuF*y[m+n+1+sub_index[sub]]*y[0+sub_index[sub]] + nuR*R[sub]*y[0+sub_index[sub]] - m*lambdaF*y[1+sub_index[sub]]; 
-	
+	//printf("F1=%lf\n", dydt[1+sub_index[sub]]);
 	for(i=2; i<=m; i++){
 		dydt[i+sub_index[sub]]=m*lambdaF*(y[(i-1)+sub_index[sub]] -y[i+sub_index[sub]]);
+		//printf("F=%lf\n", dydt[i+sub_index[sub]]);
+
 	}
 
 	//**********************VIRUS-INFECTED************************
 	dydt[m+1+sub_index[sub]] = y[0+sub_index[sub]]*nuV*y[m+n+2+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV)-n*lambdaV*y[m+1+sub_index[sub]];
-
+	//printf("V1=%lf\n", dydt[m+1+sub_index[sub]]);
+	//printf("first term = %lf\t, second term = %lf\n", y[0+sub_index[sub]]*nuV*y[m+n+2+sub_index[sub]]*pow((y[0+sub_index[sub]]/S0[sub]),squareCVV), n*lambdaV*y[m+1+sub_index[sub]]);
+	//printf("InitS = %lf\t nuV = %lf\t OBS = %lf\t pow = %lf\t n = %lf\t lambdaV = %lf\t V1 = %lf\n",y[0+sub_index[sub]], nuV, y[m+n+2+sub_index[sub]], pow((y[0+sub_index[sub]]/S0[sub]),squareCVV), n, lambdaV, y[m+1+sub_index[sub]]);
+	//printf("n=%i\n", n);
+	//printf("lambdaV=%lf\n", lambdaV);
+	//printf("pow yo = %lf\t S0 = %lf\t divide = %lf\t squareCVV = %lf\n", y[0+sub_index[sub]], S0[sub], (y[0+sub_index[sub]]/S0[sub]), squareCVV);
 	for (i=2;i<=n;i++){
 		dydt[m+i+sub_index[sub]]=n*lambdaV*(y[m+(i-1)+sub_index[sub]]-y[m+i+sub_index[sub]]);
+		//printf("V=%lf\n", dydt[m+i+sub_index[sub]]);
+
 	}
 	//**********************CONIDIA*****************
 	dydt[m+n+1+sub_index[sub]] = m*lambdaF*y[m+sub_index[sub]] - muF*y[m+n+1+sub_index[sub]] + netC[sub];
+	//printf("C=%lf\n", dydt[m+n+1+sub_index[sub]]);
 
 	//*************************OBS***********************
 	dydt[m+n+2+sub_index[sub]] = n*lambdaV*y[m+n+sub_index[sub]] - muV*y[m+n+2+sub_index[sub]]; 
+	//printf("OB=%lf\n", dydt[m+n+2+sub_index[sub]]);
+
+	//getc(stdin);
 }
 
 return GSL_SUCCESS;
@@ -170,6 +183,7 @@ double ODE_Solver(double t_ode,double t_end,void *Paramstuff,double *y_ode)
 int i;
 int status_ode;
 double h_init=1.0e-5;
+int DIM = 508;  //CHANGE 508
 
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;

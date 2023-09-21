@@ -7,9 +7,7 @@ Params = (STRUCTURE*) Paramstuff;
 
 int FlagDay=0;
 
-int MAXT3=47; //CHANGE 47
-
-
+int MAXT3=47; 
 
 //-------------------------------------- METAPOPULATION STRUCTURE -------------------------------------------//
 
@@ -46,6 +44,7 @@ double nuR2;
 double DD10=0;    //accumulated degree days about 10 degrees C
 double R_seed = 0.05;
 
+
 // --------------------------------------- STOCHASTICITY -------------------------------------------- //
 for (i=0;i<=MAXT3;i++)	{
 	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->R_stoch);
@@ -74,7 +73,7 @@ line_ticker = num_day;
 
 line_ticker=line_ticker-1;
 
-int num_weeks=48/7; //CHANGE 48/7
+int num_weeks=48/7; 
 
 //state variable declaration
 double S[num_sub]; double V[num_sub]; double C[num_sub]; double R[num_sub];
@@ -270,7 +269,7 @@ while (t_0<MAXT3+h)	{
 		
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
 		
-			if(larval_dispersal == 1){
+			if(larval_dispersal == 1){ 
 
 				int subout;
 				int subin;
@@ -391,6 +390,8 @@ while (t_0<MAXT3+h)	{
 	//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
 	for(sub=0; sub<num_sub; sub++){ 
 		y_ode[0+sub_index[sub]]=S[sub];	//SUSCEPTIBLE
+		//printf("DAY = %i\n", day-1);
+		//printf("preode S[%i] = %lf\n", sub, S[sub]);
 
 		for (i=1;i<=m;i++)	{ //FUNGUS INFECTED 
 			y_ode[i+sub_index[sub]]=E_F[sub][i];
@@ -443,8 +444,10 @@ while (t_0<MAXT3+h)	{
 //update state variables
 	for(sub=0; sub<num_sub; sub++){
 		S[sub]=y_ode[0+sub_index[sub]]; //SUSCEPTIBLES
+		//printf("postode S[%i] = %lf\n", sub, S[sub]);
 		C[sub]=y_ode[m+n+1+sub_index[sub]]; //CONIDIA
 		V[sub]=y_ode[m+n+2+sub_index[sub]]; //OBS
+		//printf("post ODE S = %lf\t C = %lf\t V = %lf\n", S[sub], C[sub], V[sub]);
 	}
 	for(sub=0; sub<num_sub; sub++){	
 	

@@ -63,37 +63,8 @@ int c_m_sub_fit;
 int r_pop_fit;
 int r_meta_fit;
 int r_sub_fit;
-
+//adaptable fit parameters
 int fit[92];
-
-//FIXED PARS
-const double h = 0.01;		      
-const double exposetime = 16; //what is this
-const double VFPass = 125.31; //check
-
-const int n = 27; //virus exposed classes
-const int m = 50; //fungus exposed classes
-const int DIM = 508;  //CHANGE 508
-
-const double specific_muF = 0.00962435749864498; //conidia decay rate
-const double Cend = 525.015699999847;
-const double DDstart = 100.157149999888;
-const double DDstop = 267.034499999981;
-
-const int beta = 10;
-const int theta = 1;
-const double rain_P = 3.80285399989692;
-const double rain_P2 = 3.54725448752468;
-const double rain_P3 = 0.166585199947054;
-const double RH_P = 0.070488499999861;
-const double temp_P = 0.233982799999915;
-
-const double fourth_size = 291.2745;
-
-const double epsilon = 1e-6;
-
-const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
-const double lambdaV = 0.0625; //transmission rate between virus exposed classes
 
 const int sub_index[4] = {0, 127, 254, 381}; //CHANGE remove 0s
 
@@ -104,8 +75,38 @@ int Realizations;
 int searches;
 int numround;
 
+int lhood_penalty_flag; //check for violations in dispersal
+double lhood_penalty = -9999; //bad score to add if too much dispersal
+
+//FIXED PARAMS
 const int epi_length = 48;
 size_t dim = 48*2;
+
+const int beta = 10;
+const int theta = 1;
+const double rain_P = 3.80285399989692;
+const double rain_P2 = 3.54725448752468;
+const double rain_P3 = 0.166585199947054;
+const double RH_P = 0.070488499999861;
+const double temp_P = 0.233982799999915;
+const double epsilon = 1e-6;
+const double fourth_size = 291.2745;
+const int n = 27; //virus exposed classes
+const int m = 50; //fungus exposed classes
+
+const double specific_muF = 0.00962435749864498; //conidia decay rate
+const double Cend = 525.015699999847;
+const double DDstart = 100.157149999888;
+const double DDstop = 267.034499999981;
+			
+const double exposetime = 16; //what is this
+const double VFPass = 125.31; //check
+
+const int DIM = 508;  
+const double h = 0.01;
+
+const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
+const double lambdaV = 0.0625; //transmission rate between virus exposed classes
 
 typedef struct //FIT PARS
 {

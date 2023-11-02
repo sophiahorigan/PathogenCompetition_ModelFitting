@@ -216,7 +216,7 @@ while (t_ode<t_end)	{
 		else if(y_ode[i]<0)  {//why can't it be zero?
 			//printf("NEGATIVE OR NAN y_ode[%i]=%e\n", i, y_ode[i]);				
 			//printf("y(%d) NEGATIVE or not a number\n",i);
-			//y_ode[i]=0;
+			y_ode[i]=0;
 		}
 	}
 

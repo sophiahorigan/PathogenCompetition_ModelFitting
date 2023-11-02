@@ -111,7 +111,7 @@ double INITR[4];
 
 if (j==1 || j==2 || j==3){
 	if (r_pop_fit == 1){
-			INITR[i] = Params->r_pop;
+		INITR[i] = Params->r_pop;
 		}
 	if (r_meta_fit == 1){
 		INITR[i] = Params->r_meta[j];
@@ -122,7 +122,7 @@ if (j==1 || j==2 || j==3){
 		if (r_sub_fit == 1){
 			INITR[i] = Params->FITINIT[j][i+num_sub+num_sub];
 		}
-		//printf("j = %i\n INITS = %lf\t INITV=%lf\t INITR=%lf\n", j,INITS[i], INITV[i], INITR[i]);
+		//printf("j = %i\t i= %i\t INITS = %lf\t INITV=%lf\t INITR=%lf\n", j, i, INITS[i], INITV[i], INITR[i]);
 	}
 	//printf("j = %i\t initS = %lf\t initV = %lf\t initR = %lf\n", j, INITS[i], INITV[i], INITR[i]);
 }
@@ -301,7 +301,7 @@ while (t_0<MAXT3+h)	{
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
 							l_a[i][sub] = Params->l_a_pop; //one value for entire population 
-							//printf("here, a_l[i][sub]=%lf\n", a_l[i][sub]);
+							//printf("here, l_a[i][sub]=%lf\n", l_a[i][sub]);
 						}
 					}
 				}
@@ -324,6 +324,7 @@ while (t_0<MAXT3+h)	{
 					for(i=1; i<=3; i++){
 						for(sub=0;sub<num_sub;sub++){
 							l_m[i][sub] = Params->l_m_pop; //one value for entire population 
+							//printf("here, l_m[i][sub]=%lf\n", l_m[i][sub]);
 						}
 					}
 				}

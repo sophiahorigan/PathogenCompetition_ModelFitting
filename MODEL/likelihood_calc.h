@@ -94,6 +94,8 @@ if(lhood_meta > Params->bestlhood[dataset]){
 //printf("flag = %i\t, lhood = %e\n", Params->miser2_flag, lhood_meta);
 //printf("flag out of loop = %i\n", Params->miser2_flag);
 
+//printf("lhood meta 2 = %lf\n", lhood_meta2);
+
 lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
 
 

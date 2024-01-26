@@ -4,6 +4,4 @@
 #PBS -d .
 #PBS -V
 
-for (( i=0; i<$1;i++)); do
-	echo `sbatch run.sbatch $2 $3`	
-done
+for FILE in *.sbatch; do echo "sbatch" $FILE; done

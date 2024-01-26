@@ -15,7 +15,7 @@ int num_sub;
 Params->j = dataset;
 int j = Params->j;
 
-if (j==1 || j==2 || j==3) { //epi data
+if (j==1 || j==2 || j==3){ //epi data
 	Params->numsub=4;
 	num_sub = Params->numsub; 
 }
@@ -68,7 +68,6 @@ int line_ticker2;
 int test_day=0;	//CK// used to find the line in the weather data that corresponds to the starting day of collections
 int num_day =  hatch;  //CK// Starting day number
 
-
 line_ticker = num_day;
 
 line_ticker=line_ticker-1;
@@ -110,40 +109,27 @@ double INITV[4];
 double INITR[4];
 
 if (j==1 || j==2 || j==3){
-	if (r_pop_fit == 1){
-		INITR[i] = Params->r_pop;
-		}
-	if (r_meta_fit == 1){
-		INITR[i] = Params->r_meta[j];
-	}
 	for(i=0; i<num_sub; i++){
-		INITS[i] = Params->FITINIT[j][i];
-		INITV[i] = Params->FITINIT[j][i+num_sub];
-		if (r_sub_fit == 1){
-			INITR[i] = Params->FITINIT[j][i+num_sub+num_sub];
-		}
-		//printf("j = %i\t i= %i\t INITS = %lf\t INITV=%lf\t INITR=%lf\n", j, i, INITS[i], INITV[i], INITR[i]);
+		INITS[i] = Params->FITINIT[j][i] - (Params->FITINIT[j][i]*Params->FITINIT[j][i+num_sub]);
+		INITV[i] = Params->FITINIT[j][i]*Params->FITINIT[j][i+num_sub];
 	}
-	//printf("j = %i\t initS = %lf\t initV = %lf\t initR = %lf\n", j, INITS[i], INITV[i], INITR[i]);
 }
+//getc(stdin);
 
 if (j==4 || j==5 || j==6){
-	INITS[0] = Params->FITINIT[j][0];
-	INITV[0] = Params->FITINIT[j][4];
-	INITR[0] = Params->FITINIT[j][8];
-	//printf("j=%i\t S=%lf\t V=%lf\t R=%lf\n", j, INITS[0], INITV[0], INITR[0]);
+	INITS[0] = Params->FITINIT[j][0] - Params->FITINIT[j][4]*Params->FITINIT[j][0];
+	INITV[0] = Params->FITINIT[j][4]*Params->FITINIT[j][0];
 }
 
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
 
 //single epizootic state params
-//printf("numsub = %i\n", num_sub);
+//printf("day=%i\n", day-1);
 for(i=0; i<num_sub; i++){ 
 	S[i] = INITS[i]; //host density
 	//printf("S[%i] = %lf\n", i, S[i]);
-	V[i] = INITV[i]; //virus cadavers
+	V[i] = 0; //virus cadavers
 	C[i] = 0; //conidia 
-	R[i] = INITR[i]; //resting spores
 	for (ii=1;ii<=n;ii++){ //virus infection
 		if (ii==1){
 			E_V[i][ii] = INITV[i];
@@ -257,8 +243,6 @@ while (t_0<MAXT3+h)	{
 	
 	//indexing variables
 	int sub;
-	const int sub_index[4] = {0, 127, 254, 381}; //CHANGE?? Remove zeros
-
 
 	// -------------------------- integrate until next stoppage event ---------------------------------- //
 
@@ -266,10 +250,10 @@ while (t_0<MAXT3+h)	{
 
 //---------------------- LARVAL DISPERSAL ----------------------------//
 	if(day-1<8){ //dispersal only occurs as first instars, 1 week
-		
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
-		
 			if(larval_dispersal == 1){ 
+
+				//printf("DISPERSAL day = %i\n", day-1);
 
 				int subout;
 				int subin;
@@ -344,29 +328,27 @@ while (t_0<MAXT3+h)	{
 					}
 				}	
 
-				for(subout=0; subout<num_sub; subout++){
-					//susceptible larvae dispersing
+				//larvae disperse
+				for(subout=0; subout<num_sub; subout++)
+				{
 					Sout[subout] = exp(-l_a[j][subout]*10) * S[subout];
-					//printf("a = %lf\n", a_l[j][subout]);
 
-					//susceptible larvae that arrive at another metapopulation
-					for(subin=0; subin<num_sub; subin++){
-						if(subin!=subout){
-
-							Sin[subin] = Sout[subout]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
-						}
-					}
-
-					for (i=1;i<=n;i++)	{ //for each exposed class
-						//infected larvae dispersing
-						//SCALE OF MIGRATION
+					for (i=1;i<=n;i++)
+					{ 
 						Vout[subout][i] += exp(-l_a[j][subout]*10) * E_V[subout][i];
+					}
+				}
+				//some fraction arrive at another population
+				for(subout=0; subout<num_sub; subout++)
+				{
+					for(subin=0; subin<num_sub; subin++)
+					{
+						if(subin!=subout)
+						{
+							Sin[subin] = Sout[subout]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 
-						for(subin=0; subin<num_sub; subin++){
-
-							if(subin!=subout){
-								//infected larvae that arrive at another metapopulation
-								//SCALE OF MIGRATION
+							for (i=1;i<=n;i++)
+							{ 
 								Vin[subin][i] += Vout[subout][i]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 							}
 						}
@@ -377,10 +359,12 @@ while (t_0<MAXT3+h)	{
 					S[sub] += (Sin[sub] - Sout[sub]);
 					//printf("S = %e\t sub = %i\t sub in = %e\t subout = %e\n", S[sub], sub, Sin[sub], Sout[sub]);
 
-					for (i=1;i<=n;i++)	{ //for each exposed class
+					for (i=1;i<=n;i++)
+					{ //for each exposed class
 						E_V[sub][i] += (Vin[sub][i] - Vout[sub][i]); //CHANGE
 					} 
-					if(S[sub]<0 || E_V[sub]<0){
+					if(S[sub]<0 || E_V[sub]<0)
+					{
 						printf("TOO MUCH DISPERSAL! NEGATIVE POPULATIONS.");
 					}
 				}
@@ -389,10 +373,10 @@ while (t_0<MAXT3+h)	{
 	}	                        	
 		
 	//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------//
+	//printf("DAY = %i\n", day-1);
 	for(sub=0; sub<num_sub; sub++){ 
 		y_ode[0+sub_index[sub]]=S[sub];	//SUSCEPTIBLE
-		//printf("DAY = %i\n", day-1);
-		//printf("preode S[%i] = %lf\n", sub, S[sub]);
+		//printf("preode S[%i] = %lf\n", sub, y_ode[0+sub_index[sub]]);
 
 		for (i=1;i<=m;i++)	{ //FUNGUS INFECTED 
 			y_ode[i+sub_index[sub]]=E_F[sub][i];
@@ -484,12 +468,14 @@ while (t_0<MAXT3+h)	{
 		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub];
 		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]; 
 		*/
+		//printf("TOTAL POP for sub %i = %lf\n", sub, S[sub]+IV[sub]+IF[sub]+V[sub]);
 		//MODEL REALIZATION PRINTING
 		if(reals==1){
 			fprintf(fpr, "%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
 		}
 		//printf("%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
 	}
+	//getc(stdin);
 }
 
 t_0=t_next;

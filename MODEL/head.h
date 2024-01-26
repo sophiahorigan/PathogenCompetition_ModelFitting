@@ -37,6 +37,7 @@ FILE *fpls; //line-search parameter value output
 FILE *fpr; //model realizations
 FILE *fpme; //miser error
 FILE *fpm;	//mcmc posteriors
+FILE *fpa; //mcmc acceptances
 
 //ROUTINES
 int linesearch;
@@ -66,7 +67,7 @@ int r_sub_fit;
 //adaptable fit parameters
 int fit[92];
 
-const int sub_index[4] = {0, 127, 254, 381}; //CHANGE remove 0s
+const int sub_index[4] = {0, 80, 160, 240};
 
 int LScalls; //linesearch calls
 int Rcalls; //realization calls
@@ -102,7 +103,7 @@ const double DDstop = 267.034499999981;
 const double exposetime = 16; //what is this
 const double VFPass = 125.31; //check
 
-const int DIM = 508;  
+const int DIM = 320; //S(1) + C(1) + Vcadav(1) + Vinf(27) + Finf(50)   * 4
 const double h = 0.01;
 
 const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
@@ -181,8 +182,8 @@ typedef struct //FIT PARS
 	double miser2_flag;
 
 	//mcmc
-	int LoopVect[92]; //one for each param? //CHECK
-	int AcceptedVect[92];
+	int AcceptedVect[NUM_PARS];
+	int LoopVect[NUM_PARS];
 
 }STRUCTURE;
 

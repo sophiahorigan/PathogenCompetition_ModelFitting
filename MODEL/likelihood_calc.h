@@ -69,16 +69,17 @@ if (dataset==4 || dataset==6) {
 //save first likelihood in stochastic set as adjustment value
 //save first likelihood as best
 
+
 if(Params->miser_ticker==1){
 	Params->lhood_adjust[dataset] = -lhood_meta;
 	Params->bestlhood[dataset] = lhood_meta;
-	//printf("dataset = %i\t adj = %lf\t best = %lf\n", dataset, Params->lhood_adjust[dataset], Params->bestlhood[dataset]);
+	//printf("SET ADJ: dataset = %i\t adj = %lf\t best = %lf\n", dataset, Params->lhood_adjust[dataset], Params->bestlhood[dataset]);
 }
 Params->miser_ticker++;
 
 //printf("first lhood adj = %lf\n", Params->bestlhood[dataset]);
 
-if(lhood_meta > Params->bestlhood[dataset]){
+if(lhood_meta > (10 + Params->bestlhood[dataset])){ //if it's 10 points greater or more //avoids re-dos for small gains
 	//printf("better one detected\n");
 	//printf("dataset = %i\t better lhood = %lf\t old lhood = %lf\n", dataset, lhood_meta, Params->bestlhood[dataset]);
 	//Params->miser2_flag++; //if adding all
@@ -94,12 +95,15 @@ if(lhood_meta > Params->bestlhood[dataset]){
 //printf("flag = %i\t, lhood = %e\n", Params->miser2_flag, lhood_meta);
 //printf("flag out of loop = %i\n", Params->miser2_flag);
 
-//printf("lhood meta 2 = %lf\n", lhood_meta2);
-
 lhood_meta2 = lhood_meta + Params->lhood_adjust[dataset];
+//printf("lhood_meta 2 = lhood_meta + Parmslhood adj %lf = %lf + %lf\n",lhood_meta2, lhood_meta, Params->lhood_adjust[dataset]);
 
+//if(lhood_meta2 > 750 || lhood_meta2 < -750){
+//	printf("bad lhood tripped! assigning 600\n");
+//	lhood_meta2 = 600;
+//}
 
-//printf("lhood = %lf\t adj = %lf\t post adj = %lf\n", lhood_meta, Params->lhood_adjust[dataset], lhood_meta2);
+//printf("j = %i\t lhood = %lf\t adj = %lf\t post adj = %lf\n", dataset, lhood_meta, Params->lhood_adjust[dataset], lhood_meta2);
 
 //printf("miser ticker = %i\t miser flag = %i\n", Params->miser_ticker, Params->miser2_flag);
 

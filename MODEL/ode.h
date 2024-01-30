@@ -20,37 +20,48 @@ double muF		= Params->muF;  //conidia decay
 int j = Params->j; //dataset
 int i;
 int num_sub = Params->numsub;
-//printf("fast ode num_sub = %i\n", num_sub);
 int sub;
 //state variables
 double S0[4];
 double R[4];
 
-if (j==1 || j==2 || j==3){
-	for(i=0; i<num_sub; i++){
+// Assign init R
+if (j==1 || j==2 || j==3)
+{
+	for (i=0; i<num_sub; i++)
+	{
 		S0[i] = Params->FITINIT[j][i];
 		//printf("S0[%i] in ode = %lf\n", i, S0[i]);
-		if (r_sub_fit == 1){
+		if (r_sub_fit == 1)
+		{
 			R[i] = Params->FITINIT[j][i+num_sub+num_sub];
 		}
-		if (r_pop_fit == 1){
+		if (r_pop_fit == 1)
+		{
 			R[i] = Params->r_pop;
+			//set some R to zero
+			if (j==1)
+			{
+				R[1] = 0;
+				R[2] = 0;
+				R[3] = 0;
+			}
 		}
-		if (r_meta_fit == 1){
+		if (r_meta_fit == 1)
+		{
 			R[i] = Params->r_meta[j];
+			//set some R to zero
+			if (j==1)
+			{
+				R[1] = 0;
+				R[2] = 0;
+				R[3] = 0;
+			}
 		}
-	}
-	//fix some init Rs at zero!
-	if (j==1){
-		R[1] = 0;
-		R[2] = 0;
-		R[3] = 0;
-	}
-	for(i=0; i<num_sub; i++){
-	//printf("in ODE R[%i] = %lf\n", i, R[i]);
 	}
 }
-if (j==4 || j==5 || j==6){
+if (j==4 || j==5 || j==6)
+{
 	S0[0] = Params->FITINIT[j][0];
 	R[0] = Params->FITINIT[j][8];
 }
@@ -64,7 +75,8 @@ double netC[4];
 double c_a[4][4];
 double c_m[4][4];
 
-for(sub=0; sub<num_sub; sub++){
+for(sub=0; sub<num_sub; sub++)
+{
 	Cout[sub] = 0;
 	Cin[sub] = 0;
 	netC[sub] = 0;

@@ -100,8 +100,8 @@ static int log_fit[92] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 //-------TEST MODE--------
 if(VERBOSE == 1)
 {
-	LScalls = 50; Rcalls = 10; Mcalls = 100; Realizations = 100000;
-	numround = 20; searches = 20;
+	LScalls = 50; Rcalls = 10; Mcalls = 50; Realizations = 50000;
+	numround = 60; searches = 20;
 }
 if(TEST == 1)
 {
@@ -297,6 +297,7 @@ if(TEST == 1)
 					Params.c_m_sub[3][2] 	= 	ltf_params[50];			//META 3 SUB 3
 					Params.c_m_sub[3][3] 	= 	ltf_params[51];			//META 3 SUB 4
 					//LARVAE 1/AVG DIST DISP
+					//TEMP
 					Params.l_a_pop 			= 	exp(ltf_params[52]);	//POP
 					Params.l_a_meta[1] 		= 	exp(ltf_params[53]);	//META 1
 					Params.l_a_meta[2] 		= 	exp(ltf_params[54]);	//META 2
@@ -424,6 +425,7 @@ if(TEST == 1)
 				}
 			}
 			fprintf(fpls, "%4.3e ", total_loghood_metas);
+			//printf("printing best Param set = %lf\n", total_loghood_metas);
 			fprintf(fpls, "%4.3e ", best_posterior);
 			fprintf(fpls, "\n");
 		}
@@ -488,18 +490,18 @@ if(TEST == 1)
 		Params.FITINIT[3][3] 	= 	init_s;				 	//META 3 SUB 4
 		//INITR
 		Params.r_pop 			= 	exp(-5.404);				//POP
-		Params.r_meta[1] 		= 	exp(ltf_params[2]);		//META 1
-		Params.r_meta[2] 		= 	exp(ltf_params[3]);		//META 2
-		Params.r_meta[3] 		=	exp(ltf_params[4]);		//META 3
-		Params.FITINIT[1][8] 	= 	exp(ltf_params[5]); 	//META 1 SUB 1
-		Params.FITINIT[2][8] 	= 	exp(ltf_params[6]); 	//META 2 SUB 1
-		Params.FITINIT[2][9] 	= 	exp(ltf_params[7]); 	//META 2 SUB 2 
-		Params.FITINIT[2][10] 	= 	exp(ltf_params[8]); 	//META 2 SUB 3
-		Params.FITINIT[2][11] 	= 	exp(ltf_params[9]); 	//META 2 SUB 4
-		Params.FITINIT[3][8] 	= 	exp(ltf_params[10]); 	//META 3 SUB 1
-		Params.FITINIT[3][9] 	= 	exp(ltf_params[11]); 	//META 3 SUB 2
-		Params.FITINIT[3][10] 	= 	exp(ltf_params[12]); 	//META 3 SUB 3
-		Params.FITINIT[3][11] 	= 	exp(ltf_params[13]); 	//META 3 SUB 4
+		Params.r_meta[1] 		= 	exp(-5.404);		//META 1
+		Params.r_meta[2] 		= 	exp(-5.404);		//META 2
+		Params.r_meta[3] 		=	exp(-5.404);		//META 3
+		Params.FITINIT[1][8] 	= 	exp(-5.404); 		//META 1 SUB 1
+		Params.FITINIT[2][8] 	= 	exp(-5.404);		//META 2 SUB 1
+		Params.FITINIT[2][9] 	= 	exp(-5.404); 		//META 2 SUB 2 
+		Params.FITINIT[2][10] 	= 	exp(-5.404);		//META 2 SUB 3
+		Params.FITINIT[2][11] 	= 	exp(-5.404);		//META 2 SUB 4
+		Params.FITINIT[3][8] 	= 	exp(-5.404); 		//META 3 SUB 1
+		Params.FITINIT[3][9] 	= 	exp(-5.404);		//META 3 SUB 2
+		Params.FITINIT[3][10] 	= 	exp(-5.404); 		//META 3 SUB 3
+		Params.FITINIT[3][11] 	= 	exp(-5.404); 		//META 3 SUB 4
 		//RSTOCH
 		Params.R_stoch 			=	exp(-0.604);				//POP
 		//FSTOCH
@@ -705,35 +707,184 @@ if(TEST == 1)
 
 		if(model==1)
 		{
-			file = fopen("PCAsd_1.txt", "r");         
+			file = fopen("PCAsd2_1.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations_1.txt", "r");  
+			file = fopen("PCArotations2_1.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale_1.txt", "r");       
+			file = fopen("PCAscale2_1.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter_1.txt", "r");      
+			file = fopen("PCAcenter2_1.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
 			}
 			fclose(file);
 		}
+		if(model==2)
+		{
+			file = fopen("PCAsd2_2.txt", "r");         
+			for (a = 0; a < (NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &SDpca[a]);
+			}
+			fclose(file);
 
+			file = fopen("PCArotations2_2.txt", "r");  
+			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &Coefficients[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAscale2_2.txt", "r");       
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Scale[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAcenter2_2.txt", "r");      
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Center[a]);
+			}
+			fclose(file);
+		}
+		if(model==4)
+		{
+			file = fopen("PCAsd2_4.txt", "r");         
+			for (a = 0; a < (NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &SDpca[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCArotations2_4.txt", "r");  
+			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &Coefficients[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAscale2_4.txt", "r");       
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Scale[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAcenter2_4.txt", "r");      
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Center[a]);
+			}
+			fclose(file);
+		}
+		if(model==22)
+		{
+			file = fopen("PCAsd2_22.txt", "r");         
+			for (a = 0; a < (NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &SDpca[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCArotations2_22.txt", "r");  
+			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &Coefficients[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAscale2_22.txt", "r");       
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Scale[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAcenter2_22.txt", "r");      
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Center[a]);
+			}
+			fclose(file);
+		}
+		if(model==28)
+		{
+			file = fopen("PCAsd2_28.txt", "r");         
+			for (a = 0; a < (NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &SDpca[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCArotations2_28.txt", "r");  
+			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &Coefficients[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAscale2_28.txt", "r");       
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Scale[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAcenter2_28.txt", "r");      
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Center[a]);
+			}
+			fclose(file);
+		}
+		if(model==32)
+		{
+			file = fopen("PCAsd2_32.txt", "r");         
+			for (a = 0; a < (NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &SDpca[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCArotations2_32.txt", "r");  
+			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
+			{
+				fscanf(file, "%lf\n", &Coefficients[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAscale2_32.txt", "r");       
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Scale[a]);
+			}
+			fclose(file);
+
+			file = fopen("PCAcenter2_32.txt", "r");      
+			for (a = 0; a < NumberOfParams; a++)
+			{
+				fscanf(file, "%lf\n", &Center[a]);
+			}
+			fclose(file);
+		}
 		//-------GENERATE INITIAL PCS--------
 		for (a = 0; a < NumberOfParams; a++)
 		{
@@ -879,7 +1030,7 @@ if(TEST == 1)
 			Params.specific_nuF		= 	0.000241071699421562; 	//POP
 
 			//--------PASS FIT PARAMS-------
-			if(model==1)
+			if(model==1) //R POP, C NA, L POP
 			{
 				//INITS
 				Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
@@ -900,15 +1051,14 @@ if(TEST == 1)
 				Params.R_stoch 			= 	New_Params[2];		//POP
 				//FSTOCH										
 				Params.F_stoch			= 	New_Params[3];		//POP
-				//LARVAE 1/AVG DIST DISP
+				//L DISP
 				Params.l_a_pop 			=	New_Params[4];		//POP
-				//LARVAE FRAC SUCCESSFUL DISP
 				Params.l_m_pop 			= 	New_Params[5];		//POP
 			}
-			if(model==21)
+			if(model==2) //R META, C NA, L POP
 			{
+				//INITS
 				//---assign new parameter values---//
-				
 				Params.FITINIT[1][0] = New_Params[0];
 				Params.FITINIT[1][1] = New_Params[0];
 				Params.FITINIT[1][2] = New_Params[0]; 
@@ -921,129 +1071,148 @@ if(TEST == 1)
 				Params.FITINIT[3][1] = New_Params[0]; 
 				Params.FITINIT[3][2] = New_Params[0];
 				Params.FITINIT[3][3] = New_Params[0];
-				//meta1
-				Params.FITINIT[1][8] = New_Params[1];
-				//meta2
-				Params.FITINIT[2][8] = New_Params[2];
-				Params.FITINIT[2][9] = New_Params[3]; 
-				Params.FITINIT[2][10] = New_Params[4];
-				Params.FITINIT[2][11] = New_Params[5];
-				//meta1
-				Params.FITINIT[3][8] = New_Params[6];
-				Params.FITINIT[3][9] = New_Params[7];
-				Params.FITINIT[3][10] = New_Params[8];
-				Params.FITINIT[3][11] = New_Params[9];
-				//CORE SET
-				Params.muV			= New_Params[10]; //virus decay
-				Params.CV			= New_Params[11]; //hetereogeneity to virus infection 
-				Params.nuV    		= New_Params[12]; //virus transmission
-				Params.specific_nuF	= New_Params[13]; //fungus transmissison
-				Params.R_stoch 		= New_Params[14];
-				Params.F_stoch		= New_Params[15];
-				//dispersal
-				Params.c_a_pop = New_Params[16];
-				Params.c_m_pop = New_Params[17];
-				Params.l_a_pop = New_Params[18];
-				Params.l_m_pop = New_Params[19];
+				//INIT R
+				Params.r_meta[1] 		= 	New_Params[1];		//META 1
+				Params.r_meta[2] 		= 	New_Params[2];		//META 2
+				Params.r_meta[3] 		=	New_Params[3];		//META 3
+				//RSTOCH
+				Params.R_stoch 			= 	New_Params[4];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	New_Params[5];		//POP
+				//L DISP
+				Params.l_a_pop 			=	New_Params[6];		//POP
+				Params.l_m_pop 			= 	New_Params[7];		//POP
 			}
-			if(model==45)
+			if(model==4) //R POP, C NA, L META
 			{
-				//---assign new parameter values---//
-				Params.FITINIT[1][0] = New_Params[0];
-				Params.FITINIT[1][1] = New_Params[0];
-				Params.FITINIT[1][2] = New_Params[0]; 
-				Params.FITINIT[1][3] = New_Params[0]; 
-				Params.FITINIT[2][0] = New_Params[0]; 
-				Params.FITINIT[2][1] = New_Params[0];
-				Params.FITINIT[2][2] = New_Params[0];
-				Params.FITINIT[2][3] = New_Params[0];
-				Params.FITINIT[3][0] = New_Params[0]; 
-				Params.FITINIT[3][1] = New_Params[0]; 
-				Params.FITINIT[3][2] = New_Params[0];
-				Params.FITINIT[3][3] = New_Params[0];
-				//meta1
-				Params.FITINIT[1][8] = New_Params[1];
-				//meta2
-				Params.FITINIT[2][8] = New_Params[2];
-				Params.FITINIT[2][9] = New_Params[3]; 
-				Params.FITINIT[2][10] = New_Params[4];
-				Params.FITINIT[2][11] = New_Params[5];
-				//meta1
-				Params.FITINIT[3][8] = New_Params[6];
-				Params.FITINIT[3][9] = New_Params[7];
-				Params.FITINIT[3][10] = New_Params[8];
-				Params.FITINIT[3][11] = New_Params[9];
-				//CORE SET
-				Params.muV			= New_Params[10]; //virus decay
-				Params.CV			= New_Params[11]; //hetereogeneity to virus infection 
-				Params.nuV    		= New_Params[12]; //virus transmission
-				Params.specific_nuF	= New_Params[13]; //fungus transmissison
-				Params.R_stoch 		= New_Params[14];
-				Params.F_stoch		= New_Params[15];
-				//DISPERSAL
-				Params.c_a_sub[1][0] = New_Params[16]; 
-				Params.c_a_sub[1][1] = New_Params[17];
-				Params.c_a_sub[1][2] = New_Params[18];
-				Params.c_a_sub[1][3] = New_Params[19];
-				//meta 2
-				Params.c_a_sub[2][0] = New_Params[20];
-				Params.c_a_sub[2][1] = New_Params[21];
-				Params.c_a_sub[2][2] = New_Params[22];
-				Params.c_a_sub[2][3] = New_Params[23];
-				//meta 3
-				Params.c_a_sub[3][0] = New_Params[24]; 
-				Params.c_a_sub[3][1] = New_Params[25];
-				Params.c_a_sub[3][2] = New_Params[26];
-				Params.c_a_sub[3][3] = New_Params[27];
-				//c_m - sub //12
-				//meta1
-				Params.c_m_sub[1][0] = New_Params[28];
-				Params.c_m_sub[1][1] = New_Params[29];
-				Params.c_m_sub[1][2] = New_Params[30];
-				Params.c_m_sub[1][3] = New_Params[31];
-				//meta2	
-				Params.c_m_sub[2][0] = New_Params[32];
-				Params.c_m_sub[2][1] = New_Params[33];
-				Params.c_m_sub[2][2] = New_Params[34];
-				Params.c_m_sub[2][3] = New_Params[35];
-				//meta3
-				Params.c_m_sub[3][0] = New_Params[36];
-				Params.c_m_sub[3][1] = New_Params[37];
-				Params.c_m_sub[3][2] = New_Params[38];
-				Params.c_m_sub[3][3] = New_Params[39];
-				//LARVAL DISPERSAL
-				//l_a - sub //12
-				//meta 1
-				Params.l_a_sub[1][0] = New_Params[40];
-				Params.l_a_sub[1][1] = New_Params[41];
-				Params.l_a_sub[1][2] = New_Params[42];
-				Params.l_a_sub[1][3] = New_Params[43];
-				//meta 2
-				Params.l_a_sub[2][0] = New_Params[44];
-				Params.l_a_sub[2][1] = New_Params[45];
-				Params.l_a_sub[2][2] = New_Params[46];
-				Params.l_a_sub[2][3] = New_Params[47];
-				//meta 3
-				Params.l_a_sub[3][0] = New_Params[48]; 
-				Params.l_a_sub[3][1] = New_Params[49];
-				Params.l_a_sub[3][2] = New_Params[50];
-				Params.l_a_sub[3][3] = New_Params[51];
-				//l_m - sub //12
-				//meta1
-				Params.l_m_sub[1][0] = New_Params[52];
-				Params.l_m_sub[1][1] = New_Params[53];
-				Params.l_m_sub[1][2] = New_Params[54];
-				Params.l_m_sub[1][3] = New_Params[55];
-				//meta2	
-				Params.l_m_sub[2][0] = New_Params[56];
-				Params.l_m_sub[2][1] = New_Params[57];
-				Params.l_m_sub[2][2] = New_Params[58];
-				Params.l_m_sub[2][3] = New_Params[59];
-				//meta3
-				Params.l_m_sub[3][0] = New_Params[60];
-				Params.l_m_sub[3][1] = New_Params[61];
-				Params.l_m_sub[3][2] = New_Params[62];
-				Params.l_m_sub[3][3] = New_Params[63];
+				//INITS
+				Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+				//INITR
+				Params.r_pop 			= 	New_Params[1];		//POP
+				//RSTOCH
+				Params.R_stoch 			= 	New_Params[2];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	New_Params[3];		//POP
+				//L DISP
+				Params.l_a_meta[1] 		= 	New_Params[4];		//META 1
+				Params.l_a_meta[2] 		= 	New_Params[5];		//META 2
+				Params.l_a_meta[3] 		= 	New_Params[6];		//META 3
+				Params.l_m_meta[1] 		= 	New_Params[7];		//META 1
+				Params.l_m_meta[2] 		= 	New_Params[8];		//META 2
+				Params.l_m_meta[3] 		= 	New_Params[9];		//META 3
+			}
+			if(model==22) //R POP, C META, L POP
+			{
+				//INITS
+				Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+				//INITR
+				Params.r_pop 			= 	New_Params[1];		//POP
+				//RSTOCH
+				Params.R_stoch 			= 	New_Params[2];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	New_Params[3];		//POP
+				//C DISP
+				Params.c_a_meta[1] 		= 	New_Params[4];		//META 1
+				Params.c_a_meta[2] 		= 	New_Params[5];		//META 2
+				Params.c_a_meta[3] 		= 	New_Params[6];		//META 3
+				Params.c_m_meta[1] 		= 	New_Params[7];		//META 1
+				Params.c_m_meta[2] 		= 	New_Params[8];		//META 2
+				Params.c_m_meta[3] 		= 	New_Params[9];		//META 3
+				//L DISP
+				Params.l_a_pop 			=	New_Params[10];		//POP
+				Params.l_m_pop 			= 	New_Params[11];		//POP
+			}
+			if(model==28) //R POP, C POP, L META
+			{
+				//INITS
+				Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+				//INITR
+				Params.r_pop 			= 	New_Params[1];		//POP
+				//RSTOCH
+				Params.R_stoch 			= 	New_Params[2];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	New_Params[3];		//POP
+				//C DISP
+				Params.c_a_pop 			=	New_Params[4];		//POP
+				Params.c_m_pop 			= 	New_Params[5];		//POP
+				//L DISP
+				Params.l_a_meta[1] 		= 	New_Params[6];		//META 1
+				Params.l_a_meta[2] 		= 	New_Params[7];		//META 2
+				Params.l_a_meta[3] 		= 	New_Params[8];		//META 3
+				Params.l_m_meta[1] 		= 	New_Params[9];		//META 1
+				Params.l_m_meta[2] 		= 	New_Params[10];		//META 2
+				Params.l_m_meta[3] 		= 	New_Params[11];		//META 3
+			}
+			if(model==32) //R META, C META, L META
+			{
+				//INITS
+				Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+				//INIT R
+				Params.r_meta[1] 		= 	New_Params[1];		//META 1
+				Params.r_meta[2] 		= 	New_Params[2];		//META 2
+				Params.r_meta[3] 		=	New_Params[3];		//META 3
+				//RSTOCH
+				Params.R_stoch 			= 	New_Params[4];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	New_Params[5];		//POP
+				//C DISP
+				Params.c_a_meta[1] 		= 	New_Params[6];		//META 1
+				Params.c_a_meta[2] 		= 	New_Params[7];		//META 2
+				Params.c_a_meta[3] 		= 	New_Params[8];		//META 3
+				Params.c_m_meta[1] 		= 	New_Params[9];		//META 1
+				Params.c_m_meta[2] 		= 	New_Params[10];		//META 2
+				Params.c_m_meta[3] 		= 	New_Params[11];		//META 3
+				//L DISP
+				Params.l_a_meta[1] 		= 	New_Params[12];		//META 1
+				Params.l_a_meta[2] 		= 	New_Params[13];		//META 2
+				Params.l_a_meta[3] 		= 	New_Params[14];		//META 3
+				Params.l_m_meta[1] 		= 	New_Params[15];		//META 1
+				Params.l_m_meta[2] 		= 	New_Params[16];		//META 2
+				Params.l_m_meta[3] 		= 	New_Params[17];		//META 3
 			}
 
 			lhood_meta = 0; log_lhood_meta = 0; total_loghood_metas_NEW = 0;
@@ -1124,7 +1293,7 @@ if(TEST == 1)
 			Params.specific_nuF		= 	0.000241071699421562; 	//POP
 
 			//--------PASS FIT PARAMS-------
-			if(model==1)
+			if(model==1) //R POP, C NA, L POP
 			{
 				//INITS
 				Params.FITINIT[1][0] 	=	Old_Params[0];		//META 1 SUB 1
@@ -1145,15 +1314,13 @@ if(TEST == 1)
 				Params.R_stoch 			= 	Old_Params[2];		//POP
 				//FSTOCH										
 				Params.F_stoch			= 	Old_Params[3];		//POP
-				//LARVAE 1/AVG DIST DISP
+				//L DISP
 				Params.l_a_pop 			=	Old_Params[4];		//POP
-				//LARVAE FRAC SUCCESSFUL DISP
 				Params.l_m_pop 			= 	Old_Params[5];		//POP
-
 			}
-			if(model==21)
-			{ 
-				//---assign old parameter vaues---//
+			if(model==2) //R META, C NA, L POP
+			{
+				//INITS
 				Params.FITINIT[1][0] = Old_Params[0];
 				Params.FITINIT[1][1] = Old_Params[0];
 				Params.FITINIT[1][2] = Old_Params[0]; 
@@ -1166,130 +1333,148 @@ if(TEST == 1)
 				Params.FITINIT[3][1] = Old_Params[0]; 
 				Params.FITINIT[3][2] = Old_Params[0];
 				Params.FITINIT[3][3] = Old_Params[0];
-				//meta1
-				Params.FITINIT[1][8] = Old_Params[1];
-				//meta2
-				Params.FITINIT[2][8] = Old_Params[2];
-				Params.FITINIT[2][9] = Old_Params[3]; 
-				Params.FITINIT[2][10] = Old_Params[4];
-				Params.FITINIT[2][11] = Old_Params[5];
-				//meta1
-				Params.FITINIT[3][8] = Old_Params[6];
-				Params.FITINIT[3][9] = Old_Params[7];
-				Params.FITINIT[3][10] = Old_Params[8];
-				Params.FITINIT[3][11] = Old_Params[9];
-				//CORE SET
-				Params.muV			= Old_Params[10]; //virus decay
-				Params.CV			= Old_Params[11];//hetereogeneity to virus infection 
-				Params.nuV    		= Old_Params[12]; //virus transmission
-				Params.specific_nuF	= Old_Params[13]; //fungus transmissison
-				Params.R_stoch 		= Old_Params[14];
-				Params.F_stoch		= Old_Params[15];
-				//dispersal
-				Params.c_a_pop = Old_Params[16];
-				Params.c_m_pop = Old_Params[17];
-				//printf("c m pop =%lf\n", Old_Params[17]);
-				Params.l_a_pop = Old_Params[18];
-				Params.l_a_pop = Old_Params[19];
+				//INIT R
+				Params.r_meta[1] 		= 	Old_Params[1];		//META 1
+				Params.r_meta[2] 		= 	Old_Params[2];		//META 2
+				Params.r_meta[3] 		=	Old_Params[3];		//META 3
+				//RSTOCH
+				Params.R_stoch 			= 	Old_Params[4];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	Old_Params[5];		//POP
+				//L DISP
+				Params.l_a_pop 			=	Old_Params[6];		//POP
+				Params.l_m_pop 			= 	Old_Params[7];		//POP
 			}
-			if(model==45)
+			if(model==4) //R POP, C NA, L META
 			{
-				//---assign new parameter values---//
-				Params.FITINIT[1][0] = Old_Params[0];
-				Params.FITINIT[1][1] = Old_Params[0];
-				Params.FITINIT[1][2] = Old_Params[0]; 
-				Params.FITINIT[1][3] = Old_Params[0]; 
-				Params.FITINIT[2][0] = Old_Params[0]; 
-				Params.FITINIT[2][1] = Old_Params[0]; 
-				Params.FITINIT[2][2] = Old_Params[0]; 
-				Params.FITINIT[2][3] = Old_Params[0]; 
-				Params.FITINIT[3][0] = Old_Params[0]; 
-				Params.FITINIT[3][1] = Old_Params[0]; 
-				Params.FITINIT[3][2] = Old_Params[0]; 
-				Params.FITINIT[3][3] = Old_Params[0]; 
-				//meta1
-				Params.FITINIT[1][8] = Old_Params[1];
-				//meta2
-				Params.FITINIT[2][8] = Old_Params[2];
-				Params.FITINIT[2][9] = Old_Params[3]; 
-				Params.FITINIT[2][10] = Old_Params[4];
-				Params.FITINIT[2][11] = Old_Params[5];
-				//meta1
-				Params.FITINIT[3][8] = Old_Params[6];
-				Params.FITINIT[3][9] = Old_Params[7];
-				Params.FITINIT[3][10] = Old_Params[8];
-				Params.FITINIT[3][11] = Old_Params[9];
-				//CORE SET
-				Params.muV			= Old_Params[10]; //virus decay
-				Params.CV			= Old_Params[11]; //hetereogeneity to virus infection 
-				Params.nuV    		= Old_Params[12]; //virus transmission
-				Params.specific_nuF	= Old_Params[13]; //fungus transmissison
-				Params.R_stoch 		= Old_Params[14];
-				Params.F_stoch		= Old_Params[15];
-				//DISPERSAL
-				Params.c_a_sub[1][0] = Old_Params[16]; 
-				Params.c_a_sub[1][1] = Old_Params[17];
-				Params.c_a_sub[1][2] = Old_Params[18];
-				Params.c_a_sub[1][3] = Old_Params[19];
-				//meta 2
-				Params.c_a_sub[2][0] = Old_Params[20];
-				Params.c_a_sub[2][1] = Old_Params[21];
-				Params.c_a_sub[2][2] = Old_Params[22];
-				Params.c_a_sub[2][3] = Old_Params[23];
-				//meta 3
-				Params.c_a_sub[3][0] = Old_Params[24]; 
-				Params.c_a_sub[3][1] = Old_Params[25];
-				Params.c_a_sub[3][2] = Old_Params[26];
-				Params.c_a_sub[3][3] = Old_Params[27];
-				//c_m - sub //12
-				//meta1
-				Params.c_m_sub[1][0] = Old_Params[28];
-				Params.c_m_sub[1][1] = Old_Params[29];
-				Params.c_m_sub[1][2] = Old_Params[30];
-				Params.c_m_sub[1][3] = Old_Params[31];
-				//meta2	
-				Params.c_m_sub[2][0] = Old_Params[32];
-				Params.c_m_sub[2][1] = Old_Params[33];
-				Params.c_m_sub[2][2] = Old_Params[34];
-				Params.c_m_sub[2][3] = Old_Params[35];
-				//meta3
-				Params.c_m_sub[3][0] = Old_Params[36];
-				Params.c_m_sub[3][1] = Old_Params[37];
-				Params.c_m_sub[3][2] = Old_Params[38];
-				Params.c_m_sub[3][3] = Old_Params[39];
-				//LARVAL DISPERSAL
-				//l_a - sub //12
-				//meta 1
-				Params.l_a_sub[1][0] = Old_Params[40];
-				Params.l_a_sub[1][1] = Old_Params[41];
-				Params.l_a_sub[1][2] = Old_Params[42];
-				Params.l_a_sub[1][3] = Old_Params[43];
-				//meta 2
-				Params.l_a_sub[2][0] = Old_Params[44];
-				Params.l_a_sub[2][1] = Old_Params[45];
-				Params.l_a_sub[2][2] = Old_Params[46];
-				Params.l_a_sub[2][3] = Old_Params[47];
-				//meta 3
-				Params.l_a_sub[3][0] = Old_Params[48]; 
-				Params.l_a_sub[3][1] = Old_Params[49];
-				Params.l_a_sub[3][2] = Old_Params[50];
-				Params.l_a_sub[3][3] = Old_Params[51];
-				//l_m - sub //12
-				//meta1
-				Params.l_m_sub[1][0] = Old_Params[52];
-				Params.l_m_sub[1][1] = Old_Params[53];
-				Params.l_m_sub[1][2] = Old_Params[54];
-				Params.l_m_sub[1][3] = Old_Params[55];
-				//meta2	
-				Params.l_m_sub[2][0] = Old_Params[56];
-				Params.l_m_sub[2][1] = Old_Params[57];
-				Params.l_m_sub[2][2] = Old_Params[58];
-				Params.l_m_sub[2][3] = Old_Params[59];
-				//meta3
-				Params.l_m_sub[3][0] = Old_Params[60];
-				Params.l_m_sub[3][1] = Old_Params[61];
-				Params.l_m_sub[3][2] = Old_Params[62];
-				Params.l_m_sub[3][3] = Old_Params[63];
+				//INITS
+				Params.FITINIT[1][0] 	=	Old_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	Old_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	Old_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	Old_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	Old_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	Old_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	Old_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	Old_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	Old_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	Old_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	Old_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	Old_Params[0];		//META 3 SUB 4
+				//INITR
+				Params.r_pop 			= 	Old_Params[1];		//POP
+				//RSTOCH
+				Params.R_stoch 			= 	Old_Params[2];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	Old_Params[3];		//POP
+				//L DISP
+				Params.l_a_meta[1] 		= 	Old_Params[4];		//META 1
+				Params.l_a_meta[2] 		= 	Old_Params[5];		//META 2
+				Params.l_a_meta[3] 		= 	Old_Params[6];		//META 3
+				Params.l_m_meta[1] 		= 	Old_Params[7];		//META 1
+				Params.l_m_meta[2] 		= 	Old_Params[8];		//META 2
+				Params.l_m_meta[3] 		= 	Old_Params[9];		//META 3
+			}
+			if(model==22) //R POP, C META, L POP
+			{
+				//INITS
+				Params.FITINIT[1][0] 	=	Old_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	Old_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	Old_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	Old_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	Old_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	Old_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	Old_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	Old_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	Old_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	Old_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	Old_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	Old_Params[0];		//META 3 SUB 4
+				//INITR
+				Params.r_pop 			= 	Old_Params[1];		//POP
+				//RSTOCH
+				Params.R_stoch 			= 	Old_Params[2];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	Old_Params[3];		//POP
+				//C DISP
+				Params.c_a_meta[1] 		= 	Old_Params[4];		//META 1
+				Params.c_a_meta[2] 		= 	Old_Params[5];		//META 2
+				Params.c_a_meta[3] 		= 	Old_Params[6];		//META 3
+				Params.c_m_meta[1] 		= 	Old_Params[7];		//META 1
+				Params.c_m_meta[2] 		= 	Old_Params[8];		//META 2
+				Params.c_m_meta[3] 		= 	Old_Params[9];		//META 3
+				//L DISP
+				Params.l_a_pop 			=	Old_Params[10];		//POP
+				Params.l_m_pop 			= 	Old_Params[11];		//POP
+			}
+			if(model==28) //R POP, C POP, L META
+			{
+				//INITS
+				Params.FITINIT[1][0] 	=	Old_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	Old_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	Old_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	Old_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	Old_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	Old_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	Old_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	Old_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	Old_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	Old_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	Old_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	Old_Params[0];		//META 3 SUB 4
+				//INITR
+				Params.r_pop 			= 	Old_Params[1];		//POP
+				//RSTOCH
+				Params.R_stoch 			= 	Old_Params[2];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	Old_Params[3];		//POP
+				//C DISP
+				Params.c_a_pop 			=	Old_Params[4];		//POP
+				Params.c_m_pop 			= 	Old_Params[5];		//POP
+				//L DISP
+				Params.l_a_meta[1] 		= 	Old_Params[6];		//META 1
+				Params.l_a_meta[2] 		= 	Old_Params[7];		//META 2
+				Params.l_a_meta[3] 		= 	Old_Params[8];		//META 3
+				Params.l_m_meta[1] 		= 	Old_Params[9];		//META 1
+				Params.l_m_meta[2] 		= 	Old_Params[10];		//META 2
+				Params.l_m_meta[3] 		= 	Old_Params[11];		//META 3
+			}
+			if(model==32) //R META, C META, L META
+			{
+				//INITS
+				Params.FITINIT[1][0] 	=	Old_Params[0];		//META 1 SUB 1
+				Params.FITINIT[1][1] 	=	Old_Params[0];		//META 1 SUB 2
+				Params.FITINIT[1][2] 	= 	Old_Params[0]; 		//META 1 SUB 3
+				Params.FITINIT[1][3] 	= 	Old_Params[0]; 		//META 1 SUB 4
+				Params.FITINIT[2][0] 	= 	Old_Params[0]; 		//META 2 SUB 1
+				Params.FITINIT[2][1] 	= 	Old_Params[0];		//META 2 SUB 2
+				Params.FITINIT[2][2] 	= 	Old_Params[0];		//META 2 SUB 3
+				Params.FITINIT[2][3] 	= 	Old_Params[0];		//META 2 SUB 4
+				Params.FITINIT[3][0] 	= 	Old_Params[0]; 		//META 3 SUB 1
+				Params.FITINIT[3][1]	= 	Old_Params[0]; 		//META 3 SUB 2
+				Params.FITINIT[3][2]	= 	Old_Params[0];		//META 3 SUB 3
+				Params.FITINIT[3][3]	= 	Old_Params[0];		//META 3 SUB 4
+				//INIT R
+				Params.r_meta[1] 		= 	Old_Params[1];		//META 1
+				Params.r_meta[2] 		= 	Old_Params[2];		//META 2
+				Params.r_meta[3] 		=	Old_Params[3];		//META 3
+				//RSTOCH
+				Params.R_stoch 			= 	Old_Params[4];		//POP
+				//FSTOCH										
+				Params.F_stoch			= 	Old_Params[5];		//POP
+				//C DISP
+				Params.c_a_meta[1] 		= 	Old_Params[6];		//META 1
+				Params.c_a_meta[2] 		= 	Old_Params[7];		//META 2
+				Params.c_a_meta[3] 		= 	Old_Params[8];		//META 3
+				Params.c_m_meta[1] 		= 	Old_Params[9];		//META 1
+				Params.c_m_meta[2] 		= 	Old_Params[10];		//META 2
+				Params.c_m_meta[3] 		= 	Old_Params[11];		//META 3
+				//L DISP
+				Params.l_a_meta[1] 		= 	Old_Params[12];		//META 1
+				Params.l_a_meta[2] 		= 	Old_Params[13];		//META 2
+				Params.l_a_meta[3] 		= 	Old_Params[14];		//META 3
+				Params.l_m_meta[1] 		= 	Old_Params[15];		//META 1
+				Params.l_m_meta[2] 		= 	Old_Params[16];		//META 2
+				Params.l_m_meta[3] 		= 	Old_Params[17];		//META 3
 			}
 				
 				lhood_meta = 0; log_lhood_meta = 0; total_loghood_metas_OLD = 0;
@@ -1399,7 +1584,7 @@ if(TEST == 1)
 				Params.specific_nuF		= 	0.000241071699421562; 	//POP
 
 				//--------PASS FIT PARAMS-------
-				if(model==1)
+				if(model==1) //R POP, C NA, L POP
 				{
 					//INITS
 					Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
@@ -1420,53 +1605,13 @@ if(TEST == 1)
 					Params.R_stoch 			= 	New_Params[2];		//POP
 					//FSTOCH										
 					Params.F_stoch			= 	New_Params[3];		//POP
-					//LARVAE 1/AVG DIST DISP
+					//L DISP
 					Params.l_a_pop 			=	New_Params[4];		//POP
-					//LARVAE FRAC SUCCESSFUL DISP
 					Params.l_m_pop 			= 	New_Params[5];		//POP
 				}
-				if(model==21)
+				if(model==2) //R META, C NA, L POP
 				{
-					//---assign new parameter vaues---//
-					Params.FITINIT[1][0] = New_Params[0];
-					Params.FITINIT[1][1] = New_Params[0];
-					Params.FITINIT[1][2] = New_Params[0]; 
-					Params.FITINIT[1][3] = New_Params[0]; 
-					Params.FITINIT[2][0] = New_Params[0]; 
-					Params.FITINIT[2][1] = New_Params[0];
-					Params.FITINIT[2][2] = New_Params[0];
-					Params.FITINIT[2][3] = New_Params[0];
-					Params.FITINIT[3][0] = New_Params[0]; 
-					Params.FITINIT[3][1] = New_Params[0]; 
-					Params.FITINIT[3][2] = New_Params[0];
-					Params.FITINIT[3][3] = New_Params[0];
-					//meta1
-					Params.FITINIT[1][8] = New_Params[1];
-					//meta2
-					Params.FITINIT[2][8] = New_Params[2];
-					Params.FITINIT[2][9] = New_Params[3]; 
-					Params.FITINIT[2][10] = New_Params[4];
-					Params.FITINIT[2][11] = New_Params[5];
-					//meta1
-					Params.FITINIT[3][8] = New_Params[6];
-					Params.FITINIT[3][9] = New_Params[7];
-					Params.FITINIT[3][10] = New_Params[8];
-					Params.FITINIT[3][11] = New_Params[9];
-					//CORE SET
-					Params.muV			= New_Params[10]; //virus decay
-					Params.CV			= New_Params[11];//hetereogeneity to virus infection 
-					Params.nuV    		= New_Params[12]; //virus transmission
-					Params.specific_nuF	= New_Params[13]; //fungus transmissison
-					Params.R_stoch 		= New_Params[14];
-					Params.F_stoch		= New_Params[15];
-					//dispersal
-					Params.c_a_pop = New_Params[16];
-					Params.c_m_pop = New_Params[17];
-					Params.l_a_pop = New_Params[18];
-					Params.l_m_pop = New_Params[19];
-				}
-				if(model==45)
-				{
+					//INITS
 					//---assign new parameter values---//
 					Params.FITINIT[1][0] = New_Params[0];
 					Params.FITINIT[1][1] = New_Params[0];
@@ -1480,91 +1625,150 @@ if(TEST == 1)
 					Params.FITINIT[3][1] = New_Params[0]; 
 					Params.FITINIT[3][2] = New_Params[0];
 					Params.FITINIT[3][3] = New_Params[0];
-					//meta1
-					Params.FITINIT[1][8] = New_Params[1];
-					//meta2
-					Params.FITINIT[2][8] = New_Params[2];
-					Params.FITINIT[2][9] = New_Params[3]; 
-					Params.FITINIT[2][10] = New_Params[4];
-					Params.FITINIT[2][11] = New_Params[5];
-					//meta1
-					Params.FITINIT[3][8] = New_Params[6];
-					Params.FITINIT[3][9] = New_Params[7];
-					Params.FITINIT[3][10] = New_Params[8];
-					Params.FITINIT[3][11] = New_Params[9];
-					//CORE SET
-					Params.muV			= New_Params[10]; //virus decay
-					Params.CV			= New_Params[11]; //hetereogeneity to virus infection 
-					Params.nuV    		= New_Params[12]; //virus transmission
-					Params.specific_nuF	= New_Params[13]; //fungus transmissison
-					Params.R_stoch 		= New_Params[14];
-					Params.F_stoch		= New_Params[15];
-					//DISPERSAL
-					Params.c_a_sub[1][0] = New_Params[16]; 
-					Params.c_a_sub[1][1] = New_Params[17];
-					Params.c_a_sub[1][2] = New_Params[18];
-					Params.c_a_sub[1][3] = New_Params[19];
-					//meta 2
-					Params.c_a_sub[2][0] = New_Params[20];
-					Params.c_a_sub[2][1] = New_Params[21];
-					Params.c_a_sub[2][2] = New_Params[22];
-					Params.c_a_sub[2][3] = New_Params[23];
-					//meta 3
-					Params.c_a_sub[3][0] = New_Params[24]; 
-					Params.c_a_sub[3][1] = New_Params[25];
-					Params.c_a_sub[3][2] = New_Params[26];
-					Params.c_a_sub[3][3] = New_Params[27];
-					//c_m - sub //12
-					//meta1
-					Params.c_m_sub[1][0] = New_Params[28];
-					Params.c_m_sub[1][1] = New_Params[29];
-					Params.c_m_sub[1][2] = New_Params[30];
-					Params.c_m_sub[1][3] = New_Params[31];
-					//meta2	
-					Params.c_m_sub[2][0] = New_Params[32];
-					Params.c_m_sub[2][1] = New_Params[33];
-					Params.c_m_sub[2][2] = New_Params[34];
-					Params.c_m_sub[2][3] = New_Params[35];
-					//meta3
-					Params.c_m_sub[3][0] = New_Params[36];
-					Params.c_m_sub[3][1] = New_Params[37];
-					Params.c_m_sub[3][2] = New_Params[38];
-					Params.c_m_sub[3][3] = New_Params[39];
-					//LARVAL DISPERSAL
-					//l_a - sub //12
-					//meta 1
-					Params.l_a_sub[1][0] = New_Params[40];
-					Params.l_a_sub[1][1] = New_Params[41];
-					Params.l_a_sub[1][2] = New_Params[42];
-					Params.l_a_sub[1][3] = New_Params[43];
-					//meta 2
-					Params.l_a_sub[2][0] = New_Params[44];
-					Params.l_a_sub[2][1] = New_Params[45];
-					Params.l_a_sub[2][2] = New_Params[46];
-					Params.l_a_sub[2][3] = New_Params[47];
-					//meta 3
-					Params.l_a_sub[3][0] = New_Params[48]; 
-					Params.l_a_sub[3][1] = New_Params[49];
-					Params.l_a_sub[3][2] = New_Params[50];
-					Params.l_a_sub[3][3] = New_Params[51];
-					//l_m - sub //12
-					//meta1
-					Params.l_m_sub[1][0] = New_Params[52];
-					Params.l_m_sub[1][1] = New_Params[53];
-					Params.l_m_sub[1][2] = New_Params[54];
-					Params.l_m_sub[1][3] = New_Params[55];
-					//meta2	
-					Params.l_m_sub[2][0] = New_Params[56];
-					Params.l_m_sub[2][1] = New_Params[57];
-					Params.l_m_sub[2][2] = New_Params[58];
-					Params.l_m_sub[2][3] = New_Params[59];
-					//meta3
-					Params.l_m_sub[3][0] = New_Params[60];
-					Params.l_m_sub[3][1] = New_Params[61];
-					Params.l_m_sub[3][2] = New_Params[62];
-					Params.l_m_sub[3][3] = New_Params[63];
-					}
-
+					//INIT R
+					Params.r_meta[1] 		= 	New_Params[1];		//META 1
+					Params.r_meta[2] 		= 	New_Params[2];		//META 2
+					Params.r_meta[3] 		=	New_Params[3];		//META 3
+					//RSTOCH
+					Params.R_stoch 			= 	New_Params[4];		//POP
+					//FSTOCH										
+					Params.F_stoch			= 	New_Params[5];		//POP
+					//L DISP
+					Params.l_a_pop 			=	New_Params[6];		//POP
+					Params.l_m_pop 			= 	New_Params[7];		//POP
+				}
+				if(model==4) //R POP, C NA, L META
+				{
+					//INITS
+					Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+					Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+					Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+					Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+					Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+					Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+					Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+					Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+					Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+					Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+					Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+					Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+					//INITR
+					Params.r_pop 			= 	New_Params[1];		//POP
+					//RSTOCH
+					Params.R_stoch 			= 	New_Params[2];		//POP
+					//FSTOCH										
+					Params.F_stoch			= 	New_Params[3];		//POP
+					//L DISP
+					Params.l_a_meta[1] 		= 	New_Params[4];		//META 1
+					Params.l_a_meta[2] 		= 	New_Params[5];		//META 2
+					Params.l_a_meta[3] 		= 	New_Params[6];		//META 3
+					Params.l_m_meta[1] 		= 	New_Params[7];		//META 1
+					Params.l_m_meta[2] 		= 	New_Params[8];		//META 2
+					Params.l_m_meta[3] 		= 	New_Params[9];		//META 3
+				}
+				if(model==22) //R POP, C META, L POP
+				{
+					//INITS
+					Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+					Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+					Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+					Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+					Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+					Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+					Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+					Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+					Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+					Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+					Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+					Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+					//INITR
+					Params.r_pop 			= 	New_Params[1];		//POP
+					//RSTOCH
+					Params.R_stoch 			= 	New_Params[2];		//POP
+					//FSTOCH										
+					Params.F_stoch			= 	New_Params[3];		//POP
+					//C DISP
+					Params.c_a_meta[1] 		= 	New_Params[4];		//META 1
+					Params.c_a_meta[2] 		= 	New_Params[5];		//META 2
+					Params.c_a_meta[3] 		= 	New_Params[6];		//META 3
+					Params.c_m_meta[1] 		= 	New_Params[7];		//META 1
+					Params.c_m_meta[2] 		= 	New_Params[8];		//META 2
+					Params.c_m_meta[3] 		= 	New_Params[9];		//META 3
+					//L DISP
+					Params.l_a_pop 			=	New_Params[10];		//POP
+					Params.l_m_pop 			= 	New_Params[11];		//POP
+				}
+				if(model==28) //R POP, C POP, L META
+				{
+					//INITS
+					Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+					Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+					Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+					Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+					Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+					Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+					Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+					Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+					Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+					Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+					Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+					Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+					//INITR
+					Params.r_pop 			= 	New_Params[1];		//POP
+					//RSTOCH
+					Params.R_stoch 			= 	New_Params[2];		//POP
+					//FSTOCH										
+					Params.F_stoch			= 	New_Params[3];		//POP
+					//C DISP
+					Params.c_a_pop 			=	New_Params[4];		//POP
+					Params.c_m_pop 			= 	New_Params[5];		//POP
+					//L DISP
+					Params.l_a_meta[1] 		= 	New_Params[6];		//META 1
+					Params.l_a_meta[2] 		= 	New_Params[7];		//META 2
+					Params.l_a_meta[3] 		= 	New_Params[8];		//META 3
+					Params.l_m_meta[1] 		= 	New_Params[9];		//META 1
+					Params.l_m_meta[2] 		= 	New_Params[10];		//META 2
+					Params.l_m_meta[3] 		= 	New_Params[11];		//META 3
+				}
+				if(model==32) //R META, C META, L META
+				{
+					//INITS
+					Params.FITINIT[1][0] 	=	New_Params[0];		//META 1 SUB 1
+					Params.FITINIT[1][1] 	=	New_Params[0];		//META 1 SUB 2
+					Params.FITINIT[1][2] 	= 	New_Params[0]; 		//META 1 SUB 3
+					Params.FITINIT[1][3] 	= 	New_Params[0]; 		//META 1 SUB 4
+					Params.FITINIT[2][0] 	= 	New_Params[0]; 		//META 2 SUB 1
+					Params.FITINIT[2][1] 	= 	New_Params[0];		//META 2 SUB 2
+					Params.FITINIT[2][2] 	= 	New_Params[0];		//META 2 SUB 3
+					Params.FITINIT[2][3] 	= 	New_Params[0];		//META 2 SUB 4
+					Params.FITINIT[3][0] 	= 	New_Params[0]; 		//META 3 SUB 1
+					Params.FITINIT[3][1]	= 	New_Params[0]; 		//META 3 SUB 2
+					Params.FITINIT[3][2]	= 	New_Params[0];		//META 3 SUB 3
+					Params.FITINIT[3][3]	= 	New_Params[0];		//META 3 SUB 4
+					//INIT R
+					Params.r_meta[1] 		= 	New_Params[1];		//META 1
+					Params.r_meta[2] 		= 	New_Params[2];		//META 2
+					Params.r_meta[3] 		=	New_Params[3];		//META 3
+					//RSTOCH
+					Params.R_stoch 			= 	New_Params[4];		//POP
+					//FSTOCH										
+					Params.F_stoch			= 	New_Params[5];		//POP
+					//C DISP
+					Params.c_a_meta[1] 		= 	New_Params[6];		//META 1
+					Params.c_a_meta[2] 		= 	New_Params[7];		//META 2
+					Params.c_a_meta[3] 		= 	New_Params[8];		//META 3
+					Params.c_m_meta[1] 		= 	New_Params[9];		//META 1
+					Params.c_m_meta[2] 		= 	New_Params[10];		//META 2
+					Params.c_m_meta[3] 		= 	New_Params[11];		//META 3
+					//L DISP
+					Params.l_a_meta[1] 		= 	New_Params[12];		//META 1
+					Params.l_a_meta[2] 		= 	New_Params[13];		//META 2
+					Params.l_a_meta[3] 		= 	New_Params[14];		//META 3
+					Params.l_m_meta[1] 		= 	New_Params[15];		//META 1
+					Params.l_m_meta[2] 		= 	New_Params[16];		//META 2
+					Params.l_m_meta[3] 		= 	New_Params[17];		//META 3
+				}
+				
 				lhood_meta = 0; log_lhood_meta = 0; total_loghood_metas_NEW = 0;
 				meta_err = 0;
 

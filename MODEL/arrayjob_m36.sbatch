@@ -6,7 +6,7 @@
 #SBATCH --array=1-11
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=28
-#SBATCH --time=10:00:00
+#SBATCH --time=20:00:00
 
 module load openmpi
 

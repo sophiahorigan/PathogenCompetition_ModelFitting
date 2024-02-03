@@ -181,6 +181,9 @@ typedef struct //FIT PARS
 	int miser_ticker;
 	double miser2_flag;
 
+	//lhood sub
+	double lhood_sub[DATA_SETS][10]; //lhood for each datapoint
+
 	//mcmc
 	int AcceptedVect[NUM_PARS];
 	int LoopVect[NUM_PARS];

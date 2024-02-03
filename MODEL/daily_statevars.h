@@ -132,7 +132,7 @@ for(i=0; i<num_sub; i++){
 	C[i] = 0; //conidia 
 	for (ii=1;ii<=n;ii++){ //virus infection
 		if (ii==1){
-			E_V[i][ii] = INITV[i];
+			E_V[i][ii] = 0;
 		}
 		else{
 			E_V[i][ii] = 0;
@@ -249,7 +249,7 @@ while (t_0<MAXT3+h)	{
 	while (t<t_next)	{
 
 //---------------------- LARVAL DISPERSAL ----------------------------//
-	if(day-1<8){ //dispersal only occurs as first instars, 1 week
+	if((day-1)==8){ //dispersal occurs throughout first week
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
 			if(larval_dispersal == 1){ 
 
@@ -257,11 +257,12 @@ while (t_0<MAXT3+h)	{
 
 				int subout;
 				int subin;
+				int sub;
 
-				double Vin[num_sub][n];
-				double Vout[num_sub][n];
+				double Vin[num_sub]; //cadavers
+				double Vout[num_sub];
 
-				double Sout[num_sub]; 
+				double Sout[num_sub]; //susceptible insects
 				double Sin[num_sub]; 
 
 				double l_a[4][4];
@@ -273,10 +274,13 @@ while (t_0<MAXT3+h)	{
 					Sout[sub] = 0;
 					Sin[sub] = 0;
 
-					for(i=1;i<=n;i++){
-						Vout[sub][i] = 0;
-						Vin[sub][i] = 0;
-					}
+					Vout[sub] = 0;
+					Vin[sub] = 0;
+				}
+
+				//initiate first round of infectious cadavers
+				for(sub=0; sub<num_sub; sub++){ 
+					V[sub] = INITV[sub];
 				}
 
 				//COMPETING MODELS
@@ -333,10 +337,7 @@ while (t_0<MAXT3+h)	{
 				{
 					Sout[subout] = exp(-l_a[j][subout]*10) * S[subout];
 
-					for (i=1;i<=n;i++)
-					{ 
-						Vout[subout][i] += exp(-l_a[j][subout]*10) * E_V[subout][i];
-					}
+					Vout[subout] += exp(-l_a[j][subout]*10) * V[subout];
 				}
 				//some fraction arrive at another population
 				for(subout=0; subout<num_sub; subout++)
@@ -347,22 +348,16 @@ while (t_0<MAXT3+h)	{
 						{
 							Sin[subin] = Sout[subout]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 
-							for (i=1;i<=n;i++)
-							{ 
-								Vin[subin][i] += Vout[subout][i]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
-							}
+							Vin[subin] += Vout[subout]*l_m[j][subout]*exp(-l_a[j][subout]*Params->DISTANCE[j][subout][subin]);
 						}
 					}
 				}
 				for(sub=0; sub<num_sub; sub++){ //update larval density
-					//printf("preS = %e\n", S[sub]);
-					S[sub] += (Sin[sub] - Sout[sub]);
-					//printf("S = %e\t sub = %i\t sub in = %e\t subout = %e\n", S[sub], sub, Sin[sub], Sout[sub]);
 
-					for (i=1;i<=n;i++)
-					{ //for each exposed class
-						E_V[sub][i] += (Vin[sub][i] - Vout[sub][i]); //CHANGE
-					} 
+					S[sub] += (Sin[sub] - Sout[sub]);
+
+					V[sub] += (Vin[sub] - Vout[sub]);
+
 					if(S[sub]<0 || E_V[sub]<0)
 					{
 						printf("TOO MUCH DISPERSAL! NEGATIVE POPULATIONS.");
@@ -386,6 +381,7 @@ while (t_0<MAXT3+h)	{
 		} 
 		y_ode[m+n+1+sub_index[sub]]=C[sub];	//CONIDIA
 		y_ode[m+n+2+sub_index[sub]]=V[sub]; //OBS
+		//printf("V[%i] = %lf\n", sub, V[sub]);
 	}
 	
 

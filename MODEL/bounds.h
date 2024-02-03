@@ -6751,7 +6751,7 @@ double low;
 double high;
 
 if(model==1){       //R POP, C NA, L POP
-    if (i==0)			{	low = 0.00000001;	    high = 75;      }	//INITS 
+    if (i==0)			{	low = 0.00000001;	    high = 200;      }	//INITS 
     else if (i==1)		{	low = 0.00000001;       high = 0.36;	}	//INITR POP
     else if (i==2)		{	low = 0.00000001;		high = 10;		}	//R STOCH
     else if (i==3)		{	low = 0.00000001;		high = 10;		}	//F STOCH
@@ -6759,7 +6759,7 @@ if(model==1){       //R POP, C NA, L POP
     else if (i==5)		{	low = 0.00000001;		high = 1;		}	//l_m_pop
 }
 if(model==2){      //R META, C NA, L POP
-    if (i==0)			{	low = 0.00000001;	    high = 75;      }	//INITS 
+    if (i==0)			{	low = 0.00000001;	    high = 200;      }	//INITS 
     else if (i==1)		{	low = 0.00000001;       high = 0.36;	}	//INITR META 1
     else if (i==2)		{	low = 0.00000001;       high = 0.36;	}	//INITR META 2
     else if (i==3)		{	low = 0.00000001;       high = 0.36;	}	//INITR META 3
@@ -6769,7 +6769,7 @@ if(model==2){      //R META, C NA, L POP
     else if (i==7)		{	low = 0.00000001;		high = 1;		}	//l_m_pop
 }
 if(model==4){      //R POP, C NA, L META
-    if (i==0)			{	low = 0.00000001;	    high = 75;      }	//INITS 
+    if (i==0)			{	low = 0.00000001;	    high = 200;      }	//INITS 
     else if (i==1)		{	low = 0.00000001;       high = 0.36;	}	//INITR POP
     else if (i==2)		{	low = 0.00000001;		high = 10;		}	//R STOCH
     else if (i==3)		{	low = 0.00000001;		high = 10;		}	//F STOCH
@@ -6781,7 +6781,7 @@ if(model==4){      //R POP, C NA, L META
     else if (i==9)		{	low = 0.00000001;		high = 1;		}	//l_m_META 3
 }
 if(model==22){      //R POP, C META, L POP
-    if (i==0)			{	low = 0.00000001;	    high = 75;      }	//INITS 
+    if (i==0)			{	low = 0.00000001;	    high = 200;      }	//INITS 
     else if (i==1)		{	low = 0.00000001;       high = 0.36;	}	//INITR POP
     else if (i==2)		{	low = 0.00000001;		high = 10;		}	//R STOCH
     else if (i==3)		{	low = 0.00000001;		high = 10;		}	//F STOCH
@@ -6795,7 +6795,7 @@ if(model==22){      //R POP, C META, L POP
     else if (i==11)		{	low = 0.00000001;		high = 1;		}	//l_m_pop
 }
 if(model==28){      //R POP, C POP, L META
-    if (i==0)			{	low = 0.00000001;	    high = 75;      }	//INITS 
+    if (i==0)			{	low = 0.00000001;	    high = 200;      }	//INITS 
     else if (i==1)		{	low = 0.00000001;       high = 0.36;	}	//INITR POP
     else if (i==2)		{	low = 0.00000001;		high = 10;		}	//R STOCH
     else if (i==3)		{	low = 0.00000001;		high = 10;		}	//F STOCH
@@ -6809,7 +6809,7 @@ if(model==28){      //R POP, C POP, L META
     else if (i==11)		{	low = 0.00000001;		high = 1;		}	//l_m_META 3
 }
 if(model==32){      //R META, C META, L META
-    if (i==0)			{	low = 0.00000001;	    high = 75;      }	//INITS 
+    if (i==0)			{	low = 0.00000001;	    high = 200;      }	//INITS 
     else if (i==1)		{	low = 0.00000001;       high = 0.36;	}	//INITR META 1
     else if (i==2)		{	low = 0.00000001;       high = 0.36;	}	//INITR META 2
     else if (i==3)		{	low = 0.00000001;       high = 0.36;	}	//INITR META 3

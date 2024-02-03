@@ -100,8 +100,8 @@ static int log_fit[92] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 //-------TEST MODE--------
 if(VERBOSE == 1)
 {
-	LScalls = 50; Rcalls = 10; Mcalls = 50; Realizations = 50000;
-	numround = 60; searches = 20;
+	LScalls = 50; Rcalls = 10; Mcalls = 50; Realizations = 15000;
+	numround = 20; searches = 30;
 }
 if(TEST == 1)
 {
@@ -146,7 +146,9 @@ if(TEST == 1)
 		//-------BEGIN LINE SEARCH--------
 		for (int round = 0; round < numround; round++)
 		{
-			double best_posterior = -66666666666666;
+			double best_posterior = -66666666666666; //best posterior summed for all metapops
+			double best_lhood_data[4][10]; //daily lhood set associated with  best param sets
+			double best_total_loghood_metas; //loghood (no prior added) associated with best param set
 			int a = 0;
 
 			for (int i = 0; i < num_ltfparams; i++)
@@ -204,18 +206,18 @@ if(TEST == 1)
 					}
 					//--------PASS FIXED PARAMS-------
 					//INITV
-					Params.FITINIT[1][4] 	= 	0.00000000000001; 		//META 1 SUB 1
-					Params.FITINIT[1][5] 	= 	0.05; 					//META 1 SUB 2
-					Params.FITINIT[1][6] 	= 	0.05;					//META 1 SUB 3
-					Params.FITINIT[1][7] 	= 	0.00000000000001; 		//META 1 SUB 4
-					Params.FITINIT[2][4] 	= 	0.00000000000001; 		//META 2 SUB 1
-					Params.FITINIT[2][5] 	= 	0.05; 					//META 2 SUB 2
-					Params.FITINIT[2][6] 	= 	0.05; 					//META 2 SUB 3
-					Params.FITINIT[2][7] 	= 	0.00000000000001; 		//META 2 SUB 4
-					Params.FITINIT[3][4] 	= 	0.00000000000001; 		//META 3 SUB 1
-					Params.FITINIT[3][5] 	= 	0.05; 					//META 3 SUB 2
-					Params.FITINIT[3][6] 	= 	0.05; 					//META 3 SUB 3
-					Params.FITINIT[3][7] 	= 	0.00000000000001; 		//META 3 SUB 4
+					Params.FITINIT[1][4] 	= 	0; 						//META 1 SUB 1
+					Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
+					Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
+					Params.FITINIT[1][7] 	= 	0; 						//META 1 SUB 4
+					Params.FITINIT[2][4] 	= 	0; 						//META 2 SUB 1
+					Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
+					Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
+					Params.FITINIT[2][7] 	= 	0; 						//META 2 SUB 4
+					Params.FITINIT[3][4] 	= 	0; 						//META 3 SUB 1
+					Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
+					Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
+					Params.FITINIT[3][7] 	= 	0; 						//META 3 SUB 4
 					//INITR
 					Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
 					Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
@@ -393,8 +395,19 @@ if(TEST == 1)
 
 					//--------EVALUATE POSTERIOR-------
 					if (new_posterior > best_posterior)
-					{ 
+					{ 	
+						//save posterior
+						best_total_loghood_metas = total_loghood_metas;
 						best_posterior = new_posterior;
+						//save lhood scores for each data point
+						for (int j = 1; j <= 3; j++)
+						{
+							for(int i = 0; i<10; i++)
+							{
+								best_lhood_data[j][i] = Params.lhood_sub[j][i];
+							}
+						}
+						//save parameter values
 						for (int c = 0; c < num_ltfparams; c++)
 						{
 							localmax_params[c] = ltf_params[c]; 			
@@ -424,15 +437,20 @@ if(TEST == 1)
 					}
 				}
 			}
-			fprintf(fpls, "%4.3e ", total_loghood_metas);
+			fprintf(fpls, "%4.3e ", best_total_loghood_metas);
 			//printf("printing best Param set = %lf\n", total_loghood_metas);
 			fprintf(fpls, "%4.3e ", best_posterior);
+			for (int j = 1; j <= 3; j++){
+				for(int i = 0; i<10; i++){
+					fprintf(fpls, "%5.3f ", best_lhood_data[j][i]);
+				}
+			}
 			fprintf(fpls, "\n");
 		}
 		fclose(fpls); 
 	}
 ///////////////////////////////////////////////////REALIZATIONS///////////////////////////////////////////////////
-	if (reals == 1)
+	if (reals == 1) //CONSIDER CHANGING HOW I DO REALIZATIONS
 	{
 		//--------FILE SETUP-------
 		char name1[50];
@@ -445,20 +463,49 @@ if(TEST == 1)
 		fpme = fopen(nameme, "a+");
 		setbuf(fpme, NULL);
 
+		//---------PARAMS----------
+		double new_log_prior;
+		double log_prior;
+
+		/* //get prior working for reals -- read in best parameter set flexible by model
+		for (int k = 0; k < num_ltfparams; k++)
+		{
+			if (fit[k] == 1)
+			{
+				if (log_fit[k] == 1)	//log fit
+				{ 
+					new_log_prior = log(gsl_ran_flat_pdf(exp(ltf_params[k]), exp(ls_bound(model,k,1)), (exp(ls_bound(model,k,1)) + exp(ls_bound(model,k,2)))));
+					//printf("param %i = %lf\n", k, ltf_params[k]);
+					//printf("newlog prior = %lf\n", new_log_prior);
+				}
+				else 					//non-log fit
+				{ 
+					new_log_prior = log(gsl_ran_flat_pdf(ltf_params[k], ls_bound(model,k,1), (ls_bound(model,k,1) + ls_bound(model,k,2))));
+					//printf("param %i = %lf\n", k, ltf_params[k]);
+					//printf("newlog prior = %lf\n", new_log_prior);
+				}
+				if (isnan(new_log_prior) || isinf(new_log_prior)) 	//outside of bounds
+				{ 
+					printf("PROBLEM WITH PRIORS\n k=%i\t new log prior = %lf\n", k, new_log_prior);
+					new_log_prior = -999999;	//assign bad score
+				}
+				log_prior = log_prior + new_log_prior;
+			}
+		}*/
 		//--------PASS FIXED PARAMS-------
 		//INITV
-		Params.FITINIT[1][4] 	= 	0.00000000000001; 		//META 1 SUB 1
-		Params.FITINIT[1][5] 	= 	0.05; 					//META 1 SUB 2
-		Params.FITINIT[1][6] 	= 	0.05;					//META 1 SUB 3
-		Params.FITINIT[1][7] 	= 	0.00000000000001; 		//META 1 SUB 4
-		Params.FITINIT[2][4] 	= 	0.00000000000001; 		//META 2 SUB 1
-		Params.FITINIT[2][5] 	= 	0.05; 					//META 2 SUB 2
-		Params.FITINIT[2][6] 	= 	0.05; 					//META 2 SUB 3
-		Params.FITINIT[2][7] 	= 	0.00000000000001; 		//META 2 SUB 4
-		Params.FITINIT[3][4] 	= 	0.00000000000001; 		//META 3 SUB 1
-		Params.FITINIT[3][5] 	= 	0.05; 					//META 3 SUB 2
-		Params.FITINIT[3][6] 	= 	0.05; 					//META 3 SUB 3
-		Params.FITINIT[3][7] 	= 	0.00000000000001; 		//META 3 SUB 4
+		Params.FITINIT[1][4] 	= 	0;						//META 1 SUB 1 //if zero lhood function throws -inf if model predicts any infection
+		Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2 //this might be a bad idea
+		Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
+		Params.FITINIT[1][7] 	= 	0;						//META 1 SUB 4
+		Params.FITINIT[2][4] 	= 	0;						//META 2 SUB 1
+		Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
+		Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
+		Params.FITINIT[2][7] 	= 	0;						//META 2 SUB 4
+		Params.FITINIT[3][4] 	= 	0;						//META 3 SUB 1
+		Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
+		Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
+		Params.FITINIT[3][7] 	= 	0;						//META 3 SUB 4
 		//INITR
 		Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
 		Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
@@ -475,7 +522,7 @@ if(TEST == 1)
 
 		//--------PASS FIT PARAMS ESTIMATES-------
 		//INITS
-		double init_s = 2.687;
+		double init_s = 2;
 		Params.FITINIT[1][0] 	= 	init_s;				 	//META 1 SUB 1
 		Params.FITINIT[1][1] 	= 	init_s;				 	//META 1 SUB 2
 		Params.FITINIT[1][2] 	= 	init_s;				 	//META 1 SUB 3
@@ -489,10 +536,10 @@ if(TEST == 1)
 		Params.FITINIT[3][2] 	= 	init_s;				 	//META 3 SUB 3
 		Params.FITINIT[3][3] 	= 	init_s;				 	//META 3 SUB 4
 		//INITR
-		Params.r_pop 			= 	exp(-5.404);				//POP
-		Params.r_meta[1] 		= 	exp(-5.404);		//META 1
-		Params.r_meta[2] 		= 	exp(-5.404);		//META 2
-		Params.r_meta[3] 		=	exp(-5.404);		//META 3
+		Params.r_pop 			= 	0.000329;				//POP
+		Params.r_meta[1] 		= 	0.000007;		//META 1
+		Params.r_meta[2] 		= 	0.000099;		//META 2
+		Params.r_meta[3] 		=	0.000243;		//META 3
 		Params.FITINIT[1][8] 	= 	exp(-5.404); 		//META 1 SUB 1
 		Params.FITINIT[2][8] 	= 	exp(-5.404);		//META 2 SUB 1
 		Params.FITINIT[2][9] 	= 	exp(-5.404); 		//META 2 SUB 2 
@@ -503,14 +550,14 @@ if(TEST == 1)
 		Params.FITINIT[3][10] 	= 	exp(-5.404); 		//META 3 SUB 3
 		Params.FITINIT[3][11] 	= 	exp(-5.404); 		//META 3 SUB 4
 		//RSTOCH
-		Params.R_stoch 			=	exp(-0.604);				//POP
+		Params.R_stoch 			=	0.004306;				//POP
 		//FSTOCH
-		Params.F_stoch			= 	exp(-2.603);				//POP
+		Params.F_stoch			= 	4.862143;				//POP
 		//CONIDIA 1/AVG DIST DISP
-		Params.c_a_pop 			= 	exp(ltf_params[20]);	//POP
-		Params.c_a_meta[1] 		= 	exp(ltf_params[21]);	//META 1
-		Params.c_a_meta[2] 		= 	exp(ltf_params[22]);	//META 2
-		Params.c_a_meta[3] 		= 	exp(ltf_params[23]);	//META 3
+		Params.c_a_pop 			= 	1.742841;	//POP
+		Params.c_a_meta[1] 		= 	0.419547;	//META 1
+		Params.c_a_meta[2] 		= 	28.79714;	//META 2
+		Params.c_a_meta[3] 		= 	1.486261;	//META 3
 		Params.c_a_sub[1][0] 	= 	exp(ltf_params[24]); 	//META 1 SUB 1
 		Params.c_a_sub[1][1] 	= 	exp(ltf_params[25]);	//META 1 SUB 2
 		Params.c_a_sub[1][2] 	= 	exp(ltf_params[26]);	//META 1 SUB 3
@@ -524,10 +571,10 @@ if(TEST == 1)
 		Params.c_a_sub[3][2] 	= 	exp(ltf_params[34]);	//META 3 SUB 3
 		Params.c_a_sub[3][3] 	= 	exp(ltf_params[35]);	//META 3 SUB 4
 		//CONIDIA FRAC SUCCESSFUL DISP
-		Params.c_m_pop			= 	ltf_params[36]; 		//POP
-		Params.c_m_meta[1]		= 	ltf_params[37];			//META 1
-		Params.c_m_meta[2]		= 	ltf_params[38];			//META 2
-		Params.c_m_meta[3]		= 	ltf_params[39];			//META 3
+		Params.c_m_pop			= 	0.147; 				//POP
+		Params.c_m_meta[1]		= 	0.122632;			//META 1
+		Params.c_m_meta[2]		= 	0.463071;			//META 2
+		Params.c_m_meta[3]		= 	0.301757;			//META 3
 		Params.c_m_sub[1][0] 	= 	ltf_params[40];			//META 1 SUB 1
 		Params.c_m_sub[1][1] 	= 	ltf_params[41];			//META 1 SUB 2
 		Params.c_m_sub[1][2]	= 	ltf_params[42];			//META 1 SUB 3
@@ -541,10 +588,10 @@ if(TEST == 1)
 		Params.c_m_sub[3][2] 	= 	ltf_params[50];			//META 3 SUB 3
 		Params.c_m_sub[3][3] 	= 	ltf_params[51];			//META 3 SUB 4
 		//LARVAE 1/AVG DIST DISP
-		Params.l_a_pop 			= 	exp(-1.760);				//POP
-		Params.l_a_meta[1] 		= 	exp(ltf_params[53]);	//META 1
-		Params.l_a_meta[2] 		= 	exp(ltf_params[54]);	//META 2
-		Params.l_a_meta[3] 		= 	exp(ltf_params[55]);	//META 3
+		Params.l_a_pop 			= 	0.120539;				//POP
+		Params.l_a_meta[1] 		= 	0.218596;	//META 1
+		Params.l_a_meta[2] 		= 	47.24621;	//META 2
+		Params.l_a_meta[3] 		= 	0.220141;	//META 3
 		Params.l_a_sub[1][0] 	= 	exp(ltf_params[56]);	//META 1 SUB 1
 		Params.l_a_sub[1][1] 	= 	exp(ltf_params[57]);	//META 1 SUB 2
 		Params.l_a_sub[1][2] 	= 	exp(ltf_params[58]);	//META 1 SUB 3
@@ -558,10 +605,10 @@ if(TEST == 1)
 		Params.l_a_sub[3][2] 	= 	exp(ltf_params[66]);	//META 3 SUB 3
 		Params.l_a_sub[3][3] 	= 	exp(ltf_params[67]);	//META 3 SUB 4
 		//LARVAE FRAC SUCCESSFUL DISP
-		Params.l_m_pop			= 	0.267; 				//POP
-		Params.l_m_meta[1]		= 	ltf_params[69];			//META 1
-		Params.l_m_meta[2]		= 	ltf_params[70];			//META 2
-		Params.l_m_meta[3]		= 	ltf_params[71];			//META 3
+		Params.l_m_pop			= 	0.697801; 				//POP
+		Params.l_m_meta[1]		= 	0.768956;			//META 1
+		Params.l_m_meta[2]		= 	0.146108;			//META 2
+		Params.l_m_meta[3]		= 	0.802681;			//META 3
 		Params.l_m_sub[1][0] 	= 	ltf_params[72];			//META 1 SUB 1
 		Params.l_m_sub[1][1] 	= 	ltf_params[73];			//META 1 SUB 2
 		Params.l_m_sub[1][2] 	= 	ltf_params[74];			//META 1 SUB 3
@@ -585,15 +632,18 @@ if(TEST == 1)
 		Params.FITINIT[6][8] = exp(ltf_params[91]); 		//META 6 INITR
 
 		//--------GENERATE REALIZATIONS USING MISER-------
-		double lhood_meta = 0; double log_lhood_meta = 0; double total_loghood_metas = 0;
+		double lhood_meta; double log_lhood_meta; double total_loghood_metas = 0;
 		double new_posterior = 0;
 		double meta_err = 0;
 
 		for (int j = 1; j <= 3; j++)
 		{
 			Params.j = j;
-
+			//TEST
 			Params.miser_ticker = 1; Params.miser2_flag = 0;
+
+			lhood_meta = 0;
+			log_lhood_meta = 0;
 
 			gsl_monte_function G = { &likelihood_calc, dim, &Params };	
 
@@ -608,7 +658,19 @@ if(TEST == 1)
 			gsl_monte_miser_integrate (&G, xl, xu, dim, Rcalls, r_seed, s, &lhood_meta, &meta_err); 
 			gsl_monte_miser_free(s);
 
+			while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
+			{ 
+				Params.miser2_flag = 0;
+				Params.lhood_adjust[j] = -Params.bestlhood[j];
+				
+				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+				gsl_monte_miser_integrate (&G, xl, xu, dim, LScalls, r_seed, s, &lhood_meta, &meta_err); 
+				gsl_monte_miser_free(s);
+			}
+			
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
+			//printf("lhood meta = %lf\n", lhood_meta);
+			//printf("loghood [%i] = %lf\n", j, log(lhood_meta));
 
 			if (isnan(log_lhood_meta) || isinf(log_lhood_meta))
 			{
@@ -616,14 +678,19 @@ if(TEST == 1)
 			}
 			
 			total_loghood_metas = total_loghood_metas + log_lhood_meta;
-
+			//new_posterior = total_loghood_metas + log_prior;
 		}
-		printf("total loghood metas = %lf\n", total_loghood_metas);
+		for (int j = 1; j <= 3; j++){
+			for(int i = 0; i<10; i++){
+				printf("%lf ", Params.lhood_sub[j][i]);
+			}
+		}
+		printf("%lf\n", total_loghood_metas);
 		fclose(fpr); 
 		fclose(fpme);
 	}
 ///////////////////////////////////////////////////MCMC//////////////////////////////////////////////////////////
-	if (mcmc == 1)
+	if (mcmc == 1) //ADD BEST LHOOD DATA SAVE AND PRINTING
 	{
 		//-------FITTING ROUTINE--------
 		int NumberOfParams = NumFitParams(model);    
@@ -707,28 +774,28 @@ if(TEST == 1)
 
 		if(model==1)
 		{
-			file = fopen("PCAsd2_1.txt", "r");         
+			file = fopen("PCAsd3_1.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations2_1.txt", "r");  
+			file = fopen("PCArotations3_1.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale2_1.txt", "r");       
+			file = fopen("PCAscale3_1.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter2_1.txt", "r");      
+			file = fopen("PCAcenter3_1.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
@@ -737,28 +804,28 @@ if(TEST == 1)
 		}
 		if(model==2)
 		{
-			file = fopen("PCAsd2_2.txt", "r");         
+			file = fopen("PCAsd3_2.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations2_2.txt", "r");  
+			file = fopen("PCArotations3_2.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale2_2.txt", "r");       
+			file = fopen("PCAscale3_2.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter2_2.txt", "r");      
+			file = fopen("PCAcenter3_2.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
@@ -767,28 +834,28 @@ if(TEST == 1)
 		}
 		if(model==4)
 		{
-			file = fopen("PCAsd2_4.txt", "r");         
+			file = fopen("PCAsd3_4.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations2_4.txt", "r");  
+			file = fopen("PCArotations3_4.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale2_4.txt", "r");       
+			file = fopen("PCAscale3_4.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter2_4.txt", "r");      
+			file = fopen("PCAcenter3_4.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
@@ -797,28 +864,28 @@ if(TEST == 1)
 		}
 		if(model==22)
 		{
-			file = fopen("PCAsd2_22.txt", "r");         
+			file = fopen("PCAsd3_22.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations2_22.txt", "r");  
+			file = fopen("PCArotations3_22.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale2_22.txt", "r");       
+			file = fopen("PCAscale3_22.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter2_22.txt", "r");      
+			file = fopen("PCAcenter3_22.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
@@ -827,28 +894,28 @@ if(TEST == 1)
 		}
 		if(model==28)
 		{
-			file = fopen("PCAsd2_28.txt", "r");         
+			file = fopen("PCAsd3_28.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations2_28.txt", "r");  
+			file = fopen("PCArotations3_28.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale2_28.txt", "r");       
+			file = fopen("PCAscale3_28.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter2_28.txt", "r");      
+			file = fopen("PCAcenter3_28.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
@@ -857,34 +924,35 @@ if(TEST == 1)
 		}
 		if(model==32)
 		{
-			file = fopen("PCAsd2_32.txt", "r");         
+			file = fopen("PCAsd3_32.txt", "r");         
 			for (a = 0; a < (NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &SDpca[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCArotations2_32.txt", "r");  
+			file = fopen("PCArotations3_32.txt", "r");  
 			for (a = 0; a < (NumberOfParams*NumberOfParams); a++)
 			{
 				fscanf(file, "%lf\n", &Coefficients[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAscale2_32.txt", "r");       
+			file = fopen("PCAscale3_32.txt", "r");       
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Scale[a]);
 			}
 			fclose(file);
 
-			file = fopen("PCAcenter2_32.txt", "r");      
+			file = fopen("PCAcenter3_32.txt", "r");      
 			for (a = 0; a < NumberOfParams; a++)
 			{
 				fscanf(file, "%lf\n", &Center[a]);
 			}
 			fclose(file);
 		}
+		
 		//-------GENERATE INITIAL PCS--------
 		for (a = 0; a < NumberOfParams; a++)
 		{
@@ -1003,18 +1071,18 @@ if(TEST == 1)
 			//-------CALCULATE LIKELIHOOD NEW PARAM SET--------
 			//--------PASS FIXED PARAMS-------
 			//INITV
-			Params.FITINIT[1][4] 	= 	0.00000000000001; 		//META 1 SUB 1
-			Params.FITINIT[1][5] 	= 	0.05; 					//META 1 SUB 2
-			Params.FITINIT[1][6] 	= 	0.05;					//META 1 SUB 3
-			Params.FITINIT[1][7] 	= 	0.00000000000001; 		//META 1 SUB 4
-			Params.FITINIT[2][4] 	= 	0.00000000000001; 		//META 2 SUB 1
-			Params.FITINIT[2][5] 	= 	0.05; 					//META 2 SUB 2
-			Params.FITINIT[2][6] 	= 	0.05; 					//META 2 SUB 3
-			Params.FITINIT[2][7] 	= 	0.00000000000001; 		//META 2 SUB 4
-			Params.FITINIT[3][4] 	= 	0.00000000000001; 		//META 3 SUB 1
-			Params.FITINIT[3][5] 	= 	0.05; 					//META 3 SUB 2
-			Params.FITINIT[3][6] 	= 	0.05; 					//META 3 SUB 3
-			Params.FITINIT[3][7] 	= 	0.00000000000001; 		//META 3 SUB 4
+			Params.FITINIT[1][4] 	= 	0; 						//META 1 SUB 1
+			Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
+			Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
+			Params.FITINIT[1][7] 	= 	0; 						//META 1 SUB 4
+			Params.FITINIT[2][4] 	= 	0; 						//META 2 SUB 1
+			Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
+			Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
+			Params.FITINIT[2][7] 	= 	0; 						//META 2 SUB 4
+			Params.FITINIT[3][4] 	= 	0; 						//META 3 SUB 1
+			Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
+			Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
+			Params.FITINIT[3][7] 	= 	0; 						//META 3 SUB 4
 			//INITR
 			Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
 			Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3

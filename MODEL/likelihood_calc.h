@@ -18,6 +18,7 @@ DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
 
 
 int m = 0; int n; int k;
+double tmp;
 double lhood_meta=0; //since we start indexing datasets at 1 instead of 0
 double lhood_meta2=0;
 
@@ -30,18 +31,19 @@ if (dataset==1 || dataset==2 || dataset==3) //three block sites with subpopulati
 		{
 			if (Params->DATA[dataset][m][0] != -1) //for days with both model and field data
 			{
-				Params->lhood_sub[dataset][k] = gsl_ran_multinomial_lnpdf(3, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
+				 tmp = gsl_ran_multinomial_lnpdf(3, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
 				//printf("DATA S=%i\t V=%i\t F=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2]);
 				//printf("MODEL S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
 				//printf("lhood sub[%i][%i] = %lf\n", dataset, k, Params->lhood_sub[dataset][k]);
 
-				if(isinf(Params->lhood_sub[dataset][k]) || isnan(Params->lhood_sub[dataset][k])){ //unrealistic model value //MIGHT NEED TO CHANGE THIS
-					Params->lhood_sub[dataset][k] = -750; //assign bad score
+				if(tmp)
+				{
+					Params->lhood_point[dataset][k] += exp(tmp); // average over likelihood not log likelihood, easier to exp here than main .c
+					lhood_meta += tmp;			
+				} else {
+					Params->lhood_point[dataset][k] = exp(-700); 
+					lhood_meta -= 700;
 				}
-
-				lhood_meta += Params->lhood_sub[dataset][k];
-				//printf("lhood meta [%i] = %lf\n", dataset, lhood_meta[dataset]);
-
 				k++; //index for days with data
 			} 
 			m++;

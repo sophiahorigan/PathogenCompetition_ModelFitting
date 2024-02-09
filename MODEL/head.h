@@ -29,15 +29,18 @@ char *strFileNameDate;
 #define DATA_SETS 6		        // number of epizootic data sets //one for each metapop
 #define DATA_SETS_WEATHER 1		// number of weather data sets
 #define NUM_METASUB 3			//number of metapopulations with subpopulations
-#define NUM_PARS 110		        // number of parameters to be passed from main to hood
-
-
+#define NUM_PARS 92		        // number of parameters to be passed from main to hood
+#define VERBOSE 0 				//select 1 for detailed output
+#define THIN 1 					//to keep all MCMC data, thin by 1
+#define MAXITN 3				// number of linesearch full parameter sweeps to run
+#define NUM_POINTWISE 10		// number of pointwise datapoints per subpop
 
 FILE *fpls; //line-search parameter value output
 FILE *fpr; //model realizations
 FILE *fpme; //miser error
 FILE *fpm;	//mcmc posteriors
 FILE *fpa; //mcmc acceptances
+FILE *fptest; //testing
 
 //ROUTINES
 int linesearch;
@@ -65,7 +68,7 @@ int r_pop_fit;
 int r_meta_fit;
 int r_sub_fit;
 //adaptable fit parameters
-int fit[92];
+int fit[NUM_PARS];
 
 const int sub_index[4] = {0, 80, 160, 240};
 
@@ -75,9 +78,6 @@ int Mcalls; //miser calls
 int Realizations;
 int searches;
 int numround;
-
-int lhood_penalty_flag; //check for violations in dispersal
-double lhood_penalty = -9999; //bad score to add if too much dispersal
 
 //FIXED PARAMS
 const int epi_length = 48;
@@ -111,7 +111,6 @@ const double lambdaV = 0.0625; //transmission rate between virus exposed classes
 
 typedef struct //FIT PARS
 {
-	//double PARS[NUM_PARS];
 
 	double nuV;
 	double nuF;
@@ -181,8 +180,12 @@ typedef struct //FIT PARS
 	int miser_ticker;
 	double miser2_flag;
 
-	//lhood sub
-	double lhood_sub[DATA_SETS][10]; //lhood for each datapoint
+	//lhood for each datapoint
+	//linesearch
+	double lhood_point[DATA_SETS][10]; 
+	//mcmc
+	double NEW_lhood_point[DATA_SETS][10];
+	double OLD_lhood_point[DATA_SETS][10];
 
 	//mcmc
 	int AcceptedVect[NUM_PARS];

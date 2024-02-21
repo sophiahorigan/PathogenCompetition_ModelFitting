@@ -7,7 +7,7 @@ double high;
 
 //-----INITS-------
 //STARTING          {   low = -4.5;         high = 4.3      }                   //0.01-75
-if (i==0)			{   low = -15;         high = 4.3;      }	//POP           //0.01-75     //****
+if (i==0)			{   low = -15;        high = 4.3;     }	//POP           //0.01-75     //****
 
 //-----INITR------
 //STARTING          {   low = -11.5;        high = -1;   }                   //0.00001-0.36  

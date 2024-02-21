@@ -1241,6 +1241,87 @@ int* dispersal_fit(int model){
 		fitting_array[14] = 0;
 		fitting_array[15] = 0;
 		fitting_array[16] = 1;
+	}
+	if(model==46){ //L NA, C NA, R POP
+		fitting_array[0] = 0;
+		//a
+		fitting_array[1] = 0; 
+		fitting_array[2] = 0;
+		fitting_array[3] = 0; 
+		//m
+		fitting_array[4] = 0; 
+		fitting_array[5] = 0;
+		fitting_array[6] = 0; 
+
+		//CONIDIA DISPERSAL
+		fitting_array[7] = 0;
+		//a
+		fitting_array[8] = 0;
+		fitting_array[9] = 0;
+		fitting_array[10] = 0;
+		//m
+		fitting_array[11] = 0;
+		fitting_array[12] = 0;
+		fitting_array[13] = 0;
+
+		//RESTING SPORE DENSITY
+		fitting_array[14] = 1;
+		fitting_array[15] = 0;
+		fitting_array[16] = 0;
+	}
+	if(model==47){ //L NA, C NA, R META
+		fitting_array[0] = 0;
+		//a
+		fitting_array[1] = 0; 
+		fitting_array[2] = 0;
+		fitting_array[3] = 0; 
+		//m
+		fitting_array[4] = 0; 
+		fitting_array[5] = 0;
+		fitting_array[6] = 0; 
+
+		//CONIDIA DISPERSAL
+		fitting_array[7] = 0;
+		//a
+		fitting_array[8] = 0;
+		fitting_array[9] = 0;
+		fitting_array[10] = 0;
+		//m
+		fitting_array[11] = 0;
+		fitting_array[12] = 0;
+		fitting_array[13] = 0;
+
+		//RESTING SPORE DENSITY
+		fitting_array[14] = 0;
+		fitting_array[15] = 1;
+		fitting_array[16] = 0;
+	}
+	if(model==48){ //L NA, C NA, R SUB
+		fitting_array[0] = 0;
+		//a
+		fitting_array[1] = 0; 
+		fitting_array[2] = 0;
+		fitting_array[3] = 0; 
+		//m
+		fitting_array[4] = 0; 
+		fitting_array[5] = 0;
+		fitting_array[6] = 0; 
+
+		//CONIDIA DISPERSAL
+		fitting_array[7] = 0;
+		//a
+		fitting_array[8] = 0;
+		fitting_array[9] = 0;
+		fitting_array[10] = 0;
+		//m
+		fitting_array[11] = 0;
+		fitting_array[12] = 0;
+		fitting_array[13] = 0;
+
+		//RESTING SPORE DENSITY
+		fitting_array[14] = 0;
+		fitting_array[15] = 0;
+		fitting_array[16] = 1;
 	}		
 	return(fitting_array);																							
 }
@@ -1387,151 +1468,16 @@ int* which_fit(int model){
 	if(model==45){ //L SUB, C SUB, R SUB
 		fit_array[0] = fit_array[5] = fit_array[6] = fit_array[7] = fit_array[8] = fit_array[9] = fit_array[10] = fit_array[11] = fit_array[12] = fit_array[13] = fit_array[18] = fit_array[19] = fit_array[24] = fit_array[25] = fit_array[26] = fit_array[27] = fit_array[28] = fit_array[29] = fit_array[30] = fit_array[31] = fit_array[32] = fit_array[33] = fit_array[34] = fit_array[35] = fit_array[40] = fit_array[41] = fit_array[42] = fit_array[43] = fit_array[44] = fit_array[45] = fit_array[46] = fit_array[47] = fit_array[48] = fit_array[49] = fit_array[50] = fit_array[51] = fit_array[56] = fit_array[57] = fit_array[58] = fit_array[59] = fit_array[60] = fit_array[61] = fit_array[62] = fit_array[63] = fit_array[64] = fit_array[65] = fit_array[66] = fit_array[67] = fit_array[72] = fit_array[73] = fit_array[74] = fit_array[75] = fit_array[76] = fit_array[77] = fit_array[78] = fit_array[79] = fit_array[80] = fit_array[81] = fit_array[82] = fit_array[83] = 1;
 	}
+	if(model==46){ //L NA, F NA, R POP
+		fit_array[0] = fit_array[1] = fit_array[18] = fit_array[19] = 1;	
+	}
+	if(model==47){ //L NA, F NA, R META
+		fit_array[0] = fit_array[2] = fit_array[3] = fit_array[4] = fit_array[18] = fit_array[19] = 1;
+	}
+	if(model==48){ //L NA, F NA, R SUB
+		fit_array[0] = fit_array[5] = fit_array[6] = fit_array[7] = fit_array[8] = fit_array[9] = fit_array[10] = fit_array[11] = fit_array[12] = fit_array[13] = fit_array[18] = fit_array[19] = 1;
+	}
 
 	return(fit_array);
 }
 
-int NumFitParams(int model){
-	int NumberofParams;
-
-	if(model==0){
-		NumberofParams = 10;
-	}
-	if(model==1){
-		NumberofParams = 6;
-	}
-	if(model==2){
-		NumberofParams = 8;
-	}
-	if(model==3){
-		NumberofParams = 14;
-	}
-	if(model==4){
-		NumberofParams = 10;
-	}
-	if(model==5){
-		NumberofParams = 12;
-	}
-	if(model==6){
-		NumberofParams = 18;
-	}
-	if(model==7){
-		NumberofParams = 28;
-	}
-	if(model==8){
-		NumberofParams = 30;
-	}
-	if(model==9){
-		NumberofParams = 36;
-	}
-	if(model==10){
-		NumberofParams = 6;
-	}
-	if(model==11){
-		NumberofParams = 8;
-	}
-	if(model==12){
-		NumberofParams = 14;
-	}
-	if(model==13){
-		NumberofParams = 10;
-	}
-	if(model==14){
-		NumberofParams = 12;
-	}
-	if(model==15){
-		NumberofParams = 18;
-	}
-	if(model==16){
-		NumberofParams = 28;
-	}
-	if(model==17){
-		NumberofParams = 30;
-	}
-	if(model==18){
-		NumberofParams = 36;
-	}
-	if(model==19){
-		NumberofParams = 8;
-	}
-	if(model==20){
-		NumberofParams = 10;
-	}
-	if(model==21){
-		NumberofParams = 16;
-	}
-	if(model==22){
-		NumberofParams = 12;
-	}
-	if(model==23){
-		NumberofParams = 14;
-	}
-	if(model==24){
-		NumberofParams = 20;
-	}
-	if(model==25){
-		NumberofParams = 30;
-	}
-	if(model==26){
-		NumberofParams = 32;
-	}
-	if(model==27){
-		NumberofParams = 38;
-	}
-	if(model==28){
-		NumberofParams = 12;
-	}
-	if(model==29){
-		NumberofParams = 14;
-	}
-	if(model==30){
-		NumberofParams = 20;
-	}
-	if(model==31){
-		NumberofParams = 16;
-	}
-	if(model==32){
-		NumberofParams = 18;
-	}
-	if(model==33){
-		NumberofParams = 24;
-	}
-	if(model==34){
-		NumberofParams = 34;
-	}
-	if(model==35){
-		NumberofParams = 36;
-	}
-	if(model==36){
-		NumberofParams = 42;
-	}
-	if(model==37){
-		NumberofParams = 30;
-	}
-	if(model==38){
-		NumberofParams = 32;
-	}
-	if(model==39){
-		NumberofParams = 38;
-	}
-	if(model==40){
-		NumberofParams = 34;
-	}
-	if(model==41){
-		NumberofParams = 36;
-	}
-	if(model==42){
-		NumberofParams = 42;
-	}
-	if(model==43){
-		NumberofParams = 52;
-	}
-	if(model==44){
-		NumberofParams = 54;
-	}
-	if(model==45){
-		NumberofParams = 60;
-	}
-
-	return(NumberofParams);
-}

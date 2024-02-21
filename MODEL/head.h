@@ -30,9 +30,6 @@ char *strFileNameDate;
 #define DATA_SETS_WEATHER 1		// number of weather data sets
 #define NUM_METASUB 3			//number of metapopulations with subpopulations
 #define NUM_PARS 92		        // number of parameters to be passed from main to hood
-#define VERBOSE 0 				//select 1 for detailed output
-#define THIN 1 					//to keep all MCMC data, thin by 1
-#define MAXITN 3				// number of linesearch full parameter sweeps to run
 #define NUM_POINTWISE 10		// number of pointwise datapoints per subpop
 
 FILE *fpls; //line-search parameter value output
@@ -181,15 +178,7 @@ typedef struct //FIT PARS
 	double miser2_flag;
 
 	//lhood for each datapoint
-	//linesearch
 	double lhood_point[DATA_SETS][10]; 
-	//mcmc
-	double NEW_lhood_point[DATA_SETS][10];
-	double OLD_lhood_point[DATA_SETS][10];
-
-	//mcmc
-	int AcceptedVect[NUM_PARS];
-	int LoopVect[NUM_PARS];
 
 }STRUCTURE;
 

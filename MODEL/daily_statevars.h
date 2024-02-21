@@ -110,8 +110,10 @@ double INITR[4];
 
 if (j==1 || j==2 || j==3){
 	for(i=0; i<num_sub; i++){
-		INITS[i] = Params->FITINIT[j][i] - (Params->FITINIT[j][i]*Params->FITINIT[j][i+num_sub]);
+		INITS[i] = Params->FITINIT[j][i] - Params->FITINIT[j][i]*Params->FITINIT[j][i+num_sub]; 
 		INITV[i] = Params->FITINIT[j][i]*Params->FITINIT[j][i+num_sub];
+		//printf("j = %i InitV[%i] = %lf\n", j, i, INITV[i]);
+		//printf("j = %i InitV[%i] = %lf\n", j, i, INITV[i]);	
 	}
 }
 //getc(stdin);
@@ -251,6 +253,12 @@ while (t_0<MAXT3+h)	{
 //---------------------- LARVAL DISPERSAL ----------------------------//
 	if((day-1)==8){ //dispersal occurs throughout first week
 		if (j==1 || j==2 || j==3) { //only for datasets with subpopulations
+
+			//unlease the cadavers
+			for(sub=0; sub<num_sub; sub++){ 
+				V[sub] = INITV[sub];
+			}
+
 			if(larval_dispersal == 1){ 
 
 				//printf("DISPERSAL day = %i\n", day-1);
@@ -276,11 +284,6 @@ while (t_0<MAXT3+h)	{
 
 					Vout[sub] = 0;
 					Vin[sub] = 0;
-				}
-
-				//initiate first round of infectious cadavers
-				for(sub=0; sub<num_sub; sub++){ 
-					V[sub] = INITV[sub];
 				}
 
 				//COMPETING MODELS
@@ -357,11 +360,6 @@ while (t_0<MAXT3+h)	{
 					S[sub] += (Sin[sub] - Sout[sub]);
 
 					V[sub] += (Vin[sub] - Vout[sub]);
-
-					if(S[sub]<0 || E_V[sub]<0)
-					{
-						printf("TOO MUCH DISPERSAL! NEGATIVE POPULATIONS.");
-					}
 				}
 			} 
 		}

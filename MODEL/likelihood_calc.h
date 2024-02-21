@@ -31,18 +31,20 @@ if (dataset==1 || dataset==2 || dataset==3) //three block sites with subpopulati
 		{
 			if (Params->DATA[dataset][m][0] != -1) //for days with both model and field data
 			{
-				 tmp = gsl_ran_multinomial_lnpdf(3, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
+				//printf("n = %i\n", n);
+				tmp = gsl_ran_multinomial_lnpdf(3, Params->MODEL[dataset][m], Params->DATA[dataset][m]);
 				//printf("DATA S=%i\t V=%i\t F=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2]);
 				//printf("MODEL S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
-				//printf("lhood sub[%i][%i] = %lf\n", dataset, k, Params->lhood_sub[dataset][k]);
+				//printf("lhood sub[%i][%i] = %lf\n", dataset, k, tmp);
 
-				if(tmp)
+				if(isinf(tmp) || isnan(tmp))
 				{
-					Params->lhood_point[dataset][k] += exp(tmp); // average over likelihood not log likelihood, easier to exp here than main .c
-					lhood_meta += tmp;			
-				} else {
+					//printf("nan or inf!\n");
 					Params->lhood_point[dataset][k] = exp(-700); 
 					lhood_meta -= 700;
+				} else {
+					Params->lhood_point[dataset][k] += exp(tmp); // average over likelihood not log likelihood, easier to exp here than main .c
+					lhood_meta += tmp;	
 				}
 				k++; //index for days with data
 			} 

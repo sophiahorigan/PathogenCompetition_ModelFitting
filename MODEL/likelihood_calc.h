@@ -40,6 +40,10 @@ if (dataset==1 || dataset==2 || dataset==3) //three block sites with subpopulati
 				if(isinf(tmp) || isnan(tmp))
 				{
 					//printf("nan or inf!\n");
+					//printf("DATA S=%i\t V=%i\t F=%i\n", Params->DATA[dataset][m][0], Params->DATA[dataset][m][1], Params->DATA[dataset][m][2]);
+					//printf("MODEL S=%e\t V=%e\t F=%e\n", Params->MODEL[dataset][m][0], Params->MODEL[dataset][m][1], Params->MODEL[dataset][m][2]);
+					//printf("lhood sub[%i][%i] = %lf\n", dataset, k, tmp);
+					
 					Params->lhood_point[dataset][k] = exp(-700); 
 					lhood_meta -= 700;
 				} else {

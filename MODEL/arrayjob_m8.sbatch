@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=m8-ls
+#SBATCH --job-name=m8-mcmc
 #SBATCH --account=pi-gdwyer
 #SBATCH --error=error_$A-%a.txt
 #SBATCH --array=1-15
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=20:00:00
+#SBATCH --time=40:00:00
 
 module load openmpi
 

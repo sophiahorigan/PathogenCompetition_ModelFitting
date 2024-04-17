@@ -38,6 +38,7 @@ FILE *fpme; //miser error
 FILE *fpm;	//mcmc posteriors
 FILE *fpa; //mcmc acceptances
 FILE *fptest; //testing
+FILE *fplhood; //lhood for realizations
 
 //ROUTINES
 int linesearch;

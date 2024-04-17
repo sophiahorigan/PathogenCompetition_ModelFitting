@@ -6,7 +6,7 @@
 #SBATCH --array=1-15
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=20:00:00
+#SBATCH --time=40:00:00
 
 module load openmpi
 
@@ -18,4 +18,4 @@ echo "my SLURM_ARRAY_TASK ID: " $SlURM_ARRAY_TASK_ID
 #mpiexec -n 28 ./linesearch_mcmc 47 1 -input $SlURM_ARRAY_TASK_ID
 
 # MCMC # ntasks-per-node=1, array=1-15 (num chains)
-mpiexec -n 1 ./linesearch_mcmc 47 3 -input $SlURM_ARRAY_TASK_I
+mpiexec -n 1 ./linesearch_mcmc 47 3 -input $SlURM_ARRAY_TASK_ID

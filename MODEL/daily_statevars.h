@@ -465,7 +465,7 @@ while (t_0<MAXT3+h)	{
 		//printf("TOTAL POP for sub %i = %lf\n", sub, S[sub]+IV[sub]+IF[sub]+V[sub]);
 		//MODEL REALIZATION PRINTING
 		if(reals==1){
-			fprintf(fpr, "%i %i %i %e %e %e ", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
+			fprintf(fpr, "%i %i %i %e %e %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
 		}
 		//printf("%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
 	}

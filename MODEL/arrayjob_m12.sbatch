@@ -3,7 +3,7 @@
 #SBATCH --job-name=m12-mcmc
 #SBATCH --account=pi-gdwyer
 #SBATCH --error=error_$A-%a.txt
-#SBATCH --array=1-15
+#SBATCH --array=1-2
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=20:00:00

@@ -1,25 +1,24 @@
 #include "head.h"
 gsl_rng *r;
 
-///////////////////////////////////////////////////DOT-PRODUCT///////////////////////////////////////////////////
-float dot_product (int len, double (*holder)[len], double *pca)
+///////////////////////////////////////////////////DOT-PRODUCT////////////////////////////////////////////////
+float DotProduct (int Length, double *Holder, double *PCA)
 {
-	double answer = 0.0;
-	int i;
-	for(i = 0; i < len; i++)
-	{
-		answer += pca[i] * (*holder)[i];
-	}
-	return(answer);
+  double answer = 0;
+  for(int i = 0; i < Length; i++)
+  {
+    answer += PCA[i] * Holder[i];
+  }
+  return(answer);
 }
 
 int main(int argc, char *argv[])
 {
 ///////////////////////////////////////////////////SET-UP///////////////////////////////////////////////////
 
-#define VERBOSE 0 				//select 1 for detailed output
+#define VERBOSE 0				//select 1 for detailed output
 #define MAXITNLS 3				// number of linesearch full parameter sweeps to run
-#define MAXITNMCMC 5000			// number of mcmc iterations to run
+#define REALIZATIONS 15000		// number of mcmc iterations to run //has to be at least number of params to get through all cases
 
 STRUCTURE Params;
 inputdata(&Params);	
@@ -65,7 +64,9 @@ if (model > 48 || model < 0){
 	printf("INACCURATE MODEL. Model options range from 0 - 45. See Read Me for model options.\n");
 }
 
-//-------TEST MODE--------
+printf("model = %i\n", model);
+
+ //-------TEST MODE--------
 int TEST = 0;
 if(TEST)
 {
@@ -134,7 +135,7 @@ if(linesearch == 1)
 		{
 			jumper = gsl_rng_uniform_pos(r);
 
-			par_sto = ls_bound(model, i, 1) + (ls_bound(model,i,2) - ls_bound(model,i,1)) * jumper;
+			par_sto = param_bound(i, 1) + (param_bound(i,2) - param_bound(i,1)) * jumper;
 
 			if (log_fit[i]) new_params[i] = old_params[i] = exp(par_sto); 		
 
@@ -162,7 +163,7 @@ if(linesearch == 1)
 				{
 					adder = gsl_rng_uniform(r);
 					jumper = half_njmp + half_njmp * adder;
-					jumps[i] = (ls_bound(model, i, 2) - ls_bound(model, i, 1)) / jumper;
+					jumps[i] = (param_bound(i, 2) - param_bound(i, 1)) / jumper;
 				}
 			}
 
@@ -172,19 +173,21 @@ if(linesearch == 1)
 		{ 
 			if (fit[j])
 			{
-				if (verbose) printf("staring with %d until ls_tmp = %lf\n", j, ls_bound(model, j, 2));
 
-				for (ls_tmp = ls_bound(model, j, 1) + jumps[j], j_iter = 0; ls_tmp <= ls_bound(model, j, 2); ls_tmp += jumps[j])
+				if (verbose) printf("staring with %d until ls_tmp = %lf\n", j, param_bound(j, 2));
+
+				for (ls_tmp = param_bound(j, 1) + jumps[j], j_iter = 0; ls_tmp <= param_bound(j, 2); ls_tmp += jumps[j])
 				{
-					if (verbose) printf("tmp param[%i] = %lf from exp(%lf)\n", j, exp(ls_tmp), ls_tmp);
 
 					par_sto = new_params[j]; //store old value of param
 
 					if (log_fit[j])
 					{
-						new_params[j] = exp(ls_tmp); //tweak param		
+						new_params[j] = exp(ls_tmp); //tweak param	
+						if (verbose) printf("tmp param[%i] = %lf from exp(%lf)\n", j, exp(ls_tmp), ls_tmp);	
 					} else {
 						new_params[j] = ls_tmp;
+						if (verbose) printf("tmp param[%i] = %lf\n", j, ls_tmp);
 					} 
 					//--------PASS FIXED PARAMS-------
 					//INITV //percentage of initS that are infected
@@ -392,11 +395,11 @@ if(linesearch == 1)
 						{
 							if (log_fit[k])
 							{ 
-								lprior = log(gsl_ran_flat_pdf(new_params[k], exp(ls_bound(model,k,1)), (exp(ls_bound(model,k,1)) + exp(ls_bound(model,k,2)))));
+								lprior = log(gsl_ran_flat_pdf(new_params[k], exp(param_bound(k,1)), (exp(param_bound(k,1)) + exp(param_bound(k,2)))));
 
 							} else {
 
-								lprior = log(gsl_ran_flat_pdf(new_params[k], ls_bound(model,k,1), (ls_bound(model,k,1) + ls_bound(model,k,2))));
+								lprior = log(gsl_ran_flat_pdf(new_params[k], param_bound(k,1), (param_bound(k,1) + param_bound(k,2))));
 							}
 							if (isnan(lprior) || isinf(lprior)) 	//outside of bounds
 							{ 
@@ -456,7 +459,7 @@ if(linesearch == 1)
 		{
 			if (fit[j])
 			{
-				printf("%lf ", log(new_params[j]));
+				printf("%lf ", new_params[j]);
 			}
 		}
 		printf("\n");
@@ -466,7 +469,7 @@ if(linesearch == 1)
 	{
 		if (fit[j])
 		{
-			fprintf(fpls, "%lf ", log(new_params[j]));
+			fprintf(fpls, "%lf ", new_params[j]);
 		}
 	}
 
@@ -482,68 +485,100 @@ if(linesearch == 1)
 	fprintf(fpls, "\n");
 	fclose(fpls); 
 }
-/*
+
 ///////////////////////////////////////////////////REALIZATIONS///////////////////////////////////////////////////
-	if (reals == 1) 
+if (reals == 1) 
+{
+	//--------FILE SETUP-------
+	char name1[50];
+	sprintf(name1, "M%i_REALS_c%i", model, Rcalls);
+	fpr = fopen(name1, "a+");
+	setbuf(fpr, NULL);
+
+	char nameme[50];
+	sprintf(nameme, "meta_err_m%i", Params.model);
+	fpme = fopen(nameme, "a+");
+	setbuf(fpme, NULL);
+
+	char namelhood[50];
+	sprintf(namelhood, "reals_lhood_m%i", Params.model);
+	fplhood = fopen(namelhood, "a+");
+	setbuf(fplhood, NULL);
+
+	FILE *fileR;
+
+	char realparams[50] = "./realsparams";
+	char str_model[10];
+	sprintf(str_model, "_%i.txt", model);
+
+	strcat(realparams, str_model);
+
+	//---------PARAMS----------
+	int verbose = VERBOSE;
+
+	int a, b, m, k;
+	int num_param_sets = 10;
+	double new_log_prior = 0;
+	double log_prior = 0;
+	double real_params[num_param_sets][NUM_PARS];
+	for (a = 0; a < num_param_sets; a++)
 	{
-		//--------FILE SETUP-------
-		char name1[50];
-		sprintf(name1, "M%i_REALS_c%i", model, Rcalls);
-		fpr = fopen(name1, "a+");
-		setbuf(fpr, NULL);
-
-		char nameme[50];
-		sprintf(nameme, "meta_err_m%i", Params.model);
-		fpme = fopen(nameme, "a+");
-		setbuf(fpme, NULL);
-
-		FILE *fileR;
-
-		//---------PARAMS----------
-		double new_log_prior = 0;
-		double log_prior = 0;
-		double real_params[num_ltfparams];
-		for(int a; a < num_ltfparams; a++)
+		for (b = 0; b < NUM_PARS; b++)
 		{
-			real_params[a] = 0.0;
+			real_params[a][b] = -100; 
 		}
+	}
 
-		//------READ IN PARAMS-----
-		fileR = fopen(RealParams, "r");         
-		for (a = 0; a < (num_ltfparams); a++)
+	//------READ IN PARAMS-----
+	fileR = fopen(realparams, "r");
+	for (a = 0; a < num_param_sets; a++)
+	{
+		for (b = 0; b < NUM_PARS; b++)
 		{
-			if (fit[a] == 1) fscanf(fileR, "%lf\n", &real_params[a]);
+			if (fit[b] == 1) fscanf(fileR, "%lf\n", &real_params[a][b]);		
+			if (verbose && fit[b] == 1) printf("real_params[%i][%i] = %lf\n", a, b, real_params[a][b]);	
 		}
-		fclose(fileR);
+	}         
+	fclose(fileR);
+	/*
+	for (a = 0; a < num_param_sets; a++)
+	{
+		for (b = 0; b < NUM_PARS; b++)
+		{
+			printf("real_params[%i][%i] = %lf\n", a, b, real_params[a][b]);	
+		}
+	}  */
 
-		//HOW DO I SUBSET TO RUN THIS FOR ONE PARAM SET AT A TIME????? //try with one set then expand
-		//maybe use a while loop -- while something != EOF
-
+	//---------LOOP THROUGH PARAM SETS-----
+	for (m = 0; m < num_param_sets; m++)
+	{
+		//printf("m = %i\n", m);
 		//----------CALCULATE PRIORS-------
-		for (int k = 0; k < num_ltfparams; k++)
+		/*
+		log_prior = 0; new_log_prior = 0;
+
+		for (k = 0; k < NUM_PARS; k++)
 		{
-			if (fit[k] == 1)
+			if (fit[k])
 			{
-				if (log_fit[k] == 1)	//log fit
-				{ 
-					new_log_prior = log(gsl_ran_flat_pdf(exp(real_params[k]), exp(ls_bound(model,k,1)), (exp(ls_bound(model,k,1)) + exp(ls_bound(model,k,2)))));
-					//printf("param %i = %lf\n", k, ltf_params[k]);
-					//printf("newlog prior = %lf\n", new_log_prior);
+				if (log_fit[k])
+				{
+					log_prior = log(gsl_ran_flat_pdf(exp(real_params[m][k]), exp(param_bound(a, 1)), (exp(param_bound(a, 2)) + exp(param_bound(a, 1)))));
+					printf("k = %i LOG FIT log prior = %lf param = %lf lower bound = %lf upper bound = %lf\n", k, log_prior, exp(real_params[m][k]), exp(param_bound(a, 1)), (exp(param_bound(a, 2)) + exp(param_bound(a, 1))));
 				}
-				else 					//non-log fit
-				{ 
-					new_log_prior = log(gsl_ran_flat_pdf(real_params[k], ls_bound(model,k,1), (ls_bound(model,k,1) + ls_bound(model,k,2))));
-					//printf("param %i = %lf\n", k, ltf_params[k]);
-					//printf("newlog prior = %lf\n", new_log_prior);
+				else
+				{
+					log_prior = log(gsl_ran_flat_pdf(real_params[m][k], param_bound(a, 1), (param_bound(a, 2) + param_bound(a, 1))));
+					printf("k = %i NON LOG FIT log prior = %lf param = %lf lower bound = %lf upper bound = %lf\n", k, log_prior, real_params[m][k], param_bound(a, 1), (param_bound(a, 2) + param_bound(a, 1)));
 				}
-				if (isnan(new_log_prior) || isinf(new_log_prior)) 	//outside of bounds
+
+				if (isinf(log_prior))
 				{ 
-					printf("PROBLEM WITH PRIORS\n k=%i\t new log prior = %lf\n", k, new_log_prior);
-					new_log_prior = -999999;	//assign bad score
+					//printf("PROBLEM WITH PRIORS\n k=%i\t new log prior = %lf\n", k, new_log_prior);
 				}
-				log_prior =+ new_log_prior;
+				new_log_prior =+ log_prior;
 			}
-		}
+		}*/
 		//--------PASS FIXED PARAMS-------
 		//INITV
 		Params.FITINIT[1][4] 	= 	0;						//META 1 SUB 1 
@@ -574,113 +609,113 @@ if(linesearch == 1)
 
 		//--------PASS FIT PARAMS ESTIMATES-------
 		//INITS
-		Params.FITINIT[1][0] 	= 	real_params[0];			//META 1 SUB 1
-		Params.FITINIT[1][1] 	= 	real_params[0];			//META 1 SUB 2
-		Params.FITINIT[1][2] 	= 	real_params[0];			//META 1 SUB 3
-		Params.FITINIT[1][3] 	= 	real_params[0];			//META 1 SUB 4
-		Params.FITINIT[2][0] 	= 	real_params[0];			//META 2 SUB 1
-		Params.FITINIT[2][1] 	= 	real_params[0];			//META 2 SUB 2
-		Params.FITINIT[2][2] 	= 	real_params[0];			//META 2 SUB 3
-		Params.FITINIT[2][3] 	= 	real_params[0];			//META 2 SUB 4
-		Params.FITINIT[3][0] 	= 	real_params[0];			//META 3 SUB 1
-		Params.FITINIT[3][1] 	= 	real_params[0];			//META 3 SUB 2
-		Params.FITINIT[3][2] 	= 	real_params[0];			//META 3 SUB 3
-		Params.FITINIT[3][3] 	= 	real_params[0];			//META 3 SUB 4
+		Params.FITINIT[1][0] 	= 	exp(real_params[m][0]);			//META 1 SUB 1
+		Params.FITINIT[1][1] 	= 	exp(real_params[m][0]);			//META 1 SUB 2
+		Params.FITINIT[1][2] 	= 	exp(real_params[m][0]);			//META 1 SUB 3
+		Params.FITINIT[1][3] 	= 	exp(real_params[m][0]);			//META 1 SUB 4
+		Params.FITINIT[2][0] 	= 	exp(real_params[m][0]);			//META 2 SUB 1
+		Params.FITINIT[2][1] 	= 	exp(real_params[m][0]);			//META 2 SUB 2
+		Params.FITINIT[2][2] 	= 	exp(real_params[m][0]);			//META 2 SUB 3
+		Params.FITINIT[2][3] 	= 	exp(real_params[m][0]);			//META 2 SUB 4
+		Params.FITINIT[3][0] 	= 	exp(real_params[m][0]);			//META 3 SUB 1
+		Params.FITINIT[3][1] 	= 	exp(real_params[m][0]);			//META 3 SUB 2
+		Params.FITINIT[3][2] 	= 	exp(real_params[m][0]);			//META 3 SUB 3
+		Params.FITINIT[3][3] 	= 	exp(real_params[m][0]);			//META 3 SUB 4
 		//INITR
-		Params.r_pop 			= 	real_params[1];			//POP
-		Params.r_meta[1] 		= 	real_params[2];			//META 1
-		Params.r_meta[2] 		= 	real_params[3];			//META 2
-		Params.r_meta[3] 		=	real_params[4];			//META 3
-		Params.FITINIT[1][8] 	= 	real_params[5]; 		//META 1 SUB 1
-		Params.FITINIT[2][8] 	= 	real_params[6];			//META 2 SUB 1
-		Params.FITINIT[2][9] 	= 	real_params[7]; 		//META 2 SUB 2 
-		Params.FITINIT[2][10] 	= 	real_params[8];			//META 2 SUB 3
-		Params.FITINIT[2][11] 	= 	real_params[9];			//META 2 SUB 4
-		Params.FITINIT[3][8] 	= 	real_params[10]; 		//META 3 SUB 1
-		Params.FITINIT[3][9] 	= 	real_params[11];		//META 3 SUB 2
-		Params.FITINIT[3][10] 	= 	real_params[12]; 		//META 3 SUB 3
-		Params.FITINIT[3][11] 	= 	real_params[13]; 		//META 3 SUB 4
+		Params.r_pop 			= 	exp(real_params[m][1]);			//POP
+		Params.r_meta[1] 		= 	exp(real_params[m][2]);			//META 1
+		Params.r_meta[2] 		= 	exp(real_params[m][3]);			//META 2
+		Params.r_meta[3] 		=	exp(real_params[m][4]);			//META 3
+		Params.FITINIT[1][8] 	= 	exp(real_params[m][5]); 		//META 1 SUB 1
+		Params.FITINIT[2][8] 	= 	exp(real_params[m][6]);			//META 2 SUB 1
+		Params.FITINIT[2][9] 	= 	exp(real_params[m][7]); 		//META 2 SUB 2 
+		Params.FITINIT[2][10] 	= 	exp(real_params[m][8]);			//META 2 SUB 3
+		Params.FITINIT[2][11] 	= 	exp(real_params[m][9]);			//META 2 SUB 4
+		Params.FITINIT[3][8] 	= 	exp(real_params[m][10]); 		//META 3 SUB 1
+		Params.FITINIT[3][9] 	= 	exp(real_params[m][11]);		//META 3 SUB 2
+		Params.FITINIT[3][10] 	= 	exp(real_params[m][12]); 		//META 3 SUB 3
+		Params.FITINIT[3][11] 	= 	exp(real_params[m][13]); 		//META 3 SUB 4
 		//RSTOCH
-		Params.R_stoch 			=	real_params[18];		//POP
+		Params.R_stoch 			=	exp(real_params[m][18]);		//POP
 		//FSTOCH
-		Params.F_stoch			= 	real_params[19];		//POP
+		Params.F_stoch			= 	exp(real_params[m][19]);		//POP
 		//CONIDIA 1/AVG DIST DISP
-		Params.c_a_pop 			= 	real_params[20];		//POP
-		Params.c_a_meta[1] 		= 	real_params[21];		//META 1
-		Params.c_a_meta[2] 		= 	real_params[22];		//META 2
-		Params.c_a_meta[3] 		= 	real_params[23];		//META 3
-		Params.c_a_sub[1][0] 	= 	real_params[24]; 		//META 1 SUB 1
-		Params.c_a_sub[1][1] 	= 	real_params[25];		//META 1 SUB 2
-		Params.c_a_sub[1][2] 	= 	real_params[26];		//META 1 SUB 3
-		Params.c_a_sub[1][3] 	= 	real_params[27];		//META 1 SUB 4
-		Params.c_a_sub[2][0] 	= 	real_params[28]; 		//META 2 SUB 1
-		Params.c_a_sub[2][1] 	= 	real_params[29];		//META 2 SUB 2
-		Params.c_a_sub[2][2] 	= 	real_params[30];		//META 2 SUB 3
-		Params.c_a_sub[2][3] 	= 	real_params[31];		//META 2 SUB 4
-		Params.c_a_sub[3][0] 	= 	real_params[32]; 		//META 3 SUB 1
-		Params.c_a_sub[3][1] 	= 	real_params[33];		//META 3 SUB 2
-		Params.c_a_sub[3][2] 	= 	real_params[34];		//META 3 SUB 3
-		Params.c_a_sub[3][3] 	= 	real_params[35];		//META 3 SUB 4
+		Params.c_a_pop 			= 	exp(real_params[m][20]);		//POP
+		Params.c_a_meta[1] 		= 	exp(real_params[m][21]);		//META 1
+		Params.c_a_meta[2] 		= 	exp(real_params[m][22]);		//META 2
+		Params.c_a_meta[3] 		= 	exp(real_params[m][23]);		//META 3
+		Params.c_a_sub[1][0] 	= 	exp(real_params[m][24]); 		//META 1 SUB 1
+		Params.c_a_sub[1][1] 	= 	exp(real_params[m][25]);		//META 1 SUB 2
+		Params.c_a_sub[1][2] 	= 	exp(real_params[m][26]);		//META 1 SUB 3
+		Params.c_a_sub[1][3] 	= 	exp(real_params[m][27]);		//META 1 SUB 4
+		Params.c_a_sub[2][0] 	= 	exp(real_params[m][28]); 		//META 2 SUB 1
+		Params.c_a_sub[2][1] 	= 	exp(real_params[m][29]);		//META 2 SUB 2
+		Params.c_a_sub[2][2] 	= 	exp(real_params[m][30]);		//META 2 SUB 3
+		Params.c_a_sub[2][3] 	= 	exp(real_params[m][31]);		//META 2 SUB 4
+		Params.c_a_sub[3][0] 	= 	exp(real_params[m][32]); 		//META 3 SUB 1
+		Params.c_a_sub[3][1] 	= 	exp(real_params[m][33]);		//META 3 SUB 2
+		Params.c_a_sub[3][2] 	= 	exp(real_params[m][34]);		//META 3 SUB 3
+		Params.c_a_sub[3][3] 	= 	exp(real_params[m][35]);		//META 3 SUB 4
 		//CONIDIA FRAC SUCCESSFUL DISP
-		Params.c_m_pop			= 	real_params[36]; 		//POP
-		Params.c_m_meta[1]		= 	real_params[37];		//META 1
-		Params.c_m_meta[2]		= 	real_params[38];		//META 2
-		Params.c_m_meta[3]		= 	real_params[39];		//META 3
-		Params.c_m_sub[1][0] 	= 	real_params[40];		//META 1 SUB 1
-		Params.c_m_sub[1][1] 	= 	real_params[41];		//META 1 SUB 2
-		Params.c_m_sub[1][2]	= 	real_params[42];		//META 1 SUB 3
-		Params.c_m_sub[1][3] 	= 	real_params[43];		//META 1 SUB 4
-		Params.c_m_sub[2][0] 	= 	real_params[44];		//META 2 SUB 1
-		Params.c_m_sub[2][1] 	= 	real_params[45];		//META 2 SUB 2
-		Params.c_m_sub[2][2] 	= 	real_params[46];		//META 2 SUB 3
-		Params.c_m_sub[2][3] 	= 	real_params[47];		//META 2 SUB 4
-		Params.c_m_sub[3][0] 	= 	real_params[48];		//META 3 SUB 1
-		Params.c_m_sub[3][1] 	= 	real_params[49];		//META 3 SUB 2
-		Params.c_m_sub[3][2] 	= 	real_params[50];		//META 3 SUB 3
-		Params.c_m_sub[3][3] 	= 	real_params[51];		//META 3 SUB 4
+		Params.c_m_pop			= 	real_params[m][36]; 		//POP
+		Params.c_m_meta[1]		= 	real_params[m][37];		//META 1
+		Params.c_m_meta[2]		= 	real_params[m][38];		//META 2
+		Params.c_m_meta[3]		= 	real_params[m][39];		//META 3
+		Params.c_m_sub[1][0] 	= 	real_params[m][40];		//META 1 SUB 1
+		Params.c_m_sub[1][1] 	= 	real_params[m][41];		//META 1 SUB 2
+		Params.c_m_sub[1][2]	= 	real_params[m][42];		//META 1 SUB 3
+		Params.c_m_sub[1][3] 	= 	real_params[m][43];		//META 1 SUB 4
+		Params.c_m_sub[2][0] 	= 	real_params[m][44];		//META 2 SUB 1
+		Params.c_m_sub[2][1] 	= 	real_params[m][45];		//META 2 SUB 2
+		Params.c_m_sub[2][2] 	= 	real_params[m][46];		//META 2 SUB 3
+		Params.c_m_sub[2][3] 	= 	real_params[m][47];		//META 2 SUB 4
+		Params.c_m_sub[3][0] 	= 	real_params[m][48];		//META 3 SUB 1
+		Params.c_m_sub[3][1] 	= 	real_params[m][49];		//META 3 SUB 2
+		Params.c_m_sub[3][2] 	= 	real_params[m][50];		//META 3 SUB 3
+		Params.c_m_sub[3][3] 	= 	real_params[m][51];		//META 3 SUB 4
 		//LARVAE 1/AVG DIST DISP
-		Params.l_a_pop 			= 	real_params[52];		//POP
-		Params.l_a_meta[1] 		= 	real_params[53];		//META 1
-		Params.l_a_meta[2] 		= 	real_params[54];		//META 2
-		Params.l_a_meta[3] 		= 	real_params[55];		//META 3
-		Params.l_a_sub[1][0] 	= 	real_params[56];		//META 1 SUB 1
-		Params.l_a_sub[1][1] 	= 	real_params[57];		//META 1 SUB 2
-		Params.l_a_sub[1][2] 	= 	real_params[58];		//META 1 SUB 3
-		Params.l_a_sub[1][3] 	= 	real_params[59];		//META 1 SUB 4
-		Params.l_a_sub[2][0] 	=	real_params[60]; 		//META 2 SUB 1
-		Params.l_a_sub[2][1] 	= 	real_params[61];		//META 2 SUB 2
-		Params.l_a_sub[2][2] 	= 	real_params[62];		//META 2 SUB 3
-		Params.l_a_sub[2][3] 	= 	real_params[63];		//META 2 SUB 4
-		Params.l_a_sub[3][0] 	= 	real_params[64]; 		//META 3 SUB 1
-		Params.l_a_sub[3][1] 	= 	real_params[65];		//META 3 SUB 2
-		Params.l_a_sub[3][2] 	= 	real_params[66];		//META 3 SUB 3
-		Params.l_a_sub[3][3] 	= 	real_params[67];		//META 3 SUB 4
+		Params.l_a_pop 			= 	exp(real_params[m][52]);		//POP
+		Params.l_a_meta[1] 		= 	exp(real_params[m][53]);		//META 1
+		Params.l_a_meta[2] 		= 	exp(real_params[m][54]);		//META 2
+		Params.l_a_meta[3] 		= 	exp(real_params[m][55]);		//META 3
+		Params.l_a_sub[1][0] 	= 	exp(real_params[m][56]);		//META 1 SUB 1
+		Params.l_a_sub[1][1] 	= 	exp(real_params[m][57]);		//META 1 SUB 2
+		Params.l_a_sub[1][2] 	= 	exp(real_params[m][58]);		//META 1 SUB 3
+		Params.l_a_sub[1][3] 	= 	exp(real_params[m][59]);		//META 1 SUB 4
+		Params.l_a_sub[2][0] 	=	exp(real_params[m][60]); 		//META 2 SUB 1
+		Params.l_a_sub[2][1] 	= 	exp(real_params[m][61]);		//META 2 SUB 2
+		Params.l_a_sub[2][2] 	= 	exp(real_params[m][62]);		//META 2 SUB 3
+		Params.l_a_sub[2][3] 	= 	exp(real_params[m][63]);		//META 2 SUB 4
+		Params.l_a_sub[3][0] 	= 	exp(real_params[m][64]); 		//META 3 SUB 1
+		Params.l_a_sub[3][1] 	= 	exp(real_params[m][65]);		//META 3 SUB 2
+		Params.l_a_sub[3][2] 	= 	exp(real_params[m][66]);		//META 3 SUB 3
+		Params.l_a_sub[3][3] 	= 	exp(real_params[m][67]);		//META 3 SUB 4
 		//LARVAE FRAC SUCCESSFUL DISP
-		Params.l_m_pop			= 	real_params[68]; 		//POP
-		Params.l_m_meta[1]		= 	real_params[69];		//META 1
-		Params.l_m_meta[2]		= 	real_params[70];		//META 2
-		Params.l_m_meta[3]		= 	real_params[71];		//META 3
-		Params.l_m_sub[1][0] 	= 	real_params[72];		//META 1 SUB 1
-		Params.l_m_sub[1][1] 	= 	real_params[73];		//META 1 SUB 2
-		Params.l_m_sub[1][2] 	= 	real_params[74];		//META 1 SUB 3
-		Params.l_m_sub[1][3] 	= 	real_params[75];		//META 1 SUB 4
-		Params.l_m_sub[2][0] 	= 	real_params[76];		//META 2 SUB 1
-		Params.l_m_sub[2][1] 	= 	real_params[77];		//META 2 SUB 2
-		Params.l_m_sub[2][2] 	= 	real_params[78];		//META 2 SUB 3
-		Params.l_m_sub[2][3] 	= 	real_params[79];		//META 2 SUB 4
-		Params.l_m_sub[3][0] 	= 	real_params[80];		//META 3 SUB 1
-		Params.l_m_sub[3][1] 	= 	real_params[81];		//META 3 SUB 2
-		Params.l_m_sub[3][2] 	= 	real_params[82];		//META 3 SUB 3
-		Params.l_m_sub[3][3] 	= 	real_params[83];		//META 3 SUB 4
+		Params.l_m_pop			= 	real_params[m][68]; 		//POP
+		Params.l_m_meta[1]		= 	real_params[m][69];		//META 1
+		Params.l_m_meta[2]		= 	real_params[m][70];		//META 2
+		Params.l_m_meta[3]		= 	real_params[m][71];		//META 3
+		Params.l_m_sub[1][0] 	= 	real_params[m][72];		//META 1 SUB 1
+		Params.l_m_sub[1][1] 	= 	real_params[m][73];		//META 1 SUB 2
+		Params.l_m_sub[1][2] 	= 	real_params[m][74];		//META 1 SUB 3
+		Params.l_m_sub[1][3] 	= 	real_params[m][75];		//META 1 SUB 4
+		Params.l_m_sub[2][0] 	= 	real_params[m][76];		//META 2 SUB 1
+		Params.l_m_sub[2][1] 	= 	real_params[m][77];		//META 2 SUB 2
+		Params.l_m_sub[2][2] 	= 	real_params[m][78];		//META 2 SUB 3
+		Params.l_m_sub[2][3] 	= 	real_params[m][79];		//META 2 SUB 4
+		Params.l_m_sub[3][0] 	= 	real_params[m][80];		//META 3 SUB 1
+		Params.l_m_sub[3][1] 	= 	real_params[m][81];		//META 3 SUB 2
+		Params.l_m_sub[3][2] 	= 	real_params[m][82];		//META 3 SUB 3
+		Params.l_m_sub[3][3] 	= 	real_params[m][83];		//META 3 SUB 4
 		//OBSERVATIONAL
-		Params.FITINIT[4][0] 	= 	real_params[84]; 		//META 4 INITS
-		Params.FITINIT[4][4] 	= 	real_params[85]; 		//META 4 INITV
-		Params.FITINIT[4][8] 	= 	real_params[86]; 		//META 4 INITR
-		Params.FITINIT[5][0] 	= 	real_params[87]; 		//META 5 INITS
-		Params.FITINIT[5][4] 	= 	real_params[88]; 		//META 5 INITV
-		Params.FITINIT[6][0] 	= 	real_params[89];	 	//META 6 INITS
-		Params.FITINIT[6][4] 	= 	real_params[90]; 		//META 6 INITV
-		Params.FITINIT[6][8] 	= 	real_params[91]; 		//META 6 INITR
+		Params.FITINIT[4][0] 	= 	exp(real_params[m][84]); 		//META 4 INITS
+		Params.FITINIT[4][4] 	= 	exp(real_params[m][85]); 		//META 4 INITV
+		Params.FITINIT[4][8] 	= 	exp(real_params[m][86]); 		//META 4 INITR
+		Params.FITINIT[5][0] 	= 	exp(real_params[m][87]); 		//META 5 INITS
+		Params.FITINIT[5][4] 	= 	exp(real_params[m][88]); 		//META 5 INITV
+		Params.FITINIT[6][0] 	= 	exp(real_params[m][89]);	 	//META 6 INITS
+		Params.FITINIT[6][4] 	= 	exp(real_params[m][90]); 		//META 6 INITV
+		Params.FITINIT[6][8] 	= 	exp(real_params[m][91]); 		//META 6 INITR
 
 		//--------GENERATE REALIZATIONS USING MISER-------
 		double lhood_meta; double log_lhood_meta; double total_loghood_metas = 0;
@@ -690,8 +725,6 @@ if(linesearch == 1)
 		for (int j = 1; j <= 3; j++)
 		{
 			Params.j = j;
-			//TEST
-			Params.miser_ticker = 1; Params.miser2_flag = 0;
 
 			lhood_meta = 0;
 			log_lhood_meta = 0;
@@ -708,20 +741,8 @@ if(linesearch == 1)
 			gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
 			gsl_monte_miser_integrate (&G, xl, xu, dim, Rcalls, r, s, &lhood_meta, &meta_err); 
 			gsl_monte_miser_free(s);
-
-			while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
-			{ 
-				Params.miser2_flag = 0;
-				Params.lhood_adjust[j] = -Params.bestlhood[j];
-				
-				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-				gsl_monte_miser_integrate (&G, xl, xu, dim, LScalls, r, s, &lhood_meta, &meta_err); 
-				gsl_monte_miser_free(s);
-			}
 			
 			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
-			//printf("lhood meta = %lf\n", lhood_meta);
-			//printf("loghood [%i] = %lf\n", j, log(lhood_meta));
 
 			if (isnan(log_lhood_meta) || isinf(log_lhood_meta))
 			{
@@ -730,19 +751,19 @@ if(linesearch == 1)
 			
 			total_loghood_metas += log_lhood_meta;
 		}
-		new_posterior = total_loghood_metas + log_prior;
+		new_log_prior = 0;
+		new_posterior = total_loghood_metas + new_log_prior;
 
-		fprintf(fpr, "%lf %lf\n", total_loghood_metas, new_posterior);
-
-		fclose(fpr); 
-		fclose(fpme);
+		fprintf(fplhood, "%lf %lf\n", total_loghood_metas, new_posterior);
 	}
-*/
-///////////////////////////////////////////////////MCMC//////////////////////////////////////////////////////////
+	fclose(fplhood);
+	fclose(fpr); 
+	fclose(fpme);
+}
+
+///////////////////////////////////////////////////MCMC///////////////////////////////////////////////////////////
 if (mcmc == 1)
 {
-	#define THIN 1 
-
 	//-------FILES--------
 	int pid;
 	pid = getpid();
@@ -776,810 +797,1044 @@ if (mcmc == 1)
 	strcat(sdsfp, str_model);
 	strcat(imptfp, str_model);
 
-	double rotations[NUM_PARS][NUM_PARS];
-	double scale[NUM_PARS], center[NUM_PARS], sd[NUM_PARS];
-	int var_import[NUM_PARS];
+	double Coefficients[NUM_PARS*NUM_PARS];
+	double Scale[NUM_PARS], Center[NUM_PARS], SDPca[NUM_PARS];
 
 	for (i = 0; i < NUM_PARS; i++)
 	{
-		scale[i] = center[i] = sd[i] = 0.0;
-		for (int j = 0; j < NUM_PARS; j++)
-		{
-			rotations[i][j] = 0.0;
-		}
+		Scale[i] = Center[i] = SDPca[i] = 0.0;
+	}
+
+	for (int j = 0; j < NUM_PARS*NUM_PARS; j++)
+	{
+		Coefficients[j] = 0.0;
 	}
 
 	//--------READ IN LINESEARCH RESULTS-----
 	file = fopen(rotsfp, "r");       
   
 	for (i = 0; i < NUM_PARS; i++)
+	{
 		if (fit[i])
 		{
-			for(k = 0; k < NUM_PARS; k++)
+			for (j = 0; j < NUM_PARS; j++)
 			{
-				if (fit[k]) fscanf(file, "%lf ", &rotations[i][k]);
-				if (verbose && fit[k]) printf("i,j:%d%d Rotation:%e\n", i, k, rotations[i][k]);
+				if (fit[j]) fscanf(file, "%lf ", &Coefficients[j+(NUM_PARS*i)]);
+				if (verbose && fit[j]) printf("j:%i i:%i index:%d Coefficients:%e\n", j, i, j+(NUM_PARS*i), Coefficients[j+(NUM_PARS*i)]);
 			}
-			fscanf(file,"\n");
-		}
+		}		
+	}
 	fclose(file);
+	getc(stdin);
 
 	file = fopen(sclsfp, "r");  
 	for (i = 0; i < NUM_PARS; i++)
 	{
-		if (fit[i]) fscanf(file, "%lf ", &scale[i]);
-		if (verbose && fit[i]) printf("i:%d Scale:%e\n", i, scale[i]);
+		if (fit[i]) fscanf(file, "%lf ", &Scale[i]);
+		if (verbose && fit[i]) printf("i:%d Scale:%e\n", i, Scale[i]);
+		//printf("i:%d Scale:%e\n", i, scale[i]);
 	}
 	fclose(file);
 
 	file = fopen(ctrsfp, "r");       
 	for (i = 0; i < NUM_PARS; i++)
 	{
-		if (fit[i]) fscanf(file, "%lf ", &center[i]);
-		if (verbose && fit[i]) printf("i:%d Center:%e\n", i, scale[i]);
+		if (fit[i]) fscanf(file, "%lf ", &Center[i]);
+		if (verbose && fit[i]) printf("i:%d Center:%e\n", i, Center[i]);
+		//printf("i:%d Center:%e\n", i, center[i]);
 	}
 	fclose(file);
 
 	file = fopen(sdsfp, "r");      
 	for (i = 0; i < NUM_PARS; i++)
 	{
-		if (fit[i]) fscanf(file, "%lf ", &sd[i]);
-		if (verbose && fit[i]) printf("i:%d SD:%e\n", i, scale[i]);
+		if (fit[i]) fscanf(file, "%lf ", &SDPca[i]);
+		if (verbose && fit[i]) printf("i:%d SD:%e\n", i, SDPca[i]);
+		//printf("i:%d SD:%e\n", i, sd[i]);
 	}
 	fclose(file);
 
-	file = fopen(imptfp, "r");      
-	for (i = 0; i < NUM_PARS; i++)
-	{
-		if (fit[i]) fscanf(file, "%d ", &var_import[i]);
-		if (verbose && fit[i]) printf("i:%d Impt:%d\n", i, var_import[i]);
-	}
-	fclose(file);
+	//-------VARIABLE AND ARRAY SETUP--------
+	double LogJumpToNew;
+	double LogJumpToOld;
+	double ProbOfAcceptance;
 
-	double pca[NUM_PARS], old_pca[NUM_PARS];
-	double old_params[NUM_PARS], new_params[NUM_PARS];
-	double var_scale = 1.2;
-	double criterion, mc_temp;
-	float dot_holder;
-	double rejection;
-	int thin = THIN;
-	int burnin = MAXITNMCMC; //itertion step after which to propose for every PC each iteration. Set to MAXINT to avoid.
-	size_t max_itn = MAXITNMCMC;
+	double LogOldPosterior;
+	double LogNewPosterior;
+	double LogNewPrior;
+	double PreviousLogOldPosterior = -100000000000000;
 
-	double meta_err;
-
-	double new_posterior, old_posterior;
-	double lprior, old_lprior, new_lprior;
-	double new_prop_adj, old_prop_adj;
-
-	double new_lhood = 0.0;
-	double old_lhood = 1e+10;
-	double new_lhood_meta, old_lhood_meta;
-	double new_lhood_pop, old_lhood_pop;
+	double New_PC[NUM_PARS] = {0.0};
+	double Old_PC[NUM_PARS] = {0.0};
+	double Holder[NUM_PARS] = {0.0};
+	double New_Params[NUM_PARS] = {0.0};
+	double Old_Params[NUM_PARS] = {0.0};
 
 	double new_lhood_pointwise[DATA_SETS+1][NUM_POINTWISE];
 	double old_lhood_pointwise[DATA_SETS+1][NUM_POINTWISE];
 
-	new_posterior = old_posterior = 0.0;	
-	new_lhood = old_lhood = 0.0;
+	int Accept=0;
+	int Attempt=0;
 
-	int stop = 0;
-	int stop_counter = 0;
-	int redo = 0;
-	int check_last_par = 0;
-	int accept = 0;
-	int attempt = 0;
-	int recent_a = 0;
-	int accept_hall_pass = 0;
-	
+	int ticker;
+	int ticker2;
+
+	int Case;
+
+	signed int LoopNumber=-1;
+
+	double SigmaInflation=1.2;
+
+	double sigma[NUM_PARS];
+
+	double log_prior_new;
+	double log_prior_old;
+	double log_prior_OLD;
+	double log_prior_NEW;
+
+	double lhood_meta;
+	double log_lhood_meta;
+	double total_loghood_metas_OLD;
+	double total_loghood_metas_NEW;
+	double meta_err;
+
 	//-------GENERATE INITIAL PCS--------
-	stop = 1;
-
-	while (stop && stop_counter < NUM_PARS)
+	for (a = 0; a < NUM_PARS; a++)
 	{
-		if (verbose) printf("Generating first PC set\n");
-
+		if (fit[a]) sigma[a] = SigmaInflation * SDPca[a];
+	}
+	//-------RECONSTRUCT PARAMS FROM PCS AND BOUND CHECK--------
+	int PCA_ticker = 0;
+	while (PCA_ticker == 0)
+	{
 		for (a = 0; a < NUM_PARS; a++)
 		{
-			if (fit[a])
-			{
-				old_pca[a] = pca[a] = gsl_ran_gaussian(r, var_scale * sd[a]);
-				if (verbose) printf("PC %d = %e\n", a, pca[a]);
-			} else {
-				old_pca[a] = pca[a] = 0.0;
+			if (fit[a]) New_PC[a] = gsl_ran_gaussian (r, sigma[a]); 
+		}
+		for (a = 0; a < NUM_PARS; a++)
+		{
+			if(fit[a])
+			{						
+				for (b = 0; b < NUM_PARS; b++)
+				{
+					if (fit[b]) Holder[b] = Coefficients[a * NUM_PARS + b];         
+				}
+
+				New_Params[a] = exp(DotProduct(NUM_PARS, Holder, New_PC) * Scale[a] + Center[a]); 
+
+				if (verbose) printf("a = %i fit[a] = %i New_Params[a] = %lf\n", a, fit[a], New_Params[a]);
 			}
 		}
 
-		stop = 0;
-
+		PCA_ticker=1;
 		for (a = 0; a < NUM_PARS; a++)
 		{
 			if (fit[a])
 			{
-				dot_holder = dot_product(NUM_PARS, rotations + a, pca);
-				new_params[a] = old_params[a] = exp(dot_holder * var_scale * scale[a] + center[a]);
-				if (verbose) printf("init value param %i = %lf\n", a, old_params[a]);
-
 				if (log_fit[a])
 				{
-					if(log(old_params[a]) > ls_bound(model, a, 2) || log(old_params[a]) < ls_bound(model, a, 1))
-					{
-						stop = 1;
-						stop_counter++;
-					}
-
-				} else {
-
-					if(old_params[a] > ls_bound(model, a, 2) || old_params[a] < ls_bound(model, a, 1))
-					{
-						stop = 1;
-						stop_counter++;
+					if (New_Params[a] < exp(param_bound(a, 1)) || New_Params[a] > exp(param_bound(a, 2)))
+					{ 
+						PCA_ticker = 0;
+						printf("model = %i\n", model);
+						printf("out of bounds initial PC proposal for param %i\n", a);
+						printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n", New_Params[a], exp(param_bound(a, 1)), exp(param_bound(a, 2)));	
 					}
 				}
-
-			} else {
-				new_params[a] = old_params[a] = 0.0;
+				else
+				{
+					if (New_Params[a] < param_bound(a, 1) || New_Params[a] > param_bound(a, 2))
+					{ 
+						PCA_ticker = 0;
+						printf("model = %i\n", model);
+						printf("out of bounds initial PC proposal for param %i\n", a);
+						printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n", New_Params[a], param_bound(a, 1), param_bound(a, 2));	
+					}
+				}
 			}
 		}
 	}
+	printf("initial parameter set successful\n");
 
-	if (verbose) printf("Generating set took %d attempts\n", stop_counter);
+	//-------BEGIN MCMC--------
+	Case = -1;
 
-	//------CALCULATE INITIAL LIKELIHOOD----
-	//--------PASS FIXED PARAMS-------
-	//INITV
-	Params.FITINIT[1][4] 	= 	1e-6; 					//META 1 SUB 1
-	Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
-	Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
-	Params.FITINIT[1][7] 	= 	1e-6; 					//META 1 SUB 4
-	Params.FITINIT[2][4] 	= 	1e-6; 					//META 2 SUB 1
-	Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
-	Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
-	Params.FITINIT[2][7] 	= 	1e-6; 					//META 2 SUB 4
-	Params.FITINIT[3][4] 	= 	1e-6; 					//META 3 SUB 1
-	Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
-	Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
-	Params.FITINIT[3][7] 	= 	1e-6; 					//META 3 SUB 4
-	//INITR
-	Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
-	Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
-	Params.FITINIT[1][11] 	= 	0; 						//META 1 SUB 4
-	Params.FITINIT[5][8] 	= 	0; 						//META 5
-	//VIRUS DECAY
-	Params.muV				= 	0.4102453; 				//POP
-	//VIRUS HETERO		
-	Params.CV				= 	0.86; 					//POP
-	//VIRUS TRANS
-	Params.nuV    			= 	0.4607038; 				//POP
-	//FUNGUS TRANS
-	Params.specific_nuF		= 	0.000241071699421562; 	//POP
+	while (LoopNumber < REALIZATIONS) 
+	{     
+		LoopNumber = LoopNumber + 1;
 
-	//--------PASS FIT PARAMS-------
-	Params.FITINIT[1][0] 	= 	old_params[0]; 			//META 1 SUB 1
-	Params.FITINIT[1][1] 	= 	old_params[0]; 			//META 1 SUB 2
-	Params.FITINIT[1][2] 	= 	old_params[0]; 			//META 1 SUB 3
-	Params.FITINIT[1][3] 	= 	old_params[0]; 			//META 1 SUB 4
-	Params.FITINIT[2][0] 	= 	old_params[0]; 			//META 2 SUB 1
-	Params.FITINIT[2][1] 	= 	old_params[0]; 			//META 2 SUB 2
-	Params.FITINIT[2][2] 	= 	old_params[0]; 			//META 2 SUB 3
-	Params.FITINIT[2][3] 	= 	old_params[0]; 			//META 2 SUB 4
-	Params.FITINIT[3][0] 	= 	old_params[0]; 			//META 3 SUB 1
-	Params.FITINIT[3][1] 	= 	old_params[0]; 			//META 3 SUB 2
-	Params.FITINIT[3][2] 	= 	old_params[0]; 			//META 3 SUB 3
-	Params.FITINIT[3][3] 	= 	old_params[0]; 			//META 3 SUB 4
-	//INITR
-	Params.r_pop 			= 	old_params[1];			//POP
-	Params.r_meta[1] 		= 	old_params[2];			//META 1
-	Params.r_meta[2] 		= 	old_params[3];			//META 2
-	Params.r_meta[3] 		=	old_params[4];			//META 3
-	Params.FITINIT[1][8] 	= 	old_params[5]; 			//META 1 SUB 1
-	Params.FITINIT[2][8] 	= 	old_params[6]; 			//META 2 SUB 1
-	Params.FITINIT[2][9] 	= 	old_params[7]; 			//META 2 SUB 2 
-	Params.FITINIT[2][10] 	= 	old_params[8]; 			//META 2 SUB 3
-	Params.FITINIT[2][11] 	= 	old_params[9]; 			//META 2 SUB 4
-	Params.FITINIT[3][8] 	= 	old_params[10]; 		//META 3 SUB 1
-	Params.FITINIT[3][9] 	= 	old_params[11]; 		//META 3 SUB 2
-	Params.FITINIT[3][10] 	= 	old_params[12]; 		//META 3 SUB 3
-	Params.FITINIT[3][11] 	= 	old_params[13]; 		//META 3 SUB 4
-	//RSTOCH
-	Params.R_stoch 			= 	old_params[18];			//POP
-	//FSTOCH
-	Params.F_stoch			= 	old_params[19];			//POP
-	//CONIDIA 1/AVG DIST DISP
-	Params.c_a_pop 			= 	old_params[20];			//POP
-	Params.c_a_meta[1] 		= 	old_params[21];			//META 1
-	Params.c_a_meta[2] 		= 	old_params[22];			//META 2
-	Params.c_a_meta[3] 		= 	old_params[23];			//META 3
-	Params.c_a_sub[1][0] 	= 	old_params[24]; 		//META 1 SUB 1
-	Params.c_a_sub[1][1] 	= 	old_params[25];			//META 1 SUB 2
-	Params.c_a_sub[1][2] 	= 	old_params[26];			//META 1 SUB 3
-	Params.c_a_sub[1][3] 	= 	old_params[27];			//META 1 SUB 4
-	Params.c_a_sub[2][0] 	= 	old_params[28]; 		//META 2 SUB 1
-	Params.c_a_sub[2][1] 	= 	old_params[29];			//META 2 SUB 2
-	Params.c_a_sub[2][2] 	= 	old_params[30];			//META 2 SUB 3
-	Params.c_a_sub[2][3] 	= 	old_params[31];			//META 2 SUB 4
-	Params.c_a_sub[3][0] 	= 	old_params[32]; 		//META 3 SUB 1
-	Params.c_a_sub[3][1] 	= 	old_params[33];			//META 3 SUB 2
-	Params.c_a_sub[3][2] 	= 	old_params[34];			//META 3 SUB 3
-	Params.c_a_sub[3][3] 	= 	old_params[35];			//META 3 SUB 4
-	//CONIDIA FRAC SUCCESSFUL DISP
-	Params.c_m_pop			= 	old_params[36]; 		//POP
-	Params.c_m_meta[1]		= 	old_params[37];			//META 1
-	Params.c_m_meta[2]		= 	old_params[38];			//META 2
-	Params.c_m_meta[3]		= 	old_params[39];			//META 3
-	Params.c_m_sub[1][0] 	= 	old_params[40];			//META 1 SUB 1
-	Params.c_m_sub[1][1] 	= 	old_params[41];			//META 1 SUB 2
-	Params.c_m_sub[1][2]	= 	old_params[42];			//META 1 SUB 3
-	Params.c_m_sub[1][3] 	= 	old_params[43];			//META 1 SUB 4
-	Params.c_m_sub[2][0] 	= 	old_params[44];			//META 2 SUB 1
-	Params.c_m_sub[2][1] 	= 	old_params[45];			//META 2 SUB 2
-	Params.c_m_sub[2][2] 	= 	old_params[46];			//META 2 SUB 3
-	Params.c_m_sub[2][3] 	= 	old_params[47];			//META 2 SUB 4
-	Params.c_m_sub[3][0] 	= 	old_params[48];			//META 3 SUB 1
-	Params.c_m_sub[3][1] 	= 	old_params[49];			//META 3 SUB 2
-	Params.c_m_sub[3][2] 	= 	old_params[50];			//META 3 SUB 3
-	Params.c_m_sub[3][3] 	= 	old_params[51];			//META 3 SUB 4
-	//LARVAE 1/AVG DIST DISP
-	//TEMP
-	Params.l_a_pop 			= 	old_params[52];			//POP
-	Params.l_a_meta[1] 		= 	old_params[53];			//META 1
-	Params.l_a_meta[2] 		= 	old_params[54];			//META 2
-	Params.l_a_meta[3] 		= 	old_params[55];			//META 3
-	Params.l_a_sub[1][0] 	= 	old_params[56];			//META 1 SUB 1
-	Params.l_a_sub[1][1] 	= 	old_params[57];			//META 1 SUB 2
-	Params.l_a_sub[1][2] 	= 	old_params[58];			//META 1 SUB 3
-	Params.l_a_sub[1][3] 	= 	old_params[59];			//META 1 SUB 4
-	Params.l_a_sub[2][0] 	=	old_params[60]; 		//META 2 SUB 1
-	Params.l_a_sub[2][1] 	= 	old_params[61];			//META 2 SUB 2
-	Params.l_a_sub[2][2] 	= 	old_params[62];			//META 2 SUB 3
-	Params.l_a_sub[2][3] 	= 	old_params[63];			//META 2 SUB 4
-	Params.l_a_sub[3][0] 	= 	old_params[64]; 		//META 3 SUB 1
-	Params.l_a_sub[3][1] 	= 	old_params[65];			//META 3 SUB 2
-	Params.l_a_sub[3][2] 	= 	old_params[66];			//META 3 SUB 3
-	Params.l_a_sub[3][3] 	= 	old_params[67];			//META 3 SUB 4
-	//LARVAE FRAC SUCCESSFUL DISP
-	Params.l_m_pop			= 	old_params[68]; 		//POP
-	Params.l_m_meta[1]		= 	old_params[69];			//META 1
-	Params.l_m_meta[2]		= 	old_params[70];			//META 2
-	Params.l_m_meta[3]		= 	old_params[71];			//META 3
-	Params.l_m_sub[1][0] 	= 	old_params[72];			//META 1 SUB 1
-	Params.l_m_sub[1][1] 	= 	old_params[73];			//META 1 SUB 2
-	Params.l_m_sub[1][2] 	= 	old_params[74];			//META 1 SUB 3
-	Params.l_m_sub[1][3] 	= 	old_params[75];			//META 1 SUB 4
-	Params.l_m_sub[2][0] 	= 	old_params[76];			//META 2 SUB 1
-	Params.l_m_sub[2][1] 	= 	old_params[77];			//META 2 SUB 2
-	Params.l_m_sub[2][2] 	= 	old_params[78];			//META 2 SUB 3
-	Params.l_m_sub[2][3] 	= 	old_params[79];			//META 2 SUB 4
-	Params.l_m_sub[3][0] 	= 	old_params[80];			//META 3 SUB 1
-	Params.l_m_sub[3][1] 	= 	old_params[81];			//META 3 SUB 2
-	Params.l_m_sub[3][2] 	= 	old_params[82];			//META 3 SUB 3
-	Params.l_m_sub[3][3] 	= 	old_params[83];			//META 3 SUB 4
-	//OBSERVATIONAL
-	Params.FITINIT[4][0] 	= 	old_params[84]; 		//META 4 INITS
-	Params.FITINIT[4][4] 	= 	old_params[85]; 		//META 4 INITV
-	Params.FITINIT[4][8] 	= 	old_params[86]; 		//META 4 INITR
-	Params.FITINIT[5][0] 	= 	old_params[87]; 		//META 5 INITS
-	Params.FITINIT[5][4] 	= 	old_params[88]; 		//META 5 INITV
-	Params.FITINIT[6][0] 	= 	old_params[89];	 		//META 6 INITS
-	Params.FITINIT[6][4] 	= 	old_params[90]; 		//META 6 INITV
-	Params.FITINIT[6][8] 	= 	old_params[91]; 		//META 6 INITR
+		//----DETERMINE WHICH PARAM TO CHANGE---
+		Case = Case + 1;
 
-	//--------MISER CALUCLATE LIKELIHOOD-------
-	for (int j = 1; j <= 3; j++)
-	{
-		for(int i = 0; i < 10; i++)
+		if (fit[Case]==0)
 		{
-			Params.lhood_point[j][i] = 0.0;
-		}
-	}
-
-	old_lhood_pop = 0;
-
-	for (int j = 1; j <= 3; j++)				
-	{
-		old_lhood_meta = old_lhood = meta_err = 0;
-
-		Params.j = j;
-
-		Params.miser_ticker = 1; Params.miser2_flag = 0; 
-
-		gsl_monte_function G = { &likelihood_calc, dim, &Params };	
-
-		double xl[dim];	double xu[dim];	
-		for (int jj = 0; jj < dim; jj++)	
-		{
-			xl[jj] = 0;	
-			xu[jj] = 1;
-		}
-
-		gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-		gsl_monte_miser_integrate (&G, xl, xu, dim, LScalls, r, s, &old_lhood, &meta_err); 		//call MISER
-		gsl_monte_miser_free(s);
-		
-		while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
-		{ 
-			Params.miser2_flag = 0;
-			Params.lhood_adjust[j] = -Params.bestlhood[j];
-			
-			gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-			gsl_monte_miser_integrate (&G, xl, xu, dim, LScalls, r, s, &old_lhood, &meta_err); 
-			gsl_monte_miser_free(s);
-		}
-
-		old_lhood_meta = log(old_lhood) - Params.lhood_adjust[j];
-		//printf("old lhood = %lf old lhood meta = %lf\n", old_lhood, old_lhood_meta);
-
-		if (isnan(old_lhood_meta) || isinf(old_lhood_meta))			//assign bad score to errors
-		{ 
-			old_lhood_meta = -99999;
-		}
-		
-		old_lhood_pop += old_lhood_meta;
-		//printf("old lhood pop = %lf\n", old_lhood_pop);
-	}
-	//-----------AVERAGE DATA POINT LHOODS-----
-	for (int j = 1; j <= 3; j++)
-	{
-		for(int i = 0; i < 10; i++)
-		{
-			old_lhood_pointwise[j][i] = Params.lhood_point[j][i]/LScalls;
-		}
-	}
-	//------------CALCULATE AND ADD PRIOR----------
-	old_posterior = old_lprior = lprior = 0;
-
-	for (int k = 0; k < NUM_PARS; k++)
-	{
-		if (fit[k])
-		{
-			if (log_fit[k])
+			while (fit[Case]==0)
 			{ 
-				lprior = log(gsl_ran_flat_pdf(old_params[k], exp(ls_bound(model,k,1)), (exp(ls_bound(model,k,1)) + exp(ls_bound(model,k,2)))));
-				if (verbose) printf("old prior for param %i log value %lf = %lf\n", k, old_params[k], lprior);
-
-			} else {
-
-				lprior = log(gsl_ran_flat_pdf(old_params[k], ls_bound(model,k,1), (ls_bound(model,k,1) + ls_bound(model,k,2))));
-				if (verbose) printf("old prior for param %i value %lf = %lf\n", k, old_params[k], lprior);
-
+				Case = Case + 1;
+				
+				if(Case == NUM_PARS)
+				{
+					Case = 0;
+				}
 			}
-			if (isnan(lprior) || isinf(lprior)) 	//outside of bounds
-			{ 
-				lprior = -750;	//assign bad score
-			}
-			old_lprior += lprior;
-			//printf("old l prior = %lf\n", old_lprior);
 		}
-	}
 
-	old_posterior = old_lhood_pop + old_lprior;
-	//printf("old post = %lf old lhood pop = %lf old prior = %lf\n", old_posterior, old_lhood_pop, old_lprior);
+		if (verbose) printf("Case = %i\n", Case);
 
-	//-------BEGIN PCA-ADJ MH-MCMC--------
-	for (j_iter = 0; j_iter < max_itn; j_iter++)
-	{
+		//-------STORE NEW PCS AS OLD--------
+		for (a = 0; a < NUM_PARS; a++)
+		{
+			if (fit[a]) Old_PC[a] = New_PC[a];							//Store old PC values
+		}
 
-		check_last_par = 1;
-		attempt = 0;
+		//-------DRAW NEW PC IN NEW--------
+		SigmaInflation = 1; 			// original old_PC is set at 1.2, all new PC set a 1
+		
+		sigma[Case] = SigmaInflation * SDPca[Case]; 
+
+		New_PC[Case] = gsl_ran_gaussian (r, sigma[Case]);
+
+		if (verbose) printf("old pc [%i] = %lf\n", Case, Old_PC[Case]);
+		if (verbose) printf("new pc [%i] = %lf\n", Case, New_PC[Case]);
+
+		//-------RECONSTRUCT OLD AND NEW PCS TO PARAMS--------
+		for (a = 0; a < NUM_PARS; a++)								
+		{
+			if (fit[a])
+			{
+				for (b = 0; b < NUM_PARS; b++)
+				{
+					if (fit[b]) Holder[b] = Coefficients[a * NUM_PARS + b];        
+				}
+
+				New_Params[a]=exp(DotProduct(NUM_PARS, Holder, New_PC)*Scale[a]+Center[a]);            
+				Old_Params[a]=exp(DotProduct(NUM_PARS, Holder, Old_PC)*Scale[a]+Center[a]);
+				if (verbose) printf("a = %i newpc = %lf newparam = %lf, oldpc = %lf old param = %lf\n", a, New_PC[a], New_Params[a], Old_PC[a], Old_Params[a]);       
+			}
+		}
+
+		//-------BOUND CHECK PARAMS--------
+		int bound_ticker = 0;
+		if (log_fit[Case])
+		{ 
+			while (New_Params[Case] < exp(param_bound(Case, 1)) || New_Params[Case] > exp(param_bound(Case, 2)))			//if CASE out of bounds
+			{
+				if (bound_ticker > NUM_PARS) exit(1);
+
+				printf("BOUND ERROR param %i not in bounds\n", Case);
+				printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n",New_Params[Case], exp(param_bound(Case, 1)), exp(param_bound(Case, 2)));
+				
+				New_PC[Case] = gsl_ran_gaussian (r, sigma[Case]);			//draw new CASE
+				bound_ticker++;
+
+				for (a = 0; a < NUM_PARS; a++)			//reconstruct all
+				{
+					if (fit[a])
+					{							
+						for (b = 0; b < NUM_PARS; b++)
+						{
+							if (fit[b]) Holder[b] = Coefficients[a * NUM_PARS + b];         
+						}
+						New_Params[a] = exp(DotProduct(NUM_PARS, Holder, New_PC) * Scale[a] + Center[a]);  
+					}          
+				}
+			}
+		}
+		else
+		{
+			while (New_Params[Case] < param_bound(Case, 1) || New_Params[Case] > param_bound(Case, 2))		//if CASE out of bounds
+			{
+				if (bound_ticker > NUM_PARS) exit(1);
+
+				printf("BOUND ERROR param %i not in bounds\n", Case);
+				printf("value = %lf\t lower bound = %lf\t upper bound = %lf\n", New_Params[Case], param_bound(Case, 1), param_bound(Case, 2));
+				
+				New_PC[Case] = gsl_ran_gaussian (r, sigma[Case]);			//draw new CASE
+				bound_ticker++;
+
+				for (a = 0; a < NUM_PARS; a++)			//reconstruct all
+				{
+					if (fit[a])
+					{							
+						for (b = 0; b < NUM_PARS; b++)
+						{
+							if (fit[b]) Holder[b] = Coefficients[a * NUM_PARS + b];         
+						}
+						New_Params[a] = exp(DotProduct(NUM_PARS, Holder, New_PC) * Scale[a] + Center[a]);            
+					}
+				}
+			}
+		}
+		//-------CALCULATE PRIORS--------
+		log_prior_NEW = 0; log_prior_OLD = 0;
+		log_prior_new = 0; log_prior_old = 0;
 
 		for (a = 0; a < NUM_PARS; a++)
 		{
-			if (fit[a] && (j_iter > burnin || j_iter % var_import[a] == 0))
-			{
-				recent_a = a;
-				old_prop_adj = log( gsl_ran_gaussian_pdf(old_pca[a], var_scale * sd[a]) );
-
-				if (redo)
+			if (fit[a]){
+				if (log_fit[a])
 				{
-					if (verbose) printf("Recalcuating posterior for par %d\n", a);
-
-					if(!check_last_par)
-					{
-						if (verbose) printf("This recalculation is part of an end of iteration check. Setting PCA to stored OLD PCA.\n");
-					
-						for (b = 0; b < NUM_PARS; b++)
-						{
-							pca[b] = old_pca[b];
-						}
-						for (b = 0; b < NUM_PARS; b++)
-						{
-							if (fit[b])
-							{
-								dot_holder = dot_product(NUM_PARS, rotations + b, pca);
-								new_params[b] = exp(dot_holder * scale[b] + center[b]);
-							}
-						}
-					}
-				} else {
-					attempt++;
-					stop = 1;
-					while(stop)
-					{
-						pca[a] = gsl_ran_gaussian(r, var_scale * sd[a]);
-						stop = 0;
-						for (b = 0; b < NUM_PARS; b++)
-						{
-							if (fit[b])
-							{
-								dot_holder = dot_product(NUM_PARS, rotations + b, pca);
-								new_params[b] = exp(dot_holder * scale[b] + center[b]);
-
-								if (log_fit[b])
-								{
-									if(log(new_params[b]) > ls_bound(model, b, 2) || log(new_params[b]) < ls_bound(model, b, 1))
-									{
-										stop = 1;
-										if (verbose) printf("%lf is an invalid value for par %d. Trying again...\n", new_params[b], b);
-									}
-								} else {
-									if(new_params[b] > ls_bound(model, b, 2) || new_params[b] < ls_bound(model, b, 1))
-									{
-										stop = 1;
-										if (verbose) printf("%lf is an invalid value for par %d. Trying again...\n", new_params[b], b);
-									}
-								}
-
-							}
-						}
-					}
+					log_prior_new = log(gsl_ran_flat_pdf(New_Params[a], exp(param_bound(a, 1)), (exp(param_bound(a, 2)) + exp(param_bound(a, 1)))));
+					log_prior_old = log(gsl_ran_flat_pdf(Old_Params[a], exp(param_bound(a, 1)), (exp(param_bound(a, 2)) + exp(param_bound(a, 1)))));
 				}
-				new_prop_adj = 0;
-				new_prop_adj = log(gsl_ran_gaussian_pdf(pca[a], var_scale * sd[a]));
-				//printf("PROP ADJ = %lf pca[%i] = %lf varscale = %lf sd[%i] = %lf\n", new_prop_adj, a, pca[a], var_scale, a, sd[a]);
-				if (verbose) printf("Sending out parameters for PC %d\n", a);
-				if (verbose && redo) printf("This is a recalculation of lhood and posterior to avoid winner's curse.\n");
-
-				//------CALCULATE LIKELIHOOD NEW------
-				//--------PASS FIXED PARAMS-------
-				//INITV
-				Params.FITINIT[1][4] 	= 	1e-6; 					//META 1 SUB 1
-				Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
-				Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
-				Params.FITINIT[1][7] 	= 	1e-6; 					//META 1 SUB 4
-				Params.FITINIT[2][4] 	= 	1e-6; 					//META 2 SUB 1
-				Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
-				Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
-				Params.FITINIT[2][7] 	= 	1e-6; 					//META 2 SUB 4
-				Params.FITINIT[3][4] 	= 	1e-6; 					//META 3 SUB 1
-				Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
-				Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
-				Params.FITINIT[3][7] 	= 	1e-6; 					//META 3 SUB 4
-				//INITR
-				Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
-				Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
-				Params.FITINIT[1][11] 	= 	0; 						//META 1 SUB 4
-				Params.FITINIT[5][8] 	= 	0; 						//META 5
-				//VIRUS DECAY
-				Params.muV				= 	0.4102453; 				//POP
-				//VIRUS HETERO		
-				Params.CV				= 	0.86; 					//POP
-				//VIRUS TRANS
-				Params.nuV    			= 	0.4607038; 				//POP
-				//FUNGUS TRANS
-				Params.specific_nuF		= 	0.000241071699421562; 	//POP
-
-				//--------PASS FIT PARAMS-------
-				Params.FITINIT[1][0] 	= 	new_params[0]; 			//META 1 SUB 1
-				Params.FITINIT[1][1] 	= 	new_params[0]; 			//META 1 SUB 2
-				Params.FITINIT[1][2] 	= 	new_params[0]; 			//META 1 SUB 3
-				Params.FITINIT[1][3] 	= 	new_params[0]; 			//META 1 SUB 4
-				Params.FITINIT[2][0] 	= 	new_params[0]; 			//META 2 SUB 1
-				Params.FITINIT[2][1] 	= 	new_params[0]; 			//META 2 SUB 2
-				Params.FITINIT[2][2] 	= 	new_params[0]; 			//META 2 SUB 3
-				Params.FITINIT[2][3] 	= 	new_params[0]; 			//META 2 SUB 4
-				Params.FITINIT[3][0] 	= 	new_params[0]; 			//META 3 SUB 1
-				Params.FITINIT[3][1] 	= 	new_params[0]; 			//META 3 SUB 2
-				Params.FITINIT[3][2] 	= 	new_params[0]; 			//META 3 SUB 3
-				Params.FITINIT[3][3] 	= 	new_params[0]; 			//META 3 SUB 4
-				//INITR
-				Params.r_pop 			= 	new_params[1];			//POP
-				Params.r_meta[1] 		= 	new_params[2];			//META 1
-				Params.r_meta[2] 		= 	new_params[3];			//META 2
-				Params.r_meta[3] 		=	new_params[4];			//META 3
-				Params.FITINIT[1][8] 	= 	new_params[5]; 			//META 1 SUB 1
-				Params.FITINIT[2][8] 	= 	new_params[6]; 			//META 2 SUB 1
-				Params.FITINIT[2][9] 	= 	new_params[7]; 			//META 2 SUB 2 
-				Params.FITINIT[2][10] 	= 	new_params[8]; 			//META 2 SUB 3
-				Params.FITINIT[2][11] 	= 	new_params[9]; 			//META 2 SUB 4
-				Params.FITINIT[3][8] 	= 	new_params[10]; 		//META 3 SUB 1
-				Params.FITINIT[3][9] 	= 	new_params[11]; 		//META 3 SUB 2
-				Params.FITINIT[3][10] 	= 	new_params[12]; 		//META 3 SUB 3
-				Params.FITINIT[3][11] 	= 	new_params[13]; 		//META 3 SUB 4
-				//RSTOCH
-				Params.R_stoch 			= 	new_params[18];			//POP
-				//FSTOCH
-				Params.F_stoch			= 	new_params[19];			//POP
-				//CONIDIA 1/AVG DIST DISP
-				Params.c_a_pop 			= 	new_params[20];			//POP
-				Params.c_a_meta[1] 		= 	new_params[21];			//META 1
-				Params.c_a_meta[2] 		= 	new_params[22];			//META 2
-				Params.c_a_meta[3] 		= 	new_params[23];			//META 3
-				Params.c_a_sub[1][0] 	= 	new_params[24]; 		//META 1 SUB 1
-				Params.c_a_sub[1][1] 	= 	new_params[25];			//META 1 SUB 2
-				Params.c_a_sub[1][2] 	= 	new_params[26];			//META 1 SUB 3
-				Params.c_a_sub[1][3] 	= 	new_params[27];			//META 1 SUB 4
-				Params.c_a_sub[2][0] 	= 	new_params[28]; 		//META 2 SUB 1
-				Params.c_a_sub[2][1] 	= 	new_params[29];			//META 2 SUB 2
-				Params.c_a_sub[2][2] 	= 	new_params[30];			//META 2 SUB 3
-				Params.c_a_sub[2][3] 	= 	new_params[31];			//META 2 SUB 4
-				Params.c_a_sub[3][0] 	= 	new_params[32]; 		//META 3 SUB 1
-				Params.c_a_sub[3][1] 	= 	new_params[33];			//META 3 SUB 2
-				Params.c_a_sub[3][2] 	= 	new_params[34];			//META 3 SUB 3
-				Params.c_a_sub[3][3] 	= 	new_params[35];			//META 3 SUB 4
-				//CONIDIA FRAC SUCCESSFUL DISP
-				Params.c_m_pop			= 	new_params[36]; 		//POP
-				Params.c_m_meta[1]		= 	new_params[37];			//META 1
-				Params.c_m_meta[2]		= 	new_params[38];			//META 2
-				Params.c_m_meta[3]		= 	new_params[39];			//META 3
-				Params.c_m_sub[1][0] 	= 	new_params[40];			//META 1 SUB 1
-				Params.c_m_sub[1][1] 	= 	new_params[41];			//META 1 SUB 2
-				Params.c_m_sub[1][2]	= 	new_params[42];			//META 1 SUB 3
-				Params.c_m_sub[1][3] 	= 	new_params[43];			//META 1 SUB 4
-				Params.c_m_sub[2][0] 	= 	new_params[44];			//META 2 SUB 1
-				Params.c_m_sub[2][1] 	= 	new_params[45];			//META 2 SUB 2
-				Params.c_m_sub[2][2] 	= 	new_params[46];			//META 2 SUB 3
-				Params.c_m_sub[2][3] 	= 	new_params[47];			//META 2 SUB 4
-				Params.c_m_sub[3][0] 	= 	new_params[48];			//META 3 SUB 1
-				Params.c_m_sub[3][1] 	= 	new_params[49];			//META 3 SUB 2
-				Params.c_m_sub[3][2] 	= 	new_params[50];			//META 3 SUB 3
-				Params.c_m_sub[3][3] 	= 	new_params[51];			//META 3 SUB 4
-				//LARVAE 1/AVG DIST DISP
-				//TEMP
-				Params.l_a_pop 			= 	new_params[52];			//POP
-				Params.l_a_meta[1] 		= 	new_params[53];			//META 1
-				Params.l_a_meta[2] 		= 	new_params[54];			//META 2
-				Params.l_a_meta[3] 		= 	new_params[55];			//META 3
-				Params.l_a_sub[1][0] 	= 	new_params[56];			//META 1 SUB 1
-				Params.l_a_sub[1][1] 	= 	new_params[57];			//META 1 SUB 2
-				Params.l_a_sub[1][2] 	= 	new_params[58];			//META 1 SUB 3
-				Params.l_a_sub[1][3] 	= 	new_params[59];			//META 1 SUB 4
-				Params.l_a_sub[2][0] 	=	new_params[60]; 		//META 2 SUB 1
-				Params.l_a_sub[2][1] 	= 	new_params[61];			//META 2 SUB 2
-				Params.l_a_sub[2][2] 	= 	new_params[62];			//META 2 SUB 3
-				Params.l_a_sub[2][3] 	= 	new_params[63];			//META 2 SUB 4
-				Params.l_a_sub[3][0] 	= 	new_params[64]; 		//META 3 SUB 1
-				Params.l_a_sub[3][1] 	= 	new_params[65];			//META 3 SUB 2
-				Params.l_a_sub[3][2] 	= 	new_params[66];			//META 3 SUB 3
-				Params.l_a_sub[3][3] 	= 	new_params[67];			//META 3 SUB 4
-				//LARVAE FRAC SUCCESSFUL DISP
-				Params.l_m_pop			= 	new_params[68]; 		//POP
-				Params.l_m_meta[1]		= 	new_params[69];			//META 1
-				Params.l_m_meta[2]		= 	new_params[70];			//META 2
-				Params.l_m_meta[3]		= 	new_params[71];			//META 3
-				Params.l_m_sub[1][0] 	= 	new_params[72];			//META 1 SUB 1
-				Params.l_m_sub[1][1] 	= 	new_params[73];			//META 1 SUB 2
-				Params.l_m_sub[1][2] 	= 	new_params[74];			//META 1 SUB 3
-				Params.l_m_sub[1][3] 	= 	new_params[75];			//META 1 SUB 4
-				Params.l_m_sub[2][0] 	= 	new_params[76];			//META 2 SUB 1
-				Params.l_m_sub[2][1] 	= 	new_params[77];			//META 2 SUB 2
-				Params.l_m_sub[2][2] 	= 	new_params[78];			//META 2 SUB 3
-				Params.l_m_sub[2][3] 	= 	new_params[79];			//META 2 SUB 4
-				Params.l_m_sub[3][0] 	= 	new_params[80];			//META 3 SUB 1
-				Params.l_m_sub[3][1] 	= 	new_params[81];			//META 3 SUB 2
-				Params.l_m_sub[3][2] 	= 	new_params[82];			//META 3 SUB 3
-				Params.l_m_sub[3][3] 	= 	new_params[83];			//META 3 SUB 4
-				//OBSERVATIONAL
-				Params.FITINIT[4][0] 	= 	new_params[84]; 		//META 4 INITS
-				Params.FITINIT[4][4] 	= 	new_params[85]; 		//META 4 INITV
-				Params.FITINIT[4][8] 	= 	new_params[86]; 		//META 4 INITR
-				Params.FITINIT[5][0] 	= 	new_params[87]; 		//META 5 INITS
-				Params.FITINIT[5][4] 	= 	new_params[88]; 		//META 5 INITV
-				Params.FITINIT[6][0] 	= 	new_params[89];	 		//META 6 INITS
-				Params.FITINIT[6][4] 	= 	new_params[90]; 		//META 6 INITV
-				Params.FITINIT[6][8] 	= 	new_params[91]; 		//META 6 INITR
-
-				//--------MISER CALUCLATE LIKELIHOOD-------
-				for (int j = 1; j <= 3; j++)
+				else
 				{
-					for(int i = 0; i < 10; i++)
-					{
-						Params.lhood_point[j][i] = 0.0;
-					}
+					log_prior_new = log(gsl_ran_flat_pdf(New_Params[a], param_bound(a, 1), (param_bound(a, 2) + param_bound(a, 1))));
+					log_prior_old = log(gsl_ran_flat_pdf(Old_Params[a], param_bound(a, 1), (param_bound(a, 2) + param_bound(a, 1))));
 				}
 
-				new_lhood_pop = 0;
-
-				for (int j = 1; j <= 3; j++)				
-				{
-					new_lhood_meta = new_lhood = meta_err = 0;
-
-					Params.j = j;
-
-					Params.miser_ticker = 1; Params.miser2_flag = 0; 
-
-					gsl_monte_function G = { &likelihood_calc, dim, &Params };	
-
-					double xl[dim];	double xu[dim];	
-					for (int jj = 0; jj < dim; jj++)	
-					{
-						xl[jj] = 0;	
-						xu[jj] = 1;
-					}
-
-					gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-					gsl_monte_miser_integrate (&G, xl, xu, dim, LScalls, r, s, &new_lhood, &meta_err); 		//call MISER
-					gsl_monte_miser_free(s);
-					
-					while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
-					{ 
-						Params.miser2_flag = 0;
-						Params.lhood_adjust[j] = -Params.bestlhood[j];
-						
-						gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
-						gsl_monte_miser_integrate (&G, xl, xu, dim, LScalls, r, s, &new_lhood, &meta_err); 
-						gsl_monte_miser_free(s);
-					}
-
-					new_lhood_meta = log(new_lhood) - Params.lhood_adjust[j];
-
-					if (isnan(new_lhood_meta) || isinf(new_lhood_meta))			//assign bad score to errors
-					{ 
-						new_lhood_meta = -99999;
-					}
-					
-					new_lhood_pop += new_lhood_meta;
-					//printf("new lhood pop = %lf\n", new_lhood_pop);
+				//printf("a = %i\t logprior new = %lf\t log prior old = %lf\n", a, log_prior_new, log_prior_old);
+				if (isinf(log_prior_new))
+				{ 
+					log_prior_new = -66666666666666;
 				}
-				//-----------AVERAGE DATA POINT LHOODS-----
-				for (int j = 1; j <= 3; j++)
+				if (isinf(log_prior_old))
 				{
-					for(int i = 0; i < 10; i++)
-					{
-						new_lhood_pointwise[j][i] = Params.lhood_point[j][i]/LScalls;
-					}
-				}
-				//------------CALCULATE AND ADD PRIOR----------
-				new_posterior = new_lprior = lprior = 0;
-
-				for (int k = 0; k < NUM_PARS; k++)
-				{
-					if (fit[k])
-					{
-						if (log_fit[k])
-						{ 
-							lprior = log(gsl_ran_flat_pdf(new_params[k], exp(ls_bound(model,k,1)), (exp(ls_bound(model,k,1)) + exp(ls_bound(model,k,2)))));
-							if (verbose) printf("new prior for param %i log value %lf = %lf\n", k, new_params[k], lprior);
-
-						} else {
-
-							lprior = log(gsl_ran_flat_pdf(new_params[k], ls_bound(model,k,1), (ls_bound(model,k,1) + ls_bound(model,k,2))));
-							if (verbose) printf("new prior for param %i value %lf = %lf\n", k, new_params[k], lprior);
-
-						}
-						if (isnan(lprior) || isinf(lprior)) 	//outside of bounds
-						{ 
-							lprior = -750;	//assign bad score
-						}
-						new_lprior += lprior;
-					}
+					log_prior_old = -66666666666666;
 				}
 
-				new_posterior = new_lhood_pop + new_lprior;
-				//printf("new post = %lf\n", new_posterior);
-
-				//------EVALUATE CRITERON-----
-				//printf("old post = %lf new prop adj = %lf new post = %lf old prop adj = %lf\n", old_posterior, new_prop_adj, new_posterior, old_prop_adj);
-				criterion = exp ( (old_posterior - new_prop_adj) - (new_posterior - old_prop_adj) );
-
-				rejection = gsl_rng_uniform(r);
-
-				if (verbose) printf("criterion %e\n", criterion);
-				if(redo)
-				{
-					if (criterion > rejection || !check_last_par || accept_hall_pass)
-					{
-						if (verbose) printf("replacing the accepted score of %e with %e\n", old_posterior, new_posterior);
-
-						if (check_last_par)
-						{
-							old_pca[a] = pca[a];
-
-							for (k = 0; k < NUM_PARS; k++)
-							{
-								if (fit[k])
-								{
-									old_params[k] = new_params[k];
-								}
-							}
-
-							accept++;
-							var_scale = 1.0;
-						}
-						for (int j = 1; j <= 3; j++)
-						{
-							for(int i = 0; i < 10; i++)
-							{
-								old_lhood_pointwise[j][i] = new_lhood_pointwise[j][i];
-							}
-						}
-						//printf("accept second time! old post = %lf new post = %lf\n", old_posterior, new_posterior);
-						//printf("accept second time! old lhood = %lf new lhood = %lf\n", old_lhood_pop, new_lhood_pop);
-						old_posterior = new_posterior;
-						old_lhood_pop = new_lhood_pop;
-
-					} else {
-						if (verbose) printf("rejecting par %d on reconsideration\n", a);
-						pca[a] = old_pca[a];
-					}
-
-					redo = 0;
-					accept_hall_pass = 0;
-
-				} else if (criterion > rejection)
-				{
-					if (verbose) printf("Cautiously considering PC %d of value %e, going for posterior recalculation\n", a, pca[a]);
-
-					//printf("accept first time! old post = %lf new post = %lf\n", old_posterior, new_posterior);
-					//printf("accept first time! old lhood = %lf new lhood = %lf\n", old_lhood_pop, new_lhood_pop);
-
-					if (criterion < 1)
-					{
-						accept_hall_pass = 1;
-						if (verbose) printf("Special persmission since poseterior was accepted under uniform prob with criterion %e and was not exceedingly good\n", criterion);
-					}
-
-					redo = 1;
-					a--;
-
-				} else {
-
-					if (verbose) printf("rejecting par %d\n", a);
-					pca[a] = old_pca[a];
-				}
-			} 
-
-			if (a == (NUM_PARS - 1) && check_last_par)
-			{
-				redo = 1;
-				a = recent_a - 1;
-				check_last_par = 0;
-				if (verbose) printf("Final check on par %d, redo-ing lhood and posterior to avoid winner's curse\n", NUM_PARS - 1);
+				log_prior_OLD = log_prior_OLD + log_prior_old;
+				log_prior_NEW = log_prior_NEW + log_prior_new;
 			}
+		}
+		if (verbose) printf("log prior old = %lf log prior new = %lf\n", log_prior_OLD, log_prior_NEW);
 
-		}//a
+		//-------METROPOLIS SAMPLING STEP--------
+		LogJumpToNew = -log(gsl_ran_gaussian_pdf(New_PC[Case], sigma[Case])); 
+		LogJumpToOld = -log(gsl_ran_gaussian_pdf(Old_PC[Case], sigma[Case]));
 
-		if (j_iter % thin == 0)
+		//------CALCULATE LIKELIHOOD NEW---
+		//--------PASS FIXED PARAMS-------
+		//INITV
+		Params.FITINIT[1][4] 	= 	1e-6; 					//META 1 SUB 1
+		Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
+		Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
+		Params.FITINIT[1][7] 	= 	1e-6; 					//META 1 SUB 4
+		Params.FITINIT[2][4] 	= 	1e-6; 					//META 2 SUB 1
+		Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
+		Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
+		Params.FITINIT[2][7] 	= 	1e-6; 					//META 2 SUB 4
+		Params.FITINIT[3][4] 	= 	1e-6; 					//META 3 SUB 1
+		Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
+		Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
+		Params.FITINIT[3][7] 	= 	1e-6; 					//META 3 SUB 4
+		//INITR
+		Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
+		Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
+		Params.FITINIT[1][11] 	= 	0; 						//META 1 SUB 4
+		Params.FITINIT[5][8] 	= 	0; 						//META 5
+		//VIRUS DECAY
+		Params.muV				= 	0.4102453; 				//POP
+		//VIRUS HETERO		
+		Params.CV				= 	0.86; 					//POP
+		//VIRUS TRANS
+		Params.nuV    			= 	0.4607038; 				//POP
+		//FUNGUS TRANS
+		Params.specific_nuF		= 	0.000241071699421562; 	//POP
+
+		//--------PASS FIT PARAMS-------
+		Params.FITINIT[1][0] 	= 	New_Params[0]; 			//META 1 SUB 1
+		Params.FITINIT[1][1] 	= 	New_Params[0]; 			//META 1 SUB 2
+		Params.FITINIT[1][2] 	= 	New_Params[0]; 			//META 1 SUB 3
+		Params.FITINIT[1][3] 	= 	New_Params[0]; 			//META 1 SUB 4
+		Params.FITINIT[2][0] 	= 	New_Params[0]; 			//META 2 SUB 1
+		Params.FITINIT[2][1] 	= 	New_Params[0]; 			//META 2 SUB 2
+		Params.FITINIT[2][2] 	= 	New_Params[0]; 			//META 2 SUB 3
+		Params.FITINIT[2][3] 	= 	New_Params[0]; 			//META 2 SUB 4
+		Params.FITINIT[3][0] 	= 	New_Params[0]; 			//META 3 SUB 1
+		Params.FITINIT[3][1] 	= 	New_Params[0]; 			//META 3 SUB 2
+		Params.FITINIT[3][2] 	= 	New_Params[0]; 			//META 3 SUB 3
+		Params.FITINIT[3][3] 	= 	New_Params[0]; 			//META 3 SUB 4
+		//INITR
+		Params.r_pop 			= 	New_Params[1];			//POP
+		Params.r_meta[1] 		= 	New_Params[2];			//META 1
+		Params.r_meta[2] 		= 	New_Params[3];			//META 2
+		Params.r_meta[3] 		=	New_Params[4];			//META 3
+		Params.FITINIT[1][8] 	= 	New_Params[5]; 			//META 1 SUB 1
+		Params.FITINIT[2][8] 	= 	New_Params[6]; 			//META 2 SUB 1
+		Params.FITINIT[2][9] 	= 	New_Params[7]; 			//META 2 SUB 2 
+		Params.FITINIT[2][10] 	= 	New_Params[8]; 			//META 2 SUB 3
+		Params.FITINIT[2][11] 	= 	New_Params[9]; 			//META 2 SUB 4
+		Params.FITINIT[3][8] 	= 	New_Params[10]; 		//META 3 SUB 1
+		Params.FITINIT[3][9] 	= 	New_Params[11]; 		//META 3 SUB 2
+		Params.FITINIT[3][10] 	= 	New_Params[12]; 		//META 3 SUB 3
+		Params.FITINIT[3][11] 	= 	New_Params[13]; 		//META 3 SUB 4
+		//RSTOCH
+		Params.R_stoch 			= 	New_Params[18];			//POP
+		//FSTOCH
+		Params.F_stoch			= 	New_Params[19];			//POP
+		//CONIDIA 1/AVG DIST DISP
+		Params.c_a_pop 			= 	New_Params[20];			//POP
+		Params.c_a_meta[1] 		= 	New_Params[21];			//META 1
+		Params.c_a_meta[2] 		= 	New_Params[22];			//META 2
+		Params.c_a_meta[3] 		= 	New_Params[23];			//META 3
+		Params.c_a_sub[1][0] 	= 	New_Params[24]; 		//META 1 SUB 1
+		Params.c_a_sub[1][1] 	= 	New_Params[25];			//META 1 SUB 2
+		Params.c_a_sub[1][2] 	= 	New_Params[26];			//META 1 SUB 3
+		Params.c_a_sub[1][3] 	= 	New_Params[27];			//META 1 SUB 4
+		Params.c_a_sub[2][0] 	= 	New_Params[28]; 		//META 2 SUB 1
+		Params.c_a_sub[2][1] 	= 	New_Params[29];			//META 2 SUB 2
+		Params.c_a_sub[2][2] 	= 	New_Params[30];			//META 2 SUB 3
+		Params.c_a_sub[2][3] 	= 	New_Params[31];			//META 2 SUB 4
+		Params.c_a_sub[3][0] 	= 	New_Params[32]; 		//META 3 SUB 1
+		Params.c_a_sub[3][1] 	= 	New_Params[33];			//META 3 SUB 2
+		Params.c_a_sub[3][2] 	= 	New_Params[34];			//META 3 SUB 3
+		Params.c_a_sub[3][3] 	= 	New_Params[35];			//META 3 SUB 4
+		//CONIDIA FRAC SUCCESSFUL DISP
+		Params.c_m_pop			= 	New_Params[36]; 		//POP
+		Params.c_m_meta[1]		= 	New_Params[37];			//META 1
+		Params.c_m_meta[2]		= 	New_Params[38];			//META 2
+		Params.c_m_meta[3]		= 	New_Params[39];			//META 3
+		Params.c_m_sub[1][0] 	= 	New_Params[40];			//META 1 SUB 1
+		Params.c_m_sub[1][1] 	= 	New_Params[41];			//META 1 SUB 2
+		Params.c_m_sub[1][2]	= 	New_Params[42];			//META 1 SUB 3
+		Params.c_m_sub[1][3] 	= 	New_Params[43];			//META 1 SUB 4
+		Params.c_m_sub[2][0] 	= 	New_Params[44];			//META 2 SUB 1
+		Params.c_m_sub[2][1] 	= 	New_Params[45];			//META 2 SUB 2
+		Params.c_m_sub[2][2] 	= 	New_Params[46];			//META 2 SUB 3
+		Params.c_m_sub[2][3] 	= 	New_Params[47];			//META 2 SUB 4
+		Params.c_m_sub[3][0] 	= 	New_Params[48];			//META 3 SUB 1
+		Params.c_m_sub[3][1] 	= 	New_Params[49];			//META 3 SUB 2
+		Params.c_m_sub[3][2] 	= 	New_Params[50];			//META 3 SUB 3
+		Params.c_m_sub[3][3] 	= 	New_Params[51];			//META 3 SUB 4
+		//LARVAE 1/AVG DIST DISP
+		//TEMP
+		Params.l_a_pop 			= 	New_Params[52];			//POP
+		Params.l_a_meta[1] 		= 	New_Params[53];			//META 1
+		Params.l_a_meta[2] 		= 	New_Params[54];			//META 2
+		Params.l_a_meta[3] 		= 	New_Params[55];			//META 3
+		Params.l_a_sub[1][0] 	= 	New_Params[56];			//META 1 SUB 1
+		Params.l_a_sub[1][1] 	= 	New_Params[57];			//META 1 SUB 2
+		Params.l_a_sub[1][2] 	= 	New_Params[58];			//META 1 SUB 3
+		Params.l_a_sub[1][3] 	= 	New_Params[59];			//META 1 SUB 4
+		Params.l_a_sub[2][0] 	=	New_Params[60]; 		//META 2 SUB 1
+		Params.l_a_sub[2][1] 	= 	New_Params[61];			//META 2 SUB 2
+		Params.l_a_sub[2][2] 	= 	New_Params[62];			//META 2 SUB 3
+		Params.l_a_sub[2][3] 	= 	New_Params[63];			//META 2 SUB 4
+		Params.l_a_sub[3][0] 	= 	New_Params[64]; 		//META 3 SUB 1
+		Params.l_a_sub[3][1] 	= 	New_Params[65];			//META 3 SUB 2
+		Params.l_a_sub[3][2] 	= 	New_Params[66];			//META 3 SUB 3
+		Params.l_a_sub[3][3] 	= 	New_Params[67];			//META 3 SUB 4
+		//LARVAE FRAC SUCCESSFUL DISP
+		Params.l_m_pop			= 	New_Params[68]; 		//POP
+		Params.l_m_meta[1]		= 	New_Params[69];			//META 1
+		Params.l_m_meta[2]		= 	New_Params[70];			//META 2
+		Params.l_m_meta[3]		= 	New_Params[71];			//META 3
+		Params.l_m_sub[1][0] 	= 	New_Params[72];			//META 1 SUB 1
+		Params.l_m_sub[1][1] 	= 	New_Params[73];			//META 1 SUB 2
+		Params.l_m_sub[1][2] 	= 	New_Params[74];			//META 1 SUB 3
+		Params.l_m_sub[1][3] 	= 	New_Params[75];			//META 1 SUB 4
+		Params.l_m_sub[2][0] 	= 	New_Params[76];			//META 2 SUB 1
+		Params.l_m_sub[2][1] 	= 	New_Params[77];			//META 2 SUB 2
+		Params.l_m_sub[2][2] 	= 	New_Params[78];			//META 2 SUB 3
+		Params.l_m_sub[2][3] 	= 	New_Params[79];			//META 2 SUB 4
+		Params.l_m_sub[3][0] 	= 	New_Params[80];			//META 3 SUB 1
+		Params.l_m_sub[3][1] 	= 	New_Params[81];			//META 3 SUB 2
+		Params.l_m_sub[3][2] 	= 	New_Params[82];			//META 3 SUB 3
+		Params.l_m_sub[3][3] 	= 	New_Params[83];			//META 3 SUB 4
+		//OBSERVATIONAL
+		Params.FITINIT[4][0] 	= 	New_Params[84]; 		//META 4 INITS
+		Params.FITINIT[4][4] 	= 	New_Params[85]; 		//META 4 INITV
+		Params.FITINIT[4][8] 	= 	New_Params[86]; 		//META 4 INITR
+		Params.FITINIT[5][0] 	= 	New_Params[87]; 		//META 5 INITS
+		Params.FITINIT[5][4] 	= 	New_Params[88]; 		//META 5 INITV
+		Params.FITINIT[6][0] 	= 	New_Params[89];	 		//META 6 INITS
+		Params.FITINIT[6][4] 	= 	New_Params[90]; 		//META 6 INITV
+		Params.FITINIT[6][8] 	= 	New_Params[91]; 		//META 6 INITR
+
+		//--------MISER CALUCLATE LIKELIHOOD-------
+		for (int j = 1; j <= 3; j++)
 		{
-			fprintf(fpm, "%d ", j_iter);
-
-			if (verbose) printf("ITN %d, %ld, ", j_iter, seed);
-
-			for (b = 0; b < NUM_PARS; b ++)
+			for(int i = 0; i < 10; i++)
 			{
-				if (fit[b]) fprintf(fpm, "%lf ", log(old_params[b]));
-				
-				if (fit[b] && verbose) printf("%lf ", old_params[b]);
+				Params.lhood_point[j][i] = 0.0;
+			}
+		}
+
+		lhood_meta = 0; log_lhood_meta = 0; total_loghood_metas_NEW = 0;
+		meta_err = 0;
+
+		for (int j = 1; j <= 3; j++)				
+		{
+			Params.j = j;
+
+			Params.miser_ticker = 1; Params.miser2_flag = 0; 
+
+			gsl_monte_function G = { &likelihood_calc, dim, &Params };	
+
+			double xl[dim];	double xu[dim];	
+			for (int jj = 0; jj < dim; jj++)	
+			{
+				xl[jj] = 0;	
+				xu[jj] = 1;
 			}
 
-			fprintf(fpm, "%lf %lf %i ", old_posterior, old_lhood_pop, accept);
+			gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+			gsl_monte_miser_integrate (&G, xl, xu, dim, Mcalls, r, s, &lhood_meta, &meta_err); 		//call MISER
+			gsl_monte_miser_free(s);
+			
+			while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
+			{ 
+				Params.miser2_flag = 0;
+				Params.lhood_adjust[j] = -Params.bestlhood[j];
+				
+				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+				gsl_monte_miser_integrate (&G, xl, xu, dim, Mcalls, r, s, &lhood_meta, &meta_err); 
+				gsl_monte_miser_free(s);
+			}
 
-			if (verbose) printf("%lf %lf %lf %lf\n", old_posterior, old_lhood_pop, new_posterior, new_lhood_pop);
-			//printf("%lf %lf %lf %lf\n", old_posterior, old_lhood_pop, new_posterior, new_lhood_pop);
+			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
 
+			if (isnan(log_lhood_meta) || isinf(log_lhood_meta))
+			{ 
+				log_lhood_meta = -100000000000000;
+			}
+
+			total_loghood_metas_NEW = total_loghood_metas_NEW + log_lhood_meta;
+			LogNewPosterior = 0.0;
+			LogNewPosterior = total_loghood_metas_NEW + log_prior_NEW;
+		}
+		if (verbose) printf("loghood NEW = %lf posterior NEW = %lf\n", total_loghood_metas_NEW, LogNewPosterior);
+		
+		//-----------AVERAGE DATA POINT LHOODS-----
+		for (int j = 1; j <= 3; j++)
+		{
+			for(int i = 0; i < 10; i++)
+			{
+				new_lhood_pointwise[j][i] = Params.lhood_point[j][i]/Mcalls;
+			}
+		}
+		//------CALCULATE LIKELIHOOD OLD------
+		//--------PASS FIXED PARAMS-------
+		//INITV
+		Params.FITINIT[1][4] 	= 	1e-6; 					//META 1 SUB 1
+		Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
+		Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
+		Params.FITINIT[1][7] 	= 	1e-6; 					//META 1 SUB 4
+		Params.FITINIT[2][4] 	= 	1e-6; 					//META 2 SUB 1
+		Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
+		Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
+		Params.FITINIT[2][7] 	= 	1e-6; 					//META 2 SUB 4
+		Params.FITINIT[3][4] 	= 	1e-6; 					//META 3 SUB 1
+		Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
+		Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
+		Params.FITINIT[3][7] 	= 	1e-6; 					//META 3 SUB 4
+		//INITR
+		Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
+		Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
+		Params.FITINIT[1][11] 	= 	0; 						//META 1 SUB 4
+		Params.FITINIT[5][8] 	= 	0; 						//META 5
+		//VIRUS DECAY
+		Params.muV				= 	0.4102453; 				//POP
+		//VIRUS HETERO		
+		Params.CV				= 	0.86; 					//POP
+		//VIRUS TRANS
+		Params.nuV    			= 	0.4607038; 				//POP
+		//FUNGUS TRANS
+		Params.specific_nuF		= 	0.000241071699421562; 	//POP
+
+		//--------PASS FIT PARAMS-------
+		Params.FITINIT[1][0] 	= 	Old_Params[0]; 			//META 1 SUB 1
+		Params.FITINIT[1][1] 	= 	Old_Params[0]; 			//META 1 SUB 2
+		Params.FITINIT[1][2] 	= 	Old_Params[0]; 			//META 1 SUB 3
+		Params.FITINIT[1][3] 	= 	Old_Params[0]; 			//META 1 SUB 4
+		Params.FITINIT[2][0] 	= 	Old_Params[0]; 			//META 2 SUB 1
+		Params.FITINIT[2][1] 	= 	Old_Params[0]; 			//META 2 SUB 2
+		Params.FITINIT[2][2] 	= 	Old_Params[0]; 			//META 2 SUB 3
+		Params.FITINIT[2][3] 	= 	Old_Params[0]; 			//META 2 SUB 4
+		Params.FITINIT[3][0] 	= 	Old_Params[0]; 			//META 3 SUB 1
+		Params.FITINIT[3][1] 	= 	Old_Params[0]; 			//META 3 SUB 2
+		Params.FITINIT[3][2] 	= 	Old_Params[0]; 			//META 3 SUB 3
+		Params.FITINIT[3][3] 	= 	Old_Params[0]; 			//META 3 SUB 4
+		//INITR
+		Params.r_pop 			= 	Old_Params[1];			//POP
+		Params.r_meta[1] 		= 	Old_Params[2];			//META 1
+		Params.r_meta[2] 		= 	Old_Params[3];			//META 2
+		Params.r_meta[3] 		=	Old_Params[4];			//META 3
+		Params.FITINIT[1][8] 	= 	Old_Params[5]; 			//META 1 SUB 1
+		Params.FITINIT[2][8] 	= 	Old_Params[6]; 			//META 2 SUB 1
+		Params.FITINIT[2][9] 	= 	Old_Params[7]; 			//META 2 SUB 2 
+		Params.FITINIT[2][10] 	= 	Old_Params[8]; 			//META 2 SUB 3
+		Params.FITINIT[2][11] 	= 	Old_Params[9]; 			//META 2 SUB 4
+		Params.FITINIT[3][8] 	= 	Old_Params[10]; 		//META 3 SUB 1
+		Params.FITINIT[3][9] 	= 	Old_Params[11]; 		//META 3 SUB 2
+		Params.FITINIT[3][10] 	= 	Old_Params[12]; 		//META 3 SUB 3
+		Params.FITINIT[3][11] 	= 	Old_Params[13]; 		//META 3 SUB 4
+		//RSTOCH
+		Params.R_stoch 			= 	Old_Params[18];			//POP
+		//FSTOCH
+		Params.F_stoch			= 	Old_Params[19];			//POP
+		//CONIDIA 1/AVG DIST DISP
+		Params.c_a_pop 			= 	Old_Params[20];			//POP
+		Params.c_a_meta[1] 		= 	Old_Params[21];			//META 1
+		Params.c_a_meta[2] 		= 	Old_Params[22];			//META 2
+		Params.c_a_meta[3] 		= 	Old_Params[23];			//META 3
+		Params.c_a_sub[1][0] 	= 	Old_Params[24]; 		//META 1 SUB 1
+		Params.c_a_sub[1][1] 	= 	Old_Params[25];			//META 1 SUB 2
+		Params.c_a_sub[1][2] 	= 	Old_Params[26];			//META 1 SUB 3
+		Params.c_a_sub[1][3] 	= 	Old_Params[27];			//META 1 SUB 4
+		Params.c_a_sub[2][0] 	= 	Old_Params[28]; 		//META 2 SUB 1
+		Params.c_a_sub[2][1] 	= 	Old_Params[29];			//META 2 SUB 2
+		Params.c_a_sub[2][2] 	= 	Old_Params[30];			//META 2 SUB 3
+		Params.c_a_sub[2][3] 	= 	Old_Params[31];			//META 2 SUB 4
+		Params.c_a_sub[3][0] 	= 	Old_Params[32]; 		//META 3 SUB 1
+		Params.c_a_sub[3][1] 	= 	Old_Params[33];			//META 3 SUB 2
+		Params.c_a_sub[3][2] 	= 	Old_Params[34];			//META 3 SUB 3
+		Params.c_a_sub[3][3] 	= 	Old_Params[35];			//META 3 SUB 4
+		//CONIDIA FRAC SUCCESSFUL DISP
+		Params.c_m_pop			= 	Old_Params[36]; 		//POP
+		Params.c_m_meta[1]		= 	Old_Params[37];			//META 1
+		Params.c_m_meta[2]		= 	Old_Params[38];			//META 2
+		Params.c_m_meta[3]		= 	Old_Params[39];			//META 3
+		Params.c_m_sub[1][0] 	= 	Old_Params[40];			//META 1 SUB 1
+		Params.c_m_sub[1][1] 	= 	Old_Params[41];			//META 1 SUB 2
+		Params.c_m_sub[1][2]	= 	Old_Params[42];			//META 1 SUB 3
+		Params.c_m_sub[1][3] 	= 	Old_Params[43];			//META 1 SUB 4
+		Params.c_m_sub[2][0] 	= 	Old_Params[44];			//META 2 SUB 1
+		Params.c_m_sub[2][1] 	= 	Old_Params[45];			//META 2 SUB 2
+		Params.c_m_sub[2][2] 	= 	Old_Params[46];			//META 2 SUB 3
+		Params.c_m_sub[2][3] 	= 	Old_Params[47];			//META 2 SUB 4
+		Params.c_m_sub[3][0] 	= 	Old_Params[48];			//META 3 SUB 1
+		Params.c_m_sub[3][1] 	= 	Old_Params[49];			//META 3 SUB 2
+		Params.c_m_sub[3][2] 	= 	Old_Params[50];			//META 3 SUB 3
+		Params.c_m_sub[3][3] 	= 	Old_Params[51];			//META 3 SUB 4
+		//LARVAE 1/AVG DIST DISP
+		//TEMP
+		Params.l_a_pop 			= 	Old_Params[52];			//POP
+		Params.l_a_meta[1] 		= 	Old_Params[53];			//META 1
+		Params.l_a_meta[2] 		= 	Old_Params[54];			//META 2
+		Params.l_a_meta[3] 		= 	Old_Params[55];			//META 3
+		Params.l_a_sub[1][0] 	= 	Old_Params[56];			//META 1 SUB 1
+		Params.l_a_sub[1][1] 	= 	Old_Params[57];			//META 1 SUB 2
+		Params.l_a_sub[1][2] 	= 	Old_Params[58];			//META 1 SUB 3
+		Params.l_a_sub[1][3] 	= 	Old_Params[59];			//META 1 SUB 4
+		Params.l_a_sub[2][0] 	=	Old_Params[60]; 		//META 2 SUB 1
+		Params.l_a_sub[2][1] 	= 	Old_Params[61];			//META 2 SUB 2
+		Params.l_a_sub[2][2] 	= 	Old_Params[62];			//META 2 SUB 3
+		Params.l_a_sub[2][3] 	= 	Old_Params[63];			//META 2 SUB 4
+		Params.l_a_sub[3][0] 	= 	Old_Params[64]; 		//META 3 SUB 1
+		Params.l_a_sub[3][1] 	= 	Old_Params[65];			//META 3 SUB 2
+		Params.l_a_sub[3][2] 	= 	Old_Params[66];			//META 3 SUB 3
+		Params.l_a_sub[3][3] 	= 	Old_Params[67];			//META 3 SUB 4
+		//LARVAE FRAC SUCCESSFUL DISP
+		Params.l_m_pop			= 	Old_Params[68]; 		//POP
+		Params.l_m_meta[1]		= 	Old_Params[69];			//META 1
+		Params.l_m_meta[2]		= 	Old_Params[70];			//META 2
+		Params.l_m_meta[3]		= 	Old_Params[71];			//META 3
+		Params.l_m_sub[1][0] 	= 	Old_Params[72];			//META 1 SUB 1
+		Params.l_m_sub[1][1] 	= 	Old_Params[73];			//META 1 SUB 2
+		Params.l_m_sub[1][2] 	= 	Old_Params[74];			//META 1 SUB 3
+		Params.l_m_sub[1][3] 	= 	Old_Params[75];			//META 1 SUB 4
+		Params.l_m_sub[2][0] 	= 	Old_Params[76];			//META 2 SUB 1
+		Params.l_m_sub[2][1] 	= 	Old_Params[77];			//META 2 SUB 2
+		Params.l_m_sub[2][2] 	= 	Old_Params[78];			//META 2 SUB 3
+		Params.l_m_sub[2][3] 	= 	Old_Params[79];			//META 2 SUB 4
+		Params.l_m_sub[3][0] 	= 	Old_Params[80];			//META 3 SUB 1
+		Params.l_m_sub[3][1] 	= 	Old_Params[81];			//META 3 SUB 2
+		Params.l_m_sub[3][2] 	= 	Old_Params[82];			//META 3 SUB 3
+		Params.l_m_sub[3][3] 	= 	Old_Params[83];			//META 3 SUB 4
+		//OBSERVATIONAL
+		Params.FITINIT[4][0] 	= 	Old_Params[84]; 		//META 4 INITS
+		Params.FITINIT[4][4] 	= 	Old_Params[85]; 		//META 4 INITV
+		Params.FITINIT[4][8] 	= 	Old_Params[86]; 		//META 4 INITR
+		Params.FITINIT[5][0] 	= 	Old_Params[87]; 		//META 5 INITS
+		Params.FITINIT[5][4] 	= 	Old_Params[88]; 		//META 5 INITV
+		Params.FITINIT[6][0] 	= 	Old_Params[89];	 		//META 6 INITS
+		Params.FITINIT[6][4] 	= 	Old_Params[90]; 		//META 6 INITV
+		Params.FITINIT[6][8] 	= 	Old_Params[91]; 		//META 6 INITR
+
+		//--------MISER CALUCLATE LIKELIHOOD-------
+		for (int j = 1; j <= 3; j++)
+		{
+			for(int i = 0; i < 10; i++)
+			{
+				Params.lhood_point[j][i] = 0.0;
+			}
+		}
+
+		lhood_meta = 0; log_lhood_meta = 0; total_loghood_metas_OLD = 0;
+		meta_err = 0;
+
+		for (int j = 1; j <= 3; j++)				
+		{
+			Params.j = j;
+
+			Params.miser_ticker = 1; Params.miser2_flag = 0; 
+
+			gsl_monte_function G = { &likelihood_calc, dim, &Params };	
+
+			double xl[dim];	double xu[dim];	
+			for (int jj = 0; jj < dim; jj++)	
+			{
+				xl[jj] = 0;	
+				xu[jj] = 1;
+			}
+
+			gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+			gsl_monte_miser_integrate (&G, xl, xu, dim, Mcalls, r, s, &lhood_meta, &meta_err); 		//call MISER
+			gsl_monte_miser_free(s);
+			
+			while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
+			{ 
+				Params.miser2_flag = 0;
+				Params.lhood_adjust[j] = -Params.bestlhood[j];
+				
+				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+				gsl_monte_miser_integrate (&G, xl, xu, dim, Mcalls, r, s, &lhood_meta, &meta_err); 
+				gsl_monte_miser_free(s);
+			}
+
+			log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
+
+			if (isnan(log_lhood_meta) || isinf(log_lhood_meta))
+			{ 
+				log_lhood_meta = -100000000000000;
+			}
+
+			total_loghood_metas_OLD = total_loghood_metas_OLD + log_lhood_meta;
+			LogOldPosterior = 0.0;
+			LogOldPosterior = total_loghood_metas_OLD + log_prior_OLD;
+		}
+		if (verbose) printf("loghood OLD = %lf posterior OLD = %lf\n", total_loghood_metas_OLD, LogOldPosterior);
+		
+		//-----------AVERAGE DATA POINT LHOODS-----
+		for (int j = 1; j <= 3; j++)
+		{
+			for(int i = 0; i < 10; i++)
+			{
+				old_lhood_pointwise[j][i] = Params.lhood_point[j][i]/Mcalls;
+			}
+		}
+
+		if (LogOldPosterior > -1000000)
+		{ 
+			PreviousLogOldPosterior = LogOldPosterior;
+		}
+		if (LogOldPosterior < -10000000 & LoopNumber > 10)
+		{
+			printf("BUM POSTERIOR! assigning previous old \n");
+			//getc(stdin);
+			//printf("log old posterior = %lf\n", LogOldPosterior);
+			LogOldPosterior = PreviousLogOldPosterior; //wash due to weird stochasticity, assign previous value
+			//printf("previous old = %lf\n", PreviousLogOldPosterior);
+			//getc(stdin);
+		}
+		//printf("log old posterior = %lf\n", LogOldPosterior);
+		
+		//--------EVALUTE NEW VERSUS OLD-------
+		ProbOfAcceptance = exp((LogNewPosterior + LogJumpToOld) - (LogOldPosterior - LogJumpToNew));   
+
+		if (verbose) printf("prob of acceptance first pass = %lf\n", ProbOfAcceptance);
+
+		//if (isinf(ProbOfAcceptance))
+		//{
+		//	ProbOfAcceptance=1;
+		//	printf("")
+		//}
+		Attempt = Attempt + 1;
+
+		//--------IF NEW IS BETTER THAN OLD-------
+		if (ProbOfAcceptance>1 || gsl_rng_uniform_pos (r) < ProbOfAcceptance)
+		{ 
+			if (verbose) printf("Accepted first pass. Recalculating new to avoid winner's curse.\n");
+			//------RECALCULATE NEW------
+			//INITV
+			Params.FITINIT[1][4] 	= 	1e-6; 					//META 1 SUB 1
+			Params.FITINIT[1][5] 	= 	0.2; 					//META 1 SUB 2
+			Params.FITINIT[1][6] 	= 	0.2;					//META 1 SUB 3
+			Params.FITINIT[1][7] 	= 	1e-6; 					//META 1 SUB 4
+			Params.FITINIT[2][4] 	= 	1e-6; 					//META 2 SUB 1
+			Params.FITINIT[2][5] 	= 	0.2; 					//META 2 SUB 2
+			Params.FITINIT[2][6] 	= 	0.2; 					//META 2 SUB 3
+			Params.FITINIT[2][7] 	= 	1e-6; 					//META 2 SUB 4
+			Params.FITINIT[3][4] 	= 	1e-6; 					//META 3 SUB 1
+			Params.FITINIT[3][5] 	= 	0.2; 					//META 3 SUB 2
+			Params.FITINIT[3][6] 	= 	0.2; 					//META 3 SUB 3
+			Params.FITINIT[3][7] 	= 	1e-6; 					//META 3 SUB 4
+			//INITR
+			Params.FITINIT[1][9] 	= 	0; 						//META 1 SUB 2
+			Params.FITINIT[1][10] 	= 	0; 						//META 1 SUB 3
+			Params.FITINIT[1][11] 	= 	0; 						//META 1 SUB 4
+			Params.FITINIT[5][8] 	= 	0; 						//META 5
+			//VIRUS DECAY
+			Params.muV				= 	0.4102453; 				//POP
+			//VIRUS HETERO		
+			Params.CV				= 	0.86; 					//POP
+			//VIRUS TRANS
+			Params.nuV    			= 	0.4607038; 				//POP
+			//FUNGUS TRANS
+			Params.specific_nuF		= 	0.000241071699421562; 	//POP
+
+			//--------PASS FIT PARAMS-------
+			Params.FITINIT[1][0] 	= 	New_Params[0]; 			//META 1 SUB 1
+			Params.FITINIT[1][1] 	= 	New_Params[0]; 			//META 1 SUB 2
+			Params.FITINIT[1][2] 	= 	New_Params[0]; 			//META 1 SUB 3
+			Params.FITINIT[1][3] 	= 	New_Params[0]; 			//META 1 SUB 4
+			Params.FITINIT[2][0] 	= 	New_Params[0]; 			//META 2 SUB 1
+			Params.FITINIT[2][1] 	= 	New_Params[0]; 			//META 2 SUB 2
+			Params.FITINIT[2][2] 	= 	New_Params[0]; 			//META 2 SUB 3
+			Params.FITINIT[2][3] 	= 	New_Params[0]; 			//META 2 SUB 4
+			Params.FITINIT[3][0] 	= 	New_Params[0]; 			//META 3 SUB 1
+			Params.FITINIT[3][1] 	= 	New_Params[0]; 			//META 3 SUB 2
+			Params.FITINIT[3][2] 	= 	New_Params[0]; 			//META 3 SUB 3
+			Params.FITINIT[3][3] 	= 	New_Params[0]; 			//META 3 SUB 4
+			//INITR
+			Params.r_pop 			= 	New_Params[1];			//POP
+			Params.r_meta[1] 		= 	New_Params[2];			//META 1
+			Params.r_meta[2] 		= 	New_Params[3];			//META 2
+			Params.r_meta[3] 		=	New_Params[4];			//META 3
+			Params.FITINIT[1][8] 	= 	New_Params[5]; 			//META 1 SUB 1
+			Params.FITINIT[2][8] 	= 	New_Params[6]; 			//META 2 SUB 1
+			Params.FITINIT[2][9] 	= 	New_Params[7]; 			//META 2 SUB 2 
+			Params.FITINIT[2][10] 	= 	New_Params[8]; 			//META 2 SUB 3
+			Params.FITINIT[2][11] 	= 	New_Params[9]; 			//META 2 SUB 4
+			Params.FITINIT[3][8] 	= 	New_Params[10]; 		//META 3 SUB 1
+			Params.FITINIT[3][9] 	= 	New_Params[11]; 		//META 3 SUB 2
+			Params.FITINIT[3][10] 	= 	New_Params[12]; 		//META 3 SUB 3
+			Params.FITINIT[3][11] 	= 	New_Params[13]; 		//META 3 SUB 4
+			//RSTOCH
+			Params.R_stoch 			= 	New_Params[18];			//POP
+			//FSTOCH
+			Params.F_stoch			= 	New_Params[19];			//POP
+			//CONIDIA 1/AVG DIST DISP
+			Params.c_a_pop 			= 	New_Params[20];			//POP
+			Params.c_a_meta[1] 		= 	New_Params[21];			//META 1
+			Params.c_a_meta[2] 		= 	New_Params[22];			//META 2
+			Params.c_a_meta[3] 		= 	New_Params[23];			//META 3
+			Params.c_a_sub[1][0] 	= 	New_Params[24]; 		//META 1 SUB 1
+			Params.c_a_sub[1][1] 	= 	New_Params[25];			//META 1 SUB 2
+			Params.c_a_sub[1][2] 	= 	New_Params[26];			//META 1 SUB 3
+			Params.c_a_sub[1][3] 	= 	New_Params[27];			//META 1 SUB 4
+			Params.c_a_sub[2][0] 	= 	New_Params[28]; 		//META 2 SUB 1
+			Params.c_a_sub[2][1] 	= 	New_Params[29];			//META 2 SUB 2
+			Params.c_a_sub[2][2] 	= 	New_Params[30];			//META 2 SUB 3
+			Params.c_a_sub[2][3] 	= 	New_Params[31];			//META 2 SUB 4
+			Params.c_a_sub[3][0] 	= 	New_Params[32]; 		//META 3 SUB 1
+			Params.c_a_sub[3][1] 	= 	New_Params[33];			//META 3 SUB 2
+			Params.c_a_sub[3][2] 	= 	New_Params[34];			//META 3 SUB 3
+			Params.c_a_sub[3][3] 	= 	New_Params[35];			//META 3 SUB 4
+			//CONIDIA FRAC SUCCESSFUL DISP
+			Params.c_m_pop			= 	New_Params[36]; 		//POP
+			Params.c_m_meta[1]		= 	New_Params[37];			//META 1
+			Params.c_m_meta[2]		= 	New_Params[38];			//META 2
+			Params.c_m_meta[3]		= 	New_Params[39];			//META 3
+			Params.c_m_sub[1][0] 	= 	New_Params[40];			//META 1 SUB 1
+			Params.c_m_sub[1][1] 	= 	New_Params[41];			//META 1 SUB 2
+			Params.c_m_sub[1][2]	= 	New_Params[42];			//META 1 SUB 3
+			Params.c_m_sub[1][3] 	= 	New_Params[43];			//META 1 SUB 4
+			Params.c_m_sub[2][0] 	= 	New_Params[44];			//META 2 SUB 1
+			Params.c_m_sub[2][1] 	= 	New_Params[45];			//META 2 SUB 2
+			Params.c_m_sub[2][2] 	= 	New_Params[46];			//META 2 SUB 3
+			Params.c_m_sub[2][3] 	= 	New_Params[47];			//META 2 SUB 4
+			Params.c_m_sub[3][0] 	= 	New_Params[48];			//META 3 SUB 1
+			Params.c_m_sub[3][1] 	= 	New_Params[49];			//META 3 SUB 2
+			Params.c_m_sub[3][2] 	= 	New_Params[50];			//META 3 SUB 3
+			Params.c_m_sub[3][3] 	= 	New_Params[51];			//META 3 SUB 4
+			//LARVAE 1/AVG DIST DISP
+			//TEMP
+			Params.l_a_pop 			= 	New_Params[52];			//POP
+			Params.l_a_meta[1] 		= 	New_Params[53];			//META 1
+			Params.l_a_meta[2] 		= 	New_Params[54];			//META 2
+			Params.l_a_meta[3] 		= 	New_Params[55];			//META 3
+			Params.l_a_sub[1][0] 	= 	New_Params[56];			//META 1 SUB 1
+			Params.l_a_sub[1][1] 	= 	New_Params[57];			//META 1 SUB 2
+			Params.l_a_sub[1][2] 	= 	New_Params[58];			//META 1 SUB 3
+			Params.l_a_sub[1][3] 	= 	New_Params[59];			//META 1 SUB 4
+			Params.l_a_sub[2][0] 	=	New_Params[60]; 		//META 2 SUB 1
+			Params.l_a_sub[2][1] 	= 	New_Params[61];			//META 2 SUB 2
+			Params.l_a_sub[2][2] 	= 	New_Params[62];			//META 2 SUB 3
+			Params.l_a_sub[2][3] 	= 	New_Params[63];			//META 2 SUB 4
+			Params.l_a_sub[3][0] 	= 	New_Params[64]; 		//META 3 SUB 1
+			Params.l_a_sub[3][1] 	= 	New_Params[65];			//META 3 SUB 2
+			Params.l_a_sub[3][2] 	= 	New_Params[66];			//META 3 SUB 3
+			Params.l_a_sub[3][3] 	= 	New_Params[67];			//META 3 SUB 4
+			//LARVAE FRAC SUCCESSFUL DISP
+			Params.l_m_pop			= 	New_Params[68]; 		//POP
+			Params.l_m_meta[1]		= 	New_Params[69];			//META 1
+			Params.l_m_meta[2]		= 	New_Params[70];			//META 2
+			Params.l_m_meta[3]		= 	New_Params[71];			//META 3
+			Params.l_m_sub[1][0] 	= 	New_Params[72];			//META 1 SUB 1
+			Params.l_m_sub[1][1] 	= 	New_Params[73];			//META 1 SUB 2
+			Params.l_m_sub[1][2] 	= 	New_Params[74];			//META 1 SUB 3
+			Params.l_m_sub[1][3] 	= 	New_Params[75];			//META 1 SUB 4
+			Params.l_m_sub[2][0] 	= 	New_Params[76];			//META 2 SUB 1
+			Params.l_m_sub[2][1] 	= 	New_Params[77];			//META 2 SUB 2
+			Params.l_m_sub[2][2] 	= 	New_Params[78];			//META 2 SUB 3
+			Params.l_m_sub[2][3] 	= 	New_Params[79];			//META 2 SUB 4
+			Params.l_m_sub[3][0] 	= 	New_Params[80];			//META 3 SUB 1
+			Params.l_m_sub[3][1] 	= 	New_Params[81];			//META 3 SUB 2
+			Params.l_m_sub[3][2] 	= 	New_Params[82];			//META 3 SUB 3
+			Params.l_m_sub[3][3] 	= 	New_Params[83];			//META 3 SUB 4
+			//OBSERVATIONAL
+			Params.FITINIT[4][0] 	= 	New_Params[84]; 		//META 4 INITS
+			Params.FITINIT[4][4] 	= 	New_Params[85]; 		//META 4 INITV
+			Params.FITINIT[4][8] 	= 	New_Params[86]; 		//META 4 INITR
+			Params.FITINIT[5][0] 	= 	New_Params[87]; 		//META 5 INITS
+			Params.FITINIT[5][4] 	= 	New_Params[88]; 		//META 5 INITV
+			Params.FITINIT[6][0] 	= 	New_Params[89];	 		//META 6 INITS
+			Params.FITINIT[6][4] 	= 	New_Params[90]; 		//META 6 INITV
+			Params.FITINIT[6][8] 	= 	New_Params[91]; 		//META 6 INITR
+
+			//--------MISER CALUCLATE LIKELIHOOD-------
 			for (int j = 1; j <= 3; j++)
 			{
 				for(int i = 0; i < 10; i++)
 				{
-					fprintf(fpm, "%lf ", log(old_lhood_pointwise[j][i]));
+					Params.lhood_point[j][i] = 0.0;
 				}
 			}
-			fprintf(fpm, "\n");
-		}	
 
+			lhood_meta = 0; log_lhood_meta = 0; total_loghood_metas_NEW = 0;
+			meta_err = 0;
+
+			for (int j = 1; j <= 3; j++)				
+			{
+				Params.j = j;
+
+				Params.miser_ticker = 1; Params.miser2_flag = 0; 
+
+				gsl_monte_function G = { &likelihood_calc, dim, &Params };	
+
+				double xl[dim];	double xu[dim];	
+				for (int jj = 0; jj < dim; jj++)	
+				{
+					xl[jj] = 0;	
+					xu[jj] = 1;
+				}
+
+				gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+				gsl_monte_miser_integrate (&G, xl, xu, dim, Mcalls, r, s, &lhood_meta, &meta_err); 		//call MISER
+				gsl_monte_miser_free(s);
+				
+				while (Params.miser2_flag > 0)		//indicates that a better likelihood score (or a few) were found
+				{ 
+					Params.miser2_flag = 0;
+					Params.lhood_adjust[j] = -Params.bestlhood[j];
+					
+					gsl_monte_miser_state *s = gsl_monte_miser_alloc(dim);
+					gsl_monte_miser_integrate (&G, xl, xu, dim, Mcalls, r, s, &lhood_meta, &meta_err); 
+					gsl_monte_miser_free(s);
+				}
+
+				log_lhood_meta = log(lhood_meta) - Params.lhood_adjust[j];
+
+				if (isnan(log_lhood_meta) || isinf(log_lhood_meta))
+				{ 
+					log_lhood_meta = -100000000000000;
+				}
+
+				total_loghood_metas_NEW = total_loghood_metas_NEW + log_lhood_meta;
+				LogNewPosterior = 0.0;
+				LogNewPosterior = total_loghood_metas_NEW + log_prior_NEW;
+			}
+			if (verbose) printf("loghood NEW = %lf posterior NEW = %lf\n", total_loghood_metas_NEW, LogNewPosterior);
+		
+			//-----------AVERAGE DATA POINT LHOODS-----
+			for (int j = 1; j <= 3; j++)
+			{
+				for(int i = 0; i < 10; i++)
+				{
+					new_lhood_pointwise[j][i] = Params.lhood_point[j][i]/Mcalls;
+				}
+			}
+
+			//--------REEVALUATE OLD AND NEW-------
+			ProbOfAcceptance = exp((LogNewPosterior + LogJumpToOld) - (LogOldPosterior - LogJumpToNew));  
+			if (verbose) printf("prob of acceptance second pass = %lf\n", ProbOfAcceptance);
+			//if (isinf(ProbOfAcceptance))
+			//{ 
+			//	ProbOfAcceptance=1;
+			//}
+			//--------IF BETTER, ACCEPT-------
+			if (ProbOfAcceptance>1 || gsl_rng_uniform_pos (r) < ProbOfAcceptance)
+			{
+				if (verbose) printf("Accept new param set second pass\n");
+
+				LogOldPosterior = LogNewPosterior;  
+				total_loghood_metas_OLD = total_loghood_metas_NEW;
+
+				for (a = 0; a < NUM_PARS; a++)
+				{
+					if (fit[a]) Old_Params[a] = New_Params[a]; 
+				}
+				for (int j = 1; j <= 3; j++)
+				{
+					for(int i = 0; i < 10; i++)
+					{
+						old_lhood_pointwise[j][i] = new_lhood_pointwise[j][i];
+					}
+				}
+				Accept = Accept+1;
+			}
+			//--------IF WORSE, REJECT-------
+			else
+			{ 
+				if (verbose) printf("Reject new param set second pass\n");
+
+				for (a = 0; a < NUM_PARS; a++)
+				{
+					if (fit[a]) New_PC[a] = Old_PC[a];           
+				}
+				for (int j = 1; j <= 3; j++)
+				{
+					for(int i = 0; i < 10; i++)
+					{
+						new_lhood_pointwise[j][i] = old_lhood_pointwise[j][i];
+					}
+				}
+			}
+		}
+		//--------IF WORSE, REJECT--------
+		else
+		{ 
+			if (verbose) printf("Reject new param set first pass\n");
+
+			for (a = 0; a < NUM_PARS; a++)
+			{
+				if (fit[a]) New_PC[a] = Old_PC[a];      
+			}
+			for (int j = 1; j <= 3; j++)
+			{
+				for(int i = 0; i < 10; i++)
+				{
+					new_lhood_pointwise[j][i] = old_lhood_pointwise[j][i];
+				}
+			}
+		}
+ 
+		fprintf(fpm, "%i ", LoopNumber); 
+
+		for (int ii = 0; ii < NUM_PARS; ii++)
+		{ 
+			if (fit[ii]){
+				if (log_fit[ii]) fprintf(fpm, "%lf ", log(Old_Params[ii]));
+				else fprintf(fpm, "%lf ", Old_Params[ii]);
+			} 
+		}
+		fprintf(fpm, "%lf %lf %i %i ", total_loghood_metas_OLD, LogOldPosterior, Accept, Attempt); 
+		
+		for (int j = 1; j <= 3; j++)
+		{
+				for(int i = 0; i < 10; i++)
+				{
+					fprintf(fpm, "%lf ", log(old_lhood_pointwise[j][i]));
+				}
+		}
+
+		fprintf(fpm, "\n");		
 		fflush(stdout);
 		fflush(fpm);
-
-	} // j_iter
+	}	
 
 	fclose(fpm);
 
 }
 
-	time_t end = time(NULL);
+time_t end = time(NULL);
 
-	printf("All iterations took %f seconds\n", difftime(end, start));
+printf("All iterations took %f seconds\n", difftime(end, start));
 
-	return 0;
+return 0;
 
 }
 

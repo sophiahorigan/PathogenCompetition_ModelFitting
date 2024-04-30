@@ -26,17 +26,13 @@
 
 char *strFileNameDate;
 
-#define DATA_SETS_WEATHER 1		// number of weather data sets
-#define MAX_SUBS 100		    // maximum number of subpopulations
-#define NUM_POINTWISE 10		// number of pointwise datapoints per subpop
+#define MAX_SUBS 100		    	// maximum number of subpopulations
+#define MAX_YEARS 100				// maximum number of years 
+#define NUM_STATES 3				// S, F, V
+#define EPI_LENGTH 48				// length of single epizootic - should this be flexible I think so.
 
-FILE *fpsims;
-
-
-//ROUTINES
-int linesearch;
-int reals;
-int mcmc;
+FILE *fpintra;
+FILE *fpinter;
 
 //LARVAL DISPERSAL
 int larval_dispersal;
@@ -58,15 +54,6 @@ int c_m_sub_fit;
 int r_pop_fit;
 int r_meta_fit;
 int r_sub_fit;
-
-const int sub_index[4] = {0, 80, 160, 240};
-
-int LScalls; //linesearch calls
-int Rcalls; //realization calls
-int Mcalls; //miser calls
-int Realizations;
-int searches;
-int numround;
 
 //FIXED PARAMS
 //SINGLE EPIZOOTIC
@@ -93,7 +80,7 @@ const double DDstop = 267.034499999981;
 const double exposetime = 16; //what is this
 const double VFPass = 125.31; //check
 
-const int DIM = 8000; //S(1) + C(1) + Vcadav(1) + Vinf(27) + Finf(50)   * MAX_SUB
+const int EPI_DIM = 80; //S(1) + C(1) + Vcadav(1) + Vinf(27) + Finf(50)
 const double h = 0.01;
 
 const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
@@ -107,7 +94,6 @@ const double specific_nuF = 0.000241071699421562;
 
 typedef struct //FIT PARS
 {
-
 	double nuV[MAX_SUBS];
 	double nuF[MAX_SUBS];
 	double nuR[MAX_SUBS];
@@ -115,37 +101,35 @@ typedef struct //FIT PARS
 
 	double EV[400]; 
 	double EF[400]; 
-	int MAXT3[MAX_SUBS];		    // number of days in weather data		   
+	int MAXT3[MAX_SUBS];		    // number of days in weather data	 //??	   
 
-	double SINGLE_EPI_MODEL[MAX_SUBS][101][50][3]; // sub, year, day, state variable
-	double LONG_TERM_MODEL[MAX_SUBS][101][3]; // sub, year, state variable
-	double WDATA[DATA_SETS_WEATHER+1][366][8][100]; //SH dataset, days, weeks, years
+	double SINGLE_EPI_MODEL[MAX_YEARS][MAX_SUBS][EPI_LENGTH][NUM_STATES]; // year, sub, day, state variable
+	double LONG_TERM_MODEL[MAX_YEARS][MAX_SUBS][NUM_STATES]; // year, sub, state variable (NEED TO UPDATE. more than 3.)
+	double WDATA[MAX_YEARS][MAX_SUBS][52][365]; // year, sub, week, day //UPDATE TO REFLECT JIAWEIS
 
-	//indexing and dispersal params
 	int model; //model number
 	int num_sub;
-	int num_years;
+	int num_year;
 
-	double STATEVARS[3][MAX_SUBS]; 	//initial conditions across subpopulations
+	double STATEVARS[NUM_STATES][MAX_SUBS]; 	//initial conditions across subpopulations
+
 	//dispersal
-	double c_a_sub[MAX_SUBS];
-	double l_a_sub[MAX_SUBS];
-
-	//coinfection
-	double VFSus;
-	double coinf_V;
+	double c_a[MAX_SUBS];
+	double l_a[MAX_SUBS];
 
 	//stochasticity
 	double R_stoch;
 	double F_stoch;
+
+	//printing
+	int PRINT_INTRA;
+	int PRINT_INTER;
 
 }STRUCTURE;
 
 
 #include "data_input.h"
 #include "random_setup.h"
-#include "bounds.h"
+#include "generate_param.h"
 #include "ode.h"
 #include "daily_statevars.h"
-#include "likelihood_calc.h"
-#include "fitting_routine.h"

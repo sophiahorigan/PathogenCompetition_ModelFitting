@@ -1,4 +1,4 @@
-double DDEVF(void *Paramstuff, double *RandNumsPass ,size_t dim, int pop, int maxy_t, double hatch, int q, int dataset) //SH DOES save into array
+double DDEVF(void *Paramstuff, double *RandNumsPass, size_t dim, int maxy_t, double hatch, int year) //SH DOES save into array
 
 {
 
@@ -7,7 +7,7 @@ Params = (STRUCTURE*) Paramstuff;
 
 int FlagDay=0;
 
-int MAXT3=47; 
+int MAXT3=47; // DOES THIS NEED TO BECOME FLEXIBLE? or can it just be epi_length
 
 //-------------------------------------- PARAMETER DECLARATION -------------------------------------------//
 int num_sub = Params->num_sub;
@@ -15,7 +15,7 @@ int num_sub = Params->num_sub;
 //--- need to update to get cc data----
 double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
 
-double y_ode[DIM]; // NEEDS TO BE BIGGER
+double y_ode[num_sub][EPI_DIM]; // NEEDS TO BE BIGGER
 
 double rand_nuR[num_sub][MAXT3];
 double rand_nuF[num_sub][MAXT3];
@@ -40,10 +40,9 @@ for (ii=0; ii<num_sub; ii++){
 		rand_nuF[ii][i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->F_stoch);
 	}
 }
-// ----------------------------------------- FIXED PARAMETERS  ---------------------------------------------- //
 
-double R_end;   //CK//  Change value for function of latitude
-double R_start;   //CK//  Change value for function of latitude
+double R_end[num_sub];  
+double R_start[num_sub];
 
 // ------------------------------------- INITIALIZE MODEL PARAMETERS --------------------------------------- //
 
@@ -54,7 +53,7 @@ int day = 0; int week = 0;							// keeps track of day and week number
 
 int line_ticker=0;   //CK// Ticker used to associate t in function with numbered days.
 int line_ticker2;
-int test_day=0;	//CK// used to find the line in the weather data that corresponds to the starting day of collections
+int test_day[num_sub] = {0};	//CK// used to find the line in the weather data that corresponds to the starting day of collections
 int num_day =  hatch;  //CK// Starting day number
 
 line_ticker = num_day;
@@ -72,18 +71,18 @@ double E_V[num_sub][n+1]; double E_F[num_sub][m+1];
 
 // ----------------------------------- CONIDIA BLOOMING TIMES --------------------------------------- //
 
-R_start=hatch; //SH Resting spores start blooming from start day //UPDATE THIS
-
-R_end[num_sub] = 0.0;
-test_day = line_ticker;
-
 for (i = 0; i < num_sub; i++)
 {
+	R_start[num_sub] = hatch; //SH Resting spores start blooming from start day //UPDATE THIS?? needs to be something with 365
+
+	R_end[num_sub] = 0.0;
+	test_day[num_sub] = line_ticker;
+
 	while(DD10[num_sub] <= DDstop){
 
-		DDtemp_now = Params->WDATA[1][test_day][4][0]-10.0; //UPDATE WEATHER DATA
+		DDtemp_now = Params->WDATA[1][test_day][4][0]-10.0; // UPDATE WEATHER DATA TO GET SEPARATE FOR EACH SUBPOP
 		if(DDtemp_now<0.0){DDtemp_now=0.0;}
-		DD10[num_sub] = DD10[num_sub] + DDtemp_now;			//CK// summing degree days over time
+		DD10[num_sub] = DD10[num_sub] + DDtemp_now;			// sum degree days over time
 		R_end[num_sub]++;
 		test_day[num_sub]++;
 	}
@@ -91,9 +90,12 @@ for (i = 0; i < num_sub; i++)
 	DD10[num_sub]=0.0;
 }
 // ---------------------------- INITIALIZE POPULATION SIZES ------------------------------- //
+// FIGURE OUT HOW TO CALCUALTE R START BASED ON WEATHER
+double r_germ[num_sub] = {R_start};	 
 
-double r_germ = R_start;		
-if (r_germ<0)	r_germ=0;
+for(i=0; i<num_sub; i++){
+	if (r_germ<0)	r_germ=0;
+}
 
 double INITS[num_sub];
 double INITV[num_sub];
@@ -102,8 +104,6 @@ double INITR[num_sub];
 for(i=0; i<num_sub; i++){
 	INITS[i] = Params->STATEVARS[1][i] - Params->STATEVARS[1][i]*Params->STATEVARS[3][i];
 	INITV[i] = Params->STATEVARS[1][i]*Params->STATEVARS[3][i];
-	//printf("j = %i InitV[%i] = %lf\n", j, i, INITV[i]);
-	//printf("j = %i InitV[%i] = %lf\n", j, i, INITV[i]);	
 }
 
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
@@ -144,7 +144,13 @@ for(i=0; i<num_sub; i++){ //initial conditions
 	Fkill[i] = 0;
 }
 
-double timing[6]={r_germ,R_end,MAXT3}; // need to expand to accomodate all subpops
+double timing[num_sub][3];
+
+for(i=0; i<num_sub; i++){ //initial conditions
+	timing[i][0] = r_germ[i];
+	timing[i][1] = R_end[i];
+	timing[i][2] = MAXT3; 
+}
 
 // -------------------- MAIN LOOP!! (calculate populations as time is increased) -------------------------- //
 
@@ -152,6 +158,9 @@ while (t_0<MAXT3+h)	{
 	
 	FlagWeek=0;
 	// ------------------------------- Find Stoppage Event ----------------------------------------------- //
+	// NEED TO MAKE THIS SEPARATE FOR EACH SUBPOP ???!
+
+
 	// --------------------- end of day -------------------- //
 	if (day+1<timing[0] && day+1<timing[1])	{
 
@@ -232,7 +241,7 @@ while (t_0<MAXT3+h)	{
 
 	while (t<t_next)	{
 
-//---------------------- LARVAL DISPERSAL ----------------------------//
+	//---------------------- LARVAL DISPERSAL ----------------------------//
 	if((day-1)==8){ //dispersal occurs throughout first week
 
 			//unlease the cadavers
@@ -265,9 +274,9 @@ while (t_0<MAXT3+h)	{
 				//larvae disperse
 				for(subout=0; subout<num_sub; subout++)
 				{
-					Sout[subout] = exp(-Params->l_a_sub[subout]*10) * S[subout];
+					Sout[subout] = exp(-Params->l_a[subout]*10) * S[subout];
 
-					Vout[subout] += exp(-Params->l_a_sub[subout]*10) * V[subout];
+					Vout[subout] += exp(-Params->l_a[subout]*10) * V[subout];
 				}
 				//some fraction arrive at another population
 				for(subout=0; subout<num_sub; subout++)
@@ -276,9 +285,9 @@ while (t_0<MAXT3+h)	{
 					{
 						if(subin!=subout)
 						{
-							Sin[subin] = Sout[subout]*exp(-Params->l_a_sub[subout]*Params->DISTANCE[j][subout][subin]);
+							Sin[subin] = Sout[subout]*exp(-Params->l_a[subout]*Params->DISTANCE[j][subout][subin]);
 
-							Vin[subin] += Vout[subout]*exp(-Params->l_a_sub[subout]*Params->DISTANCE[j][subout][subin]);
+							Vin[subin] += Vout[subout]*exp(-Params->l_a[subout]*Params->DISTANCE[j][subout][subin]);
 						}
 					}
 				}
@@ -294,107 +303,106 @@ while (t_0<MAXT3+h)	{
 	//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------// //FIGURE OUT NEW SUB INDEX CODE
 	//printf("DAY = %i\n", day-1);
 	for(sub=0; sub<num_sub; sub++){ 
-		y_ode[0+sub_index[sub]]=S[sub];	//SUSCEPTIBLE
-		//printf("preode S[%i] = %lf\n", sub, y_ode[0+sub_index[sub]]);
+		y_ode[sub][0]=S[sub];	//SUSCEPTIBLE
 
 		for (i=1;i<=m;i++)	{ //FUNGUS INFECTED 
-			y_ode[i+sub_index[sub]]=E_F[sub][i];
+			y_ode[sub][i]=E_F[sub][i];
 		}
 		for (i=1;i<=n;i++)	{ //VIRUS INFECTED
-			y_ode[m+i+sub_index[sub]]=E_V[sub][i];
+			y_ode[sub][m+i]=E_V[sub][i];
 		} 
-		y_ode[m+n+1+sub_index[sub]]=C[sub];	//CONIDIA
-		y_ode[m+n+2+sub_index[sub]]=V[sub]; //OBS
-		//printf("V[%i] = %lf\n", sub, V[sub]);
+		y_ode[sub][m+n+1]=C[sub];	//CONIDIA
+		y_ode[sub][m+n+2]=V[sub]; //OBS
 	}
 	
 
-	//******************************* Weather Stuff ******************************// // NEED TO GIVE EACH SUB ITS OWN WEATHER
-	for (i = 0; i < num_sub; i++) // NEED TO FINISH
+	//******************************* Weather Stuff ******************************// 
+	// use weather to calculate sub-specific nuF, muF, nuR
+	for (i = 0; i < num_sub; i++) 
 	{
-		DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  //CK// begin calculation of accumulated Degree Days
-		if(DDtemp_now<0.0){DDtemp_now=0.0;}
-		DD10[num_sub] = DD10[num_sub] + DDtemp_now;			//CK// summing degree days over time
+		// Degree Day
+		DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;  
+		if (DDtemp_now < 0.0) {DDtemp_now=0.0;}
+		DD10[num_sub] = DD10[num_sub] + DDtemp_now;			
 
+		// nuF - RH
+		nuF2 = Params->specific_nuF * exp(RH_P * Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[i][day]);    
+		if (nuF2 > pow(8.0,8.0)) {nuF2 = pow(8.0,8.0);}
+		Params->nuF[num_sub] = (DD10[num_sub] / fourth_size) * nuF2;
 
-		nuF2 = Params->specific_nuF[num_sub]*exp(RH_P*Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[(int)t]);    //JL: Reading in MinRH here
-		if(nuF2> pow(8.0,8.0)){nuF2= pow(8.0,8.0);}
-		Params->nuF[num_sub] = (DD10[num_sub]/fourth_size)*nuF2;
+		// muF - T
+		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  
+		Params->muF[num_sub] = specific_muF * exp(temp_P*temp_now);	
+		if (Params->muF[num_sub] > pow(10.0,10.0)) {Params->muF[num_sub] = pow(10.0,10.0);}
 
-		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  //JL: Reading in MaxT here
-
-		Params->muF[num_sub] = specific_muF*exp(temp_P*temp_now);	//CK// Conidia Decay Response #2.2  BEST SO FAR!!
-		if(Params->muF[num_sub] > pow(10.0,10.0)){Params->muF[num_sub] = pow(10.0,10.0);}
-
+		// nuR - R
 		total_rainfall = 0.0;
 		rain_day= line_ticker - beta - 1;
-
-		for (rain_day= (line_ticker - beta - theta - 1);rain_day <= line_ticker - theta -1;rain_day++)	{
-
-			if (rain_day<0){
-				total_rainfall=0;
+		for (rain_day = (line_ticker - beta - theta - 1); rain_day <= line_ticker - theta -1; rain_day++)
+		{
+			if (rain_day < 0){
+				total_rainfall = 0;
 			}
 			else{
-					total_rainfall = Params->WDATA[1][rain_day][0][0]+total_rainfall;
+				total_rainfall = Params->WDATA[1][rain_day][0][0] + total_rainfall;
 			}
 		}
 
-		nuR2=(rain_P/(1+rain_P2*exp(-rain_P3*total_rainfall)) - rain_P/(rain_P2+1))*exp(rand_nuR[(int)t]);  
-		if(nuR2> pow(10.0,10.0)){nuR2= pow(10.0,10.0);}
+		nuR2 = (rain_P / (1 + rain_P2 * exp(-rain_P3 * total_rainfall)) - rain_P / (rain_P2+1)) * exp(rand_nuR[i][day]);  //exp(rand_nuR[(int)t]); ??
+		if (nuR2 > pow(10.0,10.0)) {nuR2 = pow(10.0,10.0);}
 
-		Params->nuR[num_sub] = (DD10/fourth_size)*nuR2;
+		Params->nuR[num_sub] = (DD10 / fourth_size) * nuR2;
 	}
 
 //********************************************************
-		t=ODE_Solver(t,t_next,Params,y_ode);
+		t = ODE_Solver(t, t_next, Params, y_ode);
 //********************************************************
 
 //update state variables
-	for(sub=0; sub<num_sub; sub++){
-		S[sub]=y_ode[0+sub_index[sub]]; //SUSCEPTIBLES
-		//printf("postode S[%i] = %lf\n", sub, S[sub]);
-		C[sub]=y_ode[m+n+1+sub_index[sub]]; //CONIDIA
-		V[sub]=y_ode[m+n+2+sub_index[sub]]; //OBS
-		//printf("post ODE S = %lf\t C = %lf\t V = %lf\n", S[sub], C[sub], V[sub]);
-	}
-	for(sub=0; sub<num_sub; sub++){	
-	
-		IF[sub]=0; //FUNGUS INFECTED
-		IV[sub]=0; //IRUS INFECTED
+	for (sub = 0; sub < num_sub; sub++)
+	{
+		S[sub] = y_ode[sub][0]; //SUSCEPTIBLES
+		C[sub]=y_ode[sub][m+n+1]; //CONIDIA
+		V[sub]=y_ode[sub][m+n+2]; //OBS
 
-		for (i=1;i<=m;i++)	{ //fungus infected
-			E_F[sub][i]=y_ode[i+sub_index[sub]];
+		IF[sub]=0; //FUNGUS INFECTED
+		IV[sub]=0; //VIRUS INFECTED
+
+		for (i = 1; i <= m; i++) 
+		{ 
+			E_F[sub][i] = y_ode[sub][i];
 			IF[sub] += E_F[sub][i];
 		}
 
-		for (i=1;i<=n;i++)	{ //early virus infections which can be coinfected
-			E_V[sub][i]=y_ode[m+i+sub_index[sub]];
+		for (i = 1; i <= n; i++)	
+		{ 
+			E_V[sub][i] = y_ode[sub][m+i];
 			IV[sub] += E_V[sub][i];
 		}
-
 	}
 
-//*******************************PRINT MODEL OUTPUT**************************//
-		//LOOP THROUGH ARRAYS
-	int day_index[4] = {0, 47, 95, 143}; //to append 48 day epizootics //probably a better way to do this //TIME TO FIGURE IT OUT
-	//CHANGE remove zeros
-	for(sub=0; sub<num_sub; sub++){	
-		//FRACTIONS 
-		///*
-		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction uninfected S 
-		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected V 
-		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected F
-		//*/
-		//ABSOLUTE VALUES
-		/*
-		Params->MODEL[j][day-1+day_index[sub]][0] = S[sub];
-		Params->MODEL[j][day-1+day_index[sub]][1] = IV[sub];
-		Params->MODEL[j][day-1+day_index[sub]][2] = IF[sub]; 
-		*/
-		//printf("TOTAL POP for sub %i = %lf\n", sub, S[sub]+IV[sub]+IF[sub]+V[sub]);ING
+// update long-term model variables
 
-		fprintf(fpsims, "%i %i %i %e %e %e\n", year, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
-		//printf("%i\t %i\t %i\t %e\t %e\t %e\n", j, sub, day-1, Params->MODEL[j][day-1+day_index[sub]][0], Params->MODEL[j][day-1+day_index[sub]][1], Params->MODEL[j][day-1+day_index[sub]][2]);
+for(i=0; i<num_sub; i++){
+	Vnext[i] = 0;
+	Vkill[i] = 0;
+	Fnext[i] = 0;
+	Fkill[i] = 0;
+}
+
+//*******************************PRINT SINGLE EPI OUTPUT**************************//
+
+	for (sub = 0; sub < num_sub; sub++) 
+	{	
+
+		Params->SINGLE_EPI_MODEL[year][sub][day-1][0] = S[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction uninfected S 
+		Params->SINGLE_EPI_MODEL[year][sub][day-1][1] = IV[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected V 
+		Params->SINGLE_EPI_MODEL[year][sub][day-1][2] = IF[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected F
+
+		if (Params->PRINT_INTRA)
+		{
+		fprintf(fpintra, "%i %i %i %e %e %e\n", year, sub, day-1, Params->SINGLE_EPI_MODEL[year][sub][day-1][0], Params->SINGLE_EPI_MODEL[year][sub][day-1][1], Params->SINGLE_EPI_MODEL[year][sub][day-1][2]);
+		}
 	}
 	//getc(stdin);
 }

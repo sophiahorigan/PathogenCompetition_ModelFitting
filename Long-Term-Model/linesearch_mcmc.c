@@ -1,29 +1,18 @@
 #include "head.h"
 gsl_rng *r;
 
-///////////////////////////////////////////////////DOT-PRODUCT////////////////////////////////////////////////
-float DotProduct (int Length, double *Holder, double *PCA)
-{
-  double answer = 0;
-  for(int i = 0; i < Length; i++)
-  {
-    answer += PCA[i] * Holder[i];
-  }
-  return(answer);
-}
-
 int main(int argc, char *argv[])
 {
 ///////////////////////////////////////////////////SET-UP///////////////////////////////////////////////////
-
-#define VERBOSE 0				//select 1 for detailed output
-#define MAXITNLS 3				// number of linesearch full parameter sweeps to run
-#define REALIZATIONS 15000		// number of mcmc iterations to run //has to be at least number of params to get through all cases
-
 STRUCTURE Params;
 inputdata(&Params);	
 
 time_t start = time(NULL);
+
+#define VERBOSE 1				// select 1 for detailed output
+
+Params.PRINT_INTRA = 1;			// select 1 to print intra annual epizootic dynamics (daily)
+Params.PRINT_INTER = 1;			// select 1 to print inter annual epizootic dynamics (yearly)
 
 //--------RANDOM NUMBERS--------
 gsl_rng * r;
@@ -37,33 +26,21 @@ srand((unsigned) time(NULL));
 seed = time(NULL)*(int)getpid();
 gsl_rng_set(r, seed);
 
-//--------ALGORITHM--------
+//--------SIM INPUT--------
 char *y = argv[1]; char *z = argv[2];
-Params.model = atoi(y); Params.numyears = atoi(z);
+Params.num_sub = atoi(y); Params.num_year = atoi(z);
 
-int model = Params.model;
-int numyears = Params.numyearss;
+int num_sub = Params.num_sub;
+int num_year = Params.num_year;
 
-if (model > 48 || model < 0){
-	printf("INACCURATE MODEL. Model options range from 0 - 47. See Read Me for model options.\n");
-}
-
-printf("Running model %i for %i years...\n", model, numyears);
-
-//-------DISPERSAL-------- //-- update to only have model 43---
-int *p;
-p = dispersal_fit(model);		//function returns 1 for fitting dispersal, 0 for not fitting dispersal
-larval_dispersal = p[0]; l_a_pop_fit = p[1]; l_a_meta_fit = p[2]; l_a_sub_fit = p[3]; l_m_pop_fit = p[4]; l_m_meta_fit = p[5]; l_m_sub_fit = p[6]; 
-conidia_dispersal = p[7]; c_a_pop_fit = p[8]; c_a_meta_fit = p[9]; c_a_sub_fit = p[10]; c_m_pop_fit = p[11]; c_m_meta_fit = p[12]; c_m_sub_fit = p[13];
-r_pop_fit = p[14]; r_meta_fit = p[15]; r_sub_fit = p[16];
+printf("Running %i subs for %i years.\n", num_sub, num_year);
 
 //-------GENERAL SETUP-------
 int verbose = VERBOSE;
-
-int year;
+int year; int sub;
 
 //-------TEST MODE--------
-int TEST = 0;
+int TEST = 1;
 if(TEST)
 {
 	Params.num_sub = 4; Params.num_years = 1;
@@ -75,63 +52,105 @@ if(TEST)
 int pid;
 pid = getpid();
 
-char namesim[50];
-sprintf(namesim, "M%i_SIM_numsub%i_numyears%i", model, num_subs, numyears);
-fpsims = fopen(namesim, "a+");
-setbuf(fpsims, NULL);
+char nameintra[50];
+sprintf(nameintra, "inter_%i_numsub%i_numyears%i", pid, num_sub, num_year);
+fpintra = fopen(nameintra, "a+");
+setbuf(fpintra, NULL);
+
+char nameinter[50];
+sprintf(nameinter, "intra_%i_numsub%i_numyears%i", pid, num_sub, num_year);
+fpinter = fopen(nameinter, "a+");
+setbuf(fpinter, NULL);
 
 //---------GENERATE DISTANCE MATRIX---------
+// go with 100 2km squares
 
 //-----LOOP THROUGH YEARS-------
-for (int i = 0; i < Params.num_years; i++)
+for (year = 0; year < num_year; year++)
 {
-	year = i;
-
+	if (VERBOSE) print("year = %i\n", year);
 
 	//-------UPDATE PARAMS--------
 	if (year = 0){ //first year, randomly generate initial parameters
-		for (int j = 0; j < num_sub; j++)
+
+		if (VERBOSE) printf("Year 0, assigning initial state variables.\n");
+
+		for (sub = 0; sub < num_sub; sub++)
 		{	
 			// S
-			Params.STATEVARS[1][j] = NEW RANDOM VALUE;
+			Params.STATEVARS[1][sub] = generate_param(0);
 			// R // have R start all the same?
-			Params.STATEVARS[2][j] = NEW RANDOM VALUE;
+			Params.STATEVARS[2][sub] = generate_param(1);
 			// V
-			Params.STATEVARS[3][j] = NEW RANDOM VALUE;
+			Params.STATEVARS[3][sub] = generate_param(2);
+
+			if (VERBOSE) printf("subpop %i: INITS = %lf INITR = %lf INITV = %lf\n", sub, Params.STATEVARS[1][sub], Params.STATEVARS[2][sub], Params.STATEVARS[3][sub]);
 		}
 	}
 	else {
-		for (int j = 0; j < num_sub; j++)
+		for (sub = 0; sub < num_sub; sub++)
 		{	
 			// S
-			Params.STATEVARS[1][j] = END VALUE OF LAST EPI;
+			Params.STATEVARS[1][sub] = END VALUE OF LAST EPI;
 			// R // have R start all the same?
-			Params.STATEVARS[2][j] = END VALUE OF LAST EPI;
+			Params.STATEVARS[2][sub] = END VALUE OF LAST EPI;
 			// V
-			Params.STATEVARS[3][j] = END VALUE OF LAST EPI;
+			Params.STATEVARS[3][sub] = END VALUE OF LAST EPI;
+
+			if (VERBOSE) printf("subpop %i: INITS = %lf INITR = %lf INITV = %lf\n", sub, Params.STATEVARS[1][sub], Params.STATEVARS[2][sub], Params.STATEVARS[3][sub]);
+
+				Params.c_a[sub] = generate_param(3);
+				Params.l_a[sub] = generate_param(4);
+				Params.R_stoch = generate_param(5);
+				Params.F_stoch = generate_param(6);
+
+				if (VERBOSE) printf("subpop %i: c_a = %lf l_a = %lf Rstoch = %lf Fstoch = %lf\n", sub, Params.c_a[sub], Params.l_a[sub], Params.R_stoch, Params.F_stoch);
 		}
-		// c_a_sub
-		Params.c_a_sub[j] = NEW RANDOM VALUE;
-		// l_a_sub
-		Params.l_a_sub[j] = NEW RANDOM VALUE;
-		Params.R_stoch = NEW RANDOM VALUE;
-		Params.F_stoch = NEW RANDOM VALUE;
 
 	}
-
 	//------RUN SINGLE EPIZOOTIC MODEL------
 	// change dim
 	// what is pop
 
-	DDEVF(Params,RandNumsPass,dim,pop,48,0,year,dataset);
+	int hatch = 0; //do i need this?
 
+	DDEVF(Params,r,dim,epi_length,hatch,year);
+
+	//------UPDATE PARAMS INTER-ANNUAL MODEL-------
+
+	for (sub = 0; sub < num_sub; sub++) 
+	{	
+		Params->SINGLE_EPI_MODEL[year][sub][day-1][0] = S[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction uninfected S 
+		Params->SINGLE_EPI_MODEL[year][sub][day-1][1] = IV[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected V 
+		Params->SINGLE_EPI_MODEL[year][sub][day-1][2] = IF[sub]/(S[sub]+IV[sub]+IF[sub]); //Saving daily fraction infected F
+
+		if (Params.PRINT_INTER)
+		{
+			//fprintf(fpinter, )
+		}
+	}
 	//------RUN INTER-ANNUAL MODEL-------
 
-}
 
-fclose(fpsims);
 
 }
+
+fclose(fpintra);
+fclose(fpinter);
+
+}
+
+
+// inter annual complications
+// when does hatch start?
+	// check jiawei's long term model
+// how to vary weather for each subpop
+	// check jiawei's long term model
+// can I pass a 2D array to the ode solver? or do I need to loop through the subpops with the ode solver?
+	// check colin's patch structure
+// if I have to loop, how do I handle the 'timing' array in the daily_statevars.h? initate the subpop loop out there?
+// that means that I wouldn't be able to do continuous condia dispersal within ode.h, bc would have to process one subpop at a time
+	// check colin's patch structure
 
 
 

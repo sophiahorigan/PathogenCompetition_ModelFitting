@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=m43-mcmc
+#SBATCH --job-name=m17-mcmc
 #SBATCH --account=pi-gdwyer
 #SBATCH --error=error_$A-%a.txt
 #SBATCH --array=1-15
@@ -15,7 +15,7 @@ echo "my SLURM_ARRAY_TASK ID: " $SlURM_ARRAY_TASK_ID
 # input: MODEL ALGORITHM
 
 # LINESEARCH # ntasks-per-node=28, array=1-20
-#mpiexec -n 28 ./linesearch_mcmc 43 1 -input $SlURM_ARRAY_TASK_ID
+#mpiexec -n 28 ./linesearch_mcmc 17 1 -input $SlURM_ARRAY_TASK_ID
 
 # MCMC # ntasks-per-node=1, array=1-15 (num chains)
-mpiexec -n 1 ./linesearch_mcmc 43 3 -input $SlURM_ARRAY_TASK_ID
+mpiexec -n 1 ./linesearch_mcmc 17 3 -input $SlURM_ARRAY_TASK_ID

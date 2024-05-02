@@ -14,6 +14,8 @@ int sub;
 double nuV 		= Params->nuV; 	//virus transmission
 double muV		= Params->muV; 	//virus decay
 double squareCVV = Params->CV*Params->CV; //heterogeneity
+double size_C	= Params->size_C;  
+double indexR = Params->indexR;
 
 //WEATHER PARAMS
 double nuR[num_sub];
@@ -32,10 +34,10 @@ double S0[num_sub];
 double R[num_sub];
 
 // Assign init R
-for (i=0; i<num_sub; i++)
+for (sub = 0; sub < num_sub; sub++) // IS THIS RIGHT?
 {
-	S0[i] = Params->STATEVARS[1][i]; //SHOULD THIS BE UPATED EACH TIME? OR FIXED FROM DAY 1? (IN WHICH CASE PUT IT IN MAIN.C)
-	R[i] = Params->STATEVARS[2][i];
+	S0[sub] = Params->INITS[sub]; 
+	R[sub] = Params->INITR[sub];
 }
 
 int subout; //indexing
@@ -76,32 +78,40 @@ if(conidia_dispersal == 1){
 	}
 }
 
-for(sub=0; sub<num_sub; sub++){
+for (sub = 0; sub < num_sub; sub++)
+{
+	//----------- Susceptible ---------
+	dydt[sub][0]  = -y[sub][0] * (nuF[sub] * y[sub][m+n+1] + nuR[sub] * R[sub]) - y[sub][0] * nuV * y[sub][m+n+3] * pow((y[sub][0] / S0[sub]), squareCVV);
 
-	//*******************SUSCEPTIBLE*********************
-	dydt[sub][0]  = -y[sub][0] * (nuF[sub] * y[sub][m+n+1] + nuR[sub] * R[sub]) - y[sub][0] * nuV * y[sub][m+n+2] * pow((y[sub][0] / S0[sub]), squareCVV);
-
-	//***********************FUNGUS-INFßECTED**********************
+	//-------- Fungus Infected ------
 	dydt[sub][1]  = nuF[sub] * y[sub][m+n+1]*y[sub][0] + nuR[sub] * R[sub] * y[sub][0] - m * lambdaF * y[sub][1]; 
-
 	for (i = 2; i <= m; i++)
 	{
 		dydt[sub][i] = m * lambdaF * (y[sub][i-1] - y[sub][i]);
 	}
 
-	//**********************VIRUS-INFECTED************************
-	dydt[sub][m+1] = y[sub][0] * nuV * y[sub][m+n+2] * pow((y[sub][0] / S0[sub]), squareCVV) - n * lambdaV * y[sub][m+1];
+	//--------- Virus Infected -------
+	dydt[sub][m+1] = y[sub][0] * nuV * y[sub][m+n+3] * pow((y[sub][0] / S0[sub]), squareCVV) - n * lambdaV * y[sub][m+1];
 
 	for (i = 2; i <= n; i++)
 	{
 		dydt[sub][m+i] = n * lambdaV * (y[sub][m+(i-1)] - y[sub][m+i]);
 
 	}
-	//**********************CONIDIA*****************
-	dydt[sub][m+n+1] = m * lambdaF * y[sub][m] - muF[sub] * y[sub][m+n+1] + netC[sub];
+	//--------- Conidia ----------
+	dydt[sub][m+n+1] = m * lambdaF * y[sub][m] * size_C[sub] - muF[sub] * y[sub][m+n+1] + netC[sub];
 
-	//*************************OBS***********************
-	dydt[sub][m+n+2] = n * lambdaV * y[sub][m+n] - muV * y[sub][m+n+2]; 
+	//---------- Resting Spores --------
+	dydt[sub][m+n+2] = indexR[sub] * m * lambdaF * y[sub][m];
+
+	//------------ OBs-----------
+	dydt[sub][m+n+3] = n * lambdaV * y[sub][m+n] - muV * y[sub][m+n+3]; 
+
+	//---------- Vkill ---------
+	dydt[sub][m+n+4] = n * lambdaV * y[sub][m+n];
+
+	//--------- Fkill ---------
+	dydt[sub][m+n+5] = m * lambdaF * y[sub][m];
 }
 
 return GSL_SUCCESS;

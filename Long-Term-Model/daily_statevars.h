@@ -16,7 +16,7 @@ int MAX_T = Params->MAX_EPI_LENGTH;
 //--- need to update to get cc data----
 double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
 
-double y_ode[num_sub][Params.EPI_DIM]; // NEEDS TO BE BIGGER
+double y_ode[num_sub][EPI_DIM]; // NEEDS TO BE BIGGER - NUMBER OF ALL INFECTIOUS CLASSES! 
 
 double rand_nuR[num_sub][MAX_T];
 double rand_nuF[num_sub][MAX_T]; //how do I make this flexible with different epi length sizes. I don't think I can.
@@ -38,9 +38,12 @@ Params->indexR = 0.0;
 for (ii = 0; ii < num_sub; ii++)
 {
 	for (i = 0; i <= MAX_T; i++)
-	{
-		rand_nuR[ii][i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->R_stoch);
-		rand_nuF[ii][i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAX_T],Params->F_stoch);
+	{	
+		//WHY DO I HAVE THIS??? SEEMS WRONG...
+		//rand_nuR[ii][i]=gsl_cdf_gaussian_Pinv(RandNumsPass,Params->R_stoch);
+		//rand_nuF[ii][i]=gsl_cdf_gaussian_Pinv(RandNumsPass,Params->F_stoch);
+		rand_nuR[ii][i]=gsl_ran_gaussian(RandNumsPass,Params->R_stoch); // DO THESE NEED DIFFERENT SEEDS? I DON'T THINK SO.
+		rand_nuF[ii][i]=gsl_ran_gaussian(RandNumsPass,Params->F_stoch);
 	}
 }
 
@@ -58,7 +61,7 @@ int num_day =  hatch;  //CK// Starting day number
 
 line_ticker = num_day;
 
-line_ticker=line_ticker-1;
+line_ticker = line_ticker-1;
 
 double S[num_sub]; // susceptible insects
 double V[num_sub]; // OB's (insects killed by virus) //Vcadaver
@@ -82,7 +85,7 @@ for (sub = 0; sub < num_sub; sub++)
 	// R start
 	while (DD10 <= DDstart)
 	{
-		DDtemp_now = Params->CCData[year][sub][test_day][4][0] - 10.0; // update weather
+		DDtemp_now = Params.WEATHER[sub][test_day][3] - 10.0; // avet
 		if (DDtemp_now < 0.0) {DDtemp_now = 0.0;}
 		DD10 = DD10 + DDtemp_now;		
 		Params.R_start[sub]++;
@@ -96,7 +99,7 @@ for (sub = 0; sub < num_sub; sub++)
 	// R end
 	while (DD10 <= DDstop)
 	{
-		DDtemp_now = Params->CCData[year][sub][test_day][4][0] - 10.0; // UPDATE WEATHER DATA TO GET SEPARATE FOR EACH SUBPOP
+		DDtemp_now = Params.WEATHER[sub][test_day][3] - 10.0; // avet
 		if (DDtemp_now < 0.0) {DDtemp_now = 0.0;}
 		DD10 = DD10 + DDtemp_now;			
 		Params.R_end[sub]++;
@@ -110,7 +113,7 @@ for (sub = 0; sub < num_sub; sub++)
 	// V start
 	while(DD10 <= VDDstart){
 
-		DDtemp_now = Params->CCData[year][sub][test_day][4][0] - 10.0; 
+		DDtemp_now = Params.WEATHER[sub][test_day][3] - 10.0; // avet
 		if (DDtemp_now < 0.0) {DDtemp_now = 0.0;}
 		DD10 = DD10 + DDtemp_now;			
 		Params.V_start[sub]++;
@@ -176,19 +179,8 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 	{
 		if (MAX_T > EPI_LENGTH[sub])
 		{
-			// set all densities to zero? how does dispersal impact the epi start, epi end?
-			// if things go to zero on their own at epi end, then this is fine. allows for any
-			// trickling dispersal from other pops whos epis are still going.
+			// set all densities to zero
 		}
-		if (MAX_T = EPI_LENGTH[sub])
-		{
-			// what should happen when we reach the end of the epi length?
-			// should individuals still be able to disperse into that population?
-			// if not, I can set a flag that trips and makes sure no new indls get in there
-		}
-
-	// if SOME PART OF AN ARRAY IS EMPTY, SKIP TO NEXT SUB?
-	// MAKE THIS WHOLE THING SEPARATE FOR EACH SUB.
 	
 		FlagWeek = 0;
 
@@ -343,14 +335,14 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 	//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------// //FIGURE OUT NEW SUB INDEX CODE
 	for (sub = 0; sub < num_sub, sub++)
 	{
-		// Susceptible insects
+		// Susceptible insects 
 		y_ode[sub][0] = S[sub];	
 		// Fungus infected insects
-		for (i=1;i<=m;i++)	{
+		for (i = 1; i <= m; i++)	{
 			y_ode[sub][i] = E_F[sub][i];
 		}
 		// Virus infected insects
-		for (i=1;i<=n;i++)	{ 
+		for (i = 1; i <= n; i++)	{ 
 			y_ode[sub][m+i] = E_V[sub][i];
 		} 
 		// Conidia
@@ -380,25 +372,25 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		}	
 
 		// nuF - RH
-		nuF2 = Params->specific_nuF * exp(RH_P * Params->WDATA[1][line_ticker - 1][6][0]) * exp(rand_nuF[i][day]);    
+		nuF2 = Params->specific_nuF * exp(RH_P * Params.WEATHER[sub][test_day][1]) * exp(rand_nuF[i][day]);   
 		if (nuF2 > pow(8.0,8.0)) {nuF2 = pow(8.0,8.0);}
 		Params->nuF[num_sub] = (DD10[num_sub] / fourth_size) * nuF2;
 
 		// muF - T
-		temp_now = Params->WDATA[1][line_ticker - 1][2][0];  
+		temp_now = Params.WEATHER[sub][test_day][3];  //avet
 		Params->muF[num_sub] = specific_muF * exp(temp_P*temp_now);	
 		if (Params->muF[num_sub] > pow(10.0,10.0)) {Params->muF[num_sub] = pow(10.0,10.0);}
 
 		// nuR - R
 		total_rainfall = 0.0;
-		rain_day= line_ticker - beta - 1;
+		rain_day = line_ticker - beta - 1;
 		for (rain_day = (line_ticker - beta - theta - 1); rain_day <= line_ticker - theta -1; rain_day++)
 		{
 			if (rain_day < 0){
 				total_rainfall = 0;
 			}
 			else{
-				total_rainfall = Params->WDATA[1][rain_day][0][0] + total_rainfall;
+				total_rainfall = Params.WEATHER[sub][rain_day][0] + total_rainfall; // CHECK DAY INDEXING 
 			}
 		}
 
@@ -408,6 +400,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		Params->nuR[num_sub] = (DD10 / fourth_size) * nuR2;
 
 	} //sub
+
 //********************************************************
 		t = ODE_Solver(t, t_next, Params, y_ode);
 //********************************************************

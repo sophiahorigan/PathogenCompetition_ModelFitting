@@ -119,58 +119,67 @@ return GSL_SUCCESS;
 
 
 // ------------------------------------------  ODE Solver  ----------------------------------------------- //
-// --- CAN YOU PASS A 2D ARRAY INTO AN ODE SOLVER? OR DO I NEED TO LOOP THROUGH SOLVING FOR EACH SUBPOP? ---//
-double ODE_Solver(double t_ode, double t_end, void *Paramstuff, double *y_ode)
+double ODE_Solver(double t_ode, double t_end, void *Paramstuff, double *y_ode) // MAKE Y_ODE GLOBAL? THEN YOU CAN PASS EACH ROW BUT IT WILL HAVE ACCESS TO ALL ROWS?
 {
-int i;
-int status_ode;
-double h_init = 1.0e-5;
-int DIM = 320; //WHAT IS THIS? ??DIM of y_ode I think
 
-STRUCTURE* Params;
-Params = (STRUCTURE*) Paramstuff;
-int num_sub = Params->numsub;
+	STRUCTURE* Params;
+	Params = (STRUCTURE*) Paramstuff;
 
-const gsl_odeiv_step_type *solver_ode	= gsl_odeiv_step_rkf45; // Runge-Kutta Fehlberg (4, 5)
+	int i; int sub;
+	int status_ode;
+	double h_init = 1.0e-5;
+	int num_sub = Params->numsub;
 
-// returns pointer to a newly allocated instance of a stepping function of type 'solver_ode' for a system of DIM dimensions //
-gsl_odeiv_step *step_ode	= gsl_odeiv_step_alloc(solver_ode, DIM);
+	int (*p)[EPI_DIM];
 
-// adaptive step size 
-// D_i = eps_abs + eps_rel * (a_y |y_i| + a_dydt h |y'_i|)
-// original: gsl_odeiv_control *tol_ode	= gsl_odeiv_control_standard_new(1.0e-10, 1.0e-5, 1.0, 0.2)
-gsl_odeiv_control *tol_ode	= gsl_odeiv_control_standard_new(1e-6, 1e-6, 1.0, 0.2); // eps_abs, eps_rel, a_y, a_dydt
-gsl_odeiv_evolve *evol_ode	= gsl_odeiv_evolve_alloc(DIM);
+	const gsl_odeiv_step_type *solver_ode	= gsl_odeiv_step_rkf45; // Runge-Kutta Fehlberg (4, 5)
 
-gsl_odeiv_system sys_ode;
-sys_ode.function  = odes;
-sys_ode.dimension = (size_t)(DIM);
-sys_ode.params	  = Params;
-//double yerr[DIM];
 
-// ----------------------------------- Integrate Over Time ------------------------------------ //
-while (t_ode < t_end)
-{
-	status_ode = gsl_odeiv_evolve_apply(evol_ode, tol_ode, step_ode, &sys_ode, &t_ode, t_end, &h_init, y_ode);
-
-	for (i = 0; i <= DIM; i++)
+	for (sub = 0; sub < num_sub; sub++)
 	{
-		if (y_ode[i] > 0)
+
+		// returns pointer to a newly allocated instance of a stepping function of type 'solver_ode' for a system of DIM dimensions //
+		gsl_odeiv_step *step_ode	= gsl_odeiv_step_alloc(solver_ode, EPI_DIM);
+
+		// adaptive step size 
+		// D_i = eps_abs + eps_rel * (a_y |y_i| + a_dydt h |y'_i|)
+		// original: gsl_odeiv_control *tol_ode	= gsl_odeiv_control_standard_new(1.0e-10, 1.0e-5, 1.0, 0.2)
+		gsl_odeiv_control *tol_ode	= gsl_odeiv_control_standard_new(1e-6, 1e-6, 1.0, 0.2); // eps_abs, eps_rel, a_y, a_dydt
+		gsl_odeiv_evolve *evol_ode	= gsl_odeiv_evolve_alloc(EPI_DIM);
+
+		gsl_odeiv_system sys_ode;
+		sys_ode.function  = odes;
+		sys_ode.dimension = (size_t)(EPI_DIM);
+		sys_ode.params	  = Params;
+
+		while (t_ode < t_end) // run for a single day
 		{
-			// keep y_ode as is
+
+			p = &y_ode[sub]; // pointer to row for sub in y_ode
+
+			status_ode = gsl_odeiv_evolve_apply(evol_ode, tol_ode, step_ode, &sys_ode, &t_ode, t_end, &h_init, p);
+
+			for (i = 0; i <= EPI_DIM; i++)
+			{
+				if (p[i] < 0)
+				{
+					p[i] = 0;
+				}
+			}
 		}
-		else
+		
+		gsl_odeiv_evolve_free(evol_ode);
+		gsl_odeiv_control_free(tol_ode);
+		gsl_odeiv_step_free(step_ode);
+
+		// compile each subpop into collective array // MIGHT NOT NEED THIS
+		/*
+		for (i = 0; i < EPI_DIM; i++)
 		{
-			//printf("y(%d) NEGATIVE or not a number\n",i);
-			y_ode[i] = 0;
-		}
+			Params->ode_output[sub][t_ode][i] = y_ode[i];
+		}*/
+		
 	}
 
-}
-// -------------------------------------- Clear Memory ----------------------------------------- //
-gsl_odeiv_evolve_free(evol_ode);
-gsl_odeiv_control_free(tol_ode);
-gsl_odeiv_step_free(step_ode);
-
-return (t_end);
+	return (t_end); 
 }

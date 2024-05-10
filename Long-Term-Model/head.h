@@ -33,6 +33,7 @@ char *strFileNameDate;
 #define MAX_EPI_DAYS 75				// max days for a single epizootic (overestimate)
 #define NUM_RAIN_PARAMS 4			// rain, rh, avet, maxt
 #define DAYS_IN_YEAR 365			// self-explanatory
+#define EPI_DIM 83					// S(1) + C(1) + V(1) + R(1) + Vinf(27) + Finf(50) + Fkill(1) + Vkill(1)
 
 FILE *fpintra;
 FILE *fpinter;
@@ -63,8 +64,7 @@ const double Cend = 525.015699999847;
 const double DDstart = 100.157149999888; // CHECK THIS
 const double DDstop = 267.034499999981;	// CHECK THIS
 const double VDDstart = 75.104413;	// CHECK THIS
-			
-const int EPI_DIM = 83; //S(1) + C(1) + V(1) + R(1) + Vinf(27) + Finf(50) + Fkill(1) + Vkill(1) 
+		
 const double h = 0.01;
 
 const double lambdaF = 0.119701349994476; //transmission rate between funugs exposed classes
@@ -72,7 +72,8 @@ const double lambdaV = 0.0625; //transmission rate between virus exposed classes
 const double muV = 0.4102453; //virus decay // from Dwyer et al 2022
 const double CV = 0.86; //heterogeneity in virus susceptibility
 const double nuV = 0.4607038; //virus transmission
-const double specific_nuF = 0.000241071699421562; 
+const double specific_nuF = 0.000241071699421562; // baseline fungus transmission (not influenced by weather)
+const double squareCVV = 0.86*0.86; // heterogenetity in susceptibility to virus infection
 
 // long term model
 const double fecundity = 15;
@@ -112,6 +113,9 @@ typedef struct //FIT PARS
 	double nuR[MAX_SUBS];
 	double muF[MAX_SUBS];
 
+	double Vkill[MAX_SUBS];
+	double Fkill[MAX_SUBS];
+
 	double EV[400]; 
 	double EF[400]; 
 
@@ -119,11 +123,13 @@ typedef struct //FIT PARS
 	int MAX_EPI_LENGTH;				// longest epi length
 
 	double SINGLE_EPI_MODEL[MAX_SIM_YEARS][MAX_SUBS][MAX_EPI_DAYS][NUM_STATES]; // year, sub, day, state variable
-	double LONG_TERM_MODEL[MAX_SIM_YEARS][MAX_SUBS][NUM_STATES]; // year, sub, state variable (NEED TO UPDATE. more than 3.)
+	double LONG_TERM_MODEL[MAX_SIM_YEARS][MAX_SUBS][30]; // year, sub
 
 	double HIST_WEATHER[MAX_WEATHER_YEARS][MAX_SUBS][DAYS_IN_YEAR][NUM_RAIN_PARAMS]; // year, sub, day, parameter
 	double CC_WEATHER[MAX_WEATHER_YEARS][MAX_SUBS][DAYS_IN_YEAR][NUM_RAIN_PARAMS];  // year, sub, day, parameter
 	double WEATHER[MAX_SUBS][DAYS_IN_YEAR][NUM_RAIN_PARAMS]; //sub, day, parameter
+
+	double DISTANCE_MAT[MAX_SUBS][MAX_SUBS]; // pairwise distance between each subpop
 
 	int model; //model number
 	int num_sub;
@@ -147,12 +153,11 @@ typedef struct //FIT PARS
 	int S_end[MAX_SUBS];
 
 	int R_start[MAX_SUBS];
+	int R_end[MAX_SUBS];
 	int V_start[MAX_SUBS];
 
-	int MAX_EPI_LENGTH;
-
-	double size_C;
-	double indexR;
+	double size_C[MAX_SUBS];
+	double indexR[MAX_SUBS];
 
 	double INITS[MAX_SUBS];
 	double INITV[MAX_SUBS];

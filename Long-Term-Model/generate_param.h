@@ -1,5 +1,7 @@
-double generate_param(int param_num){ // will add complexity to this to allow for different param drawing conditions (mean vs stochastic vs grid)
 
+/*
+double generate_param(int param_num){ // will add complexity to this to allow for different param drawing conditions (mean vs stochastic vs grid)
+    
     double tmp; 
 
     double meanS = ; double sdS = ;
@@ -15,4 +17,4 @@ double generate_param(int param_num){ // will add complexity to this to allow fo
     if (param_num == 4) {tmp = }; //l_a
 
     return tmp;
-}
+}*/

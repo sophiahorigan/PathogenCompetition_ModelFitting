@@ -5,8 +5,6 @@ double DDEVF(void *Paramstuff, double *RandNumsPass, int year) //SH DOES save in
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
-int FlagDay = 0;
-
 int sub;
 
 //-------------------------------------- PARAMETER DECLARATION -------------------------------------------//
@@ -16,23 +14,20 @@ int MAX_T = Params->MAX_EPI_LENGTH;
 //--- need to update to get cc data----
 double t=h;		double t_next=h;	double t_0=h;	int i;	int ii;			// time loop and index
 
-double y_ode[num_sub][EPI_DIM]; // NEEDS TO BE BIGGER - NUMBER OF ALL INFECTIOUS CLASSES! 
+double y_ode[MAX_SUBS][EPI_DIM]; // NEEDS TO BE BIGGER - NUMBER OF ALL INFECTIOUS CLASSES! 
 
-double rand_nuR[num_sub][MAX_T];
-double rand_nuF[num_sub][MAX_T]; //how do I make this flexible with different epi length sizes. I don't think I can.
+double rand_nuR[MAX_SUBS][MAX_T];
+double rand_nuF[MAX_SUBS][MAX_T]; //how do I make this flexible with different epi length sizes. I don't think I can.
 
-double temp_now[num_sub];  //CIK// used simplify decay functions
-double total_rainfall[num_sub] = {0.0};  //used to sum up rainfall
-int rain_day[num_sub];  //used to sum up rainfall
+double temp_now;  
+double total_rainfall = {0.0}; 
+int rain_day;  
 
 double DDtemp_now;  //CIK// used simplify decay functions
 double DD10; 
 
-double nuF2[num_sub];
-double nuR2[num_sub];
-
-Params->size_C = 1.0;
-Params->indexR = 0.0;
+double nuF2;
+double nuR2;
 
 // --------------------------------------- STOCHASTICITY -------------------------------------------- //
 for (ii = 0; ii < num_sub; ii++)
@@ -45,12 +40,22 @@ for (ii = 0; ii < num_sub; ii++)
 		rand_nuR[ii][i]=gsl_ran_gaussian(RandNumsPass,Params->R_stoch); // DO THESE NEED DIFFERENT SEEDS? I DON'T THINK SO.
 		rand_nuF[ii][i]=gsl_ran_gaussian(RandNumsPass,Params->F_stoch);
 	}
+	
 }
 
 // ------------------------------------- INITIALIZE MODEL PARAMETERS --------------------------------------- //
-// MAKE FLAGS SUBS
-int FlagWeek;	int FlagV[num_sub];	int FlagR[num_sub] = 0;	int FlagR_end[num_sub] = 0; int Flag4;
-FlagV[num_sub] = {0}; // at the beginning state, part of the population is infected  
+int FlagWeek;	int FlagDay[MAX_SUBS];  int FlagV[MAX_SUBS];	int FlagR[MAX_SUBS];	int FlagR_end[MAX_SUBS];  int Flag4[MAX_SUBS];
+
+for (ii = 0; ii < num_sub; ii++)
+{
+	Params->size_C[sub] = 1.0;
+	Params->indexR[sub] = 0.0;	
+	FlagR[sub] = 0;
+	FlagR_end[sub] = 0;
+	FlagV[sub] = 0;
+	FlagDay[sub] = 0;
+	Flag4[sub] = 0;
+}
 
 int day = 0; int week = 0;							// keeps track of day and week number
 
@@ -63,73 +68,68 @@ line_ticker = num_day;
 
 line_ticker = line_ticker-1;
 
-double S[num_sub]; // susceptible insects
-double V[num_sub]; // OB's (insects killed by virus) //Vcadaver
-double C[num_sub]; // conidia (insects killed by fungus) //Fcadaver
-double R[num_sub]; // resting spores (4th instars killed by fungus) //FRnext
-double IV[num_sub]; // total virus infected insects
-double IF[num_sub]; // total fungus infected insects
-double E_V[num_sub][n+1]; // virus infected insects classes
-double E_F[num_sub][m+1]; // fungus infected insect classes
-double Vkill[num_sub]; // cumulative virus killed
-double Fkill[num_sub]; // cumulative fungus killed
+double S[MAX_SUBS]; // susceptible insects
+double V[MAX_SUBS]; // OB's (insects killed by virus) //Vcadaver
+double C[MAX_SUBS]; // conidia (insects killed by fungus) //Fcadaver
+double R[MAX_SUBS]; // resting spores (4th instars killed by fungus) //FRnext
+double IV[MAX_SUBS]; // total virus infected insects
+double IF[MAX_SUBS]; // total fungus infected insects
+double E_V[MAX_SUBS][n+1]; // virus infected insects classes
+double E_F[MAX_SUBS][m+1]; // fungus infected insect classes
 
 // ----------------------------------- INFECTION START --------------------------------------- //
 
 for (sub = 0; sub < num_sub; sub++)
 {
 	DD10 = 0.0;
-	Params.R_start[sub] = 0.0;
-	test_day = Params.S_start[sub]; // hatch
+	Params->R_start[sub] = 0.0;
+	test_day = Params->S_start[sub]; // hatch
 
 	// R start
 	while (DD10 <= DDstart)
 	{
-		DDtemp_now = Params.WEATHER[sub][test_day][3] - 10.0; // avet
+		DDtemp_now = Params->WEATHER[sub][test_day][3] - 10.0; // avet
 		if (DDtemp_now < 0.0) {DDtemp_now = 0.0;}
 		DD10 = DD10 + DDtemp_now;		
-		Params.R_start[sub]++;
+		Params->R_start[sub]++;
 		test_day++;
 	}	
 
 	DD10 = 0.0;
-	Params.R_end[sub] = 0.0;
-	test_day = Params.S_start[sub]; // hatch
+	Params->R_end[sub] = 0.0;
+	test_day = Params->S_start[sub]; // hatch
 
 	// R end
 	while (DD10 <= DDstop)
 	{
-		DDtemp_now = Params.WEATHER[sub][test_day][3] - 10.0; // avet
+		DDtemp_now = Params->WEATHER[sub][test_day][3] - 10.0; // avet
 		if (DDtemp_now < 0.0) {DDtemp_now = 0.0;}
 		DD10 = DD10 + DDtemp_now;			
-		Params.R_end[sub]++;
+		Params->R_end[sub]++;
 		test_day++;
 	}
 
 	DD10 = 0.0;
-	Params.V_start[sub] = 0.0;
-	test_day = Params.S_start[sub];
+	Params->V_start[sub] = 0.0;
+	test_day = Params->S_start[sub];
 
 	// V start
 	while(DD10 <= VDDstart){
 
-		DDtemp_now = Params.WEATHER[sub][test_day][3] - 10.0; // avet
+		DDtemp_now = Params->WEATHER[sub][test_day][3] - 10.0; // avet
 		if (DDtemp_now < 0.0) {DDtemp_now = 0.0;}
 		DD10 = DD10 + DDtemp_now;			
-		Params.V_start[sub]++;
+		Params->V_start[sub]++;
 		test_day++;
 	}
 }
 // ---------------------------- LONG TERM VARIABLES ------------------------------- //
 for (sub = 0; sub < num_sub; sub++)
 {
-	Params->INITS[sub] <- Params->STATEVARS[1][i];
-	Params->INITV[sub] <- Params->STATEVARS[2][i];
-	Params->INITR[sub] <- Params->STATEVARS[3][i];
+	Params->INITS[sub] = Params->STATEVARS[1][i];
+	Params->INITV[sub] = Params->STATEVARS[2][i];
+	Params->INITR[sub] = Params->STATEVARS[3][i];
 }
-// WHAT ARE THESE?
-double VirFI[100], FungFI[100];
-VirFI[0] = 0.0; VirFI[1] = 0.0; FungFI[0] = 0.0; FungFI[1] = 0.0;
 
 // ----------------------------------------- INITIALIZE RESULTS ------------------------------------------- //
 for (sub = 0; sub < num_sub; sub++)
@@ -158,17 +158,17 @@ for (sub = 0; sub < num_sub; sub++)
 	{
 		V[sub] = Params->INITV[sub]; 
 	}
-	Vkill[i] = 0;
-	Fkill[i] = 0;
+	Params->Vkill[i] = 0;
+	Params->Fkill[i] = 0;
 }
 
 double timing[num_sub][3];
 
 for (sub = 0; sub < num_sub; sub++){ //initial conditions
-	timing[i][0] = R_start[sub];
-	timing[i][1] = R_end[sub];
+	timing[i][0] = Params->R_start[sub];
+	timing[i][1] = Params->R_end[sub];
 	timing[i][2] = MAX_T;
-	timing[i][3] = V_start[sub];
+	timing[i][3] = Params->V_start[sub];
 }
 
 // -------------------- MAIN LOOP!! (calculate populations as time is increased) -------------------------- //
@@ -177,7 +177,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 
 	for (int sub = 0; sub < num_sub; sub++) // this loop is going to mess up DAY
 	{
-		if (MAX_T > EPI_LENGTH[sub])
+		if (MAX_T > Params->EPI_LENGTH[sub])
 		{
 			// set all densities to zero
 		}
@@ -220,14 +220,14 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		else if (timing[sub][1] < timing[sub][0] && timing[sub][1] < day+1)
 		{
 			FlagR_end[sub] = 1;
-			t_next = timing[1];
+			t_next = timing[sub][1];
 			timing[sub][0] = 999.9;
 			timing[sub][1] = 999.9;
 		}
 		// --------------------- Resting spores bloom and end of day -------------------- //
 		else if (abs(day+1 - timing[sub][0]) < epsilon)
 		{
-			FlagDay = 1; // does this need a sub?
+			FlagDay[sub] = 1; // does this need a sub?
 			FlagR[sub] = 1;
 			if ((abs(day+1 - timing[sub][3]) < epsilon) && FlagV[sub] == 0){     //Starting virus infection (before resting spore bloom)
             	FlagV[sub] = 1;
@@ -248,7 +248,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		// --------------------- resting spores done and end of day -------------------- //
 		else if (abs(day+1 - timing[sub][1]) < epsilon)
 		{
-			FlagDay = 1;
+			FlagDay[sub] = 1;
 			FlagR_end[sub] = 1;
 			t_next = day+1;
 			timing[sub][0] = 999.9;
@@ -274,7 +274,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 
 			//unlease the cadavers
 			for(sub=0; sub<num_sub; sub++){ 
-				V[sub] = INITV[sub];
+				V[sub] = Params->INITV[sub];
 			}
 
 			if(larval_dispersal == 1){ 
@@ -290,7 +290,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 				double Sin[num_sub]; 
 
 				//initialize dispersal array
-				for(sub=0; sub<num_sub; sub++){
+				for (sub = 0; sub < num_sub; sub++){
 
 					Sout[sub] = 0;
 					Sin[sub] = 0;
@@ -300,26 +300,26 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 				}
 
 				//larvae disperse
-				for(subout=0; subout<num_sub; subout++)
+				for (subout = 0; subout < num_sub; subout++)
 				{
 					Sout[subout] = exp(-Params->l_a[subout]*10) * S[subout];
 
 					Vout[subout] += exp(-Params->l_a[subout]*10) * V[subout];
 				}
 				//some fraction arrive at another population
-				for(subout=0; subout<num_sub; subout++)
+				for (subout = 0; subout < num_sub; subout++)
 				{
 					for(subin=0; subin<num_sub; subin++)
 					{
 						if(subin!=subout)
 						{
-							Sin[subin] = Sout[subout]*exp(-Params->l_a[subout]*Params->DISTANCE[j][subout][subin]);
+							Sin[subin] = Sout[subout]*exp(-Params->l_a[subout]*Params->DISTANCE_MAT[subout][subin]);
 
-							Vin[subin] += Vout[subout]*exp(-Params->l_a[subout]*Params->DISTANCE[j][subout][subin]);
+							Vin[subin] += Vout[subout]*exp(-Params->l_a[subout]*Params->DISTANCE_MAT[subout][subin]);
 						}
 					}
 				}
-				for(sub=0; sub<num_sub; sub++){ //update larval density
+				for (sub = 0; sub < num_sub; sub++){ //update larval density
 
 					S[sub] += (Sin[sub] - Sout[sub]);
 
@@ -333,7 +333,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 	{
 
 	//-------------------------------------- DAILY UPDATE OF Y_ODE -------------------------------------------// //FIGURE OUT NEW SUB INDEX CODE
-	for (sub = 0; sub < num_sub, sub++)
+	for (sub = 0; sub < num_sub; sub++)
 	{
 		// Susceptible insects 
 		y_ode[sub][0] = S[sub];	
@@ -352,15 +352,15 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		// OBs
 		y_ode[sub][m+n+3] = V[sub]; 
 		// Vkill
-		y_ode[sub][m+n+4] = Vkill[sub]; 
+		y_ode[sub][m+n+4] = Params->Vkill[sub]; 
 		// Fkill
-		y_ode[sub][m+n+5] = Fkill[sub];
+		y_ode[sub][m+n+5] = Params->Fkill[sub];
 
 		//------------------CALCULATE WEATHER DEPENDENT FUNGUS TRANSMISSION PARAMS------//
 		// Degree Day
-		DDtemp_now = Params->WDATA[1][line_ticker - 1][4][0]-10.0;   //update
+		DDtemp_now = Params->WEATHER[sub][test_day][3] - 10.0;  //avet
 		if (DDtemp_now < 0.0) {DDtemp_now=0.0;}
-		DD10[num_sub] = DD10[num_sub] + DDtemp_now;		
+		DD10 = DD10 + DDtemp_now;		
 
 		// conidia production
 		if(DD10 >= (fourth_size) && Flag4[sub] == 0){
@@ -372,13 +372,13 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		}	
 
 		// nuF - RH
-		nuF2 = Params->specific_nuF * exp(RH_P * Params.WEATHER[sub][test_day][1]) * exp(rand_nuF[i][day]);   
+		nuF2 = specific_nuF * exp(RH_P * Params->WEATHER[sub][test_day][1]) * exp(rand_nuF[i][day]);   
 		if (nuF2 > pow(8.0,8.0)) {nuF2 = pow(8.0,8.0);}
-		Params->nuF[num_sub] = (DD10[num_sub] / fourth_size) * nuF2;
+		Params->nuF[num_sub] = (DD10 / fourth_size) * nuF2;
 
 		// muF - T
-		temp_now = Params.WEATHER[sub][test_day][3];  //avet
-		Params->muF[num_sub] = specific_muF * exp(temp_P*temp_now);	
+		temp_now = Params->WEATHER[sub][test_day][3];  //avet
+		Params->muF[num_sub] = specific_muF * exp(temp_P * temp_now);	
 		if (Params->muF[num_sub] > pow(10.0,10.0)) {Params->muF[num_sub] = pow(10.0,10.0);}
 
 		// nuR - R
@@ -387,10 +387,10 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		for (rain_day = (line_ticker - beta - theta - 1); rain_day <= line_ticker - theta -1; rain_day++)
 		{
 			if (rain_day < 0){
-				total_rainfall = 0;
+				total_rainfall = 0.0;
 			}
 			else{
-				total_rainfall = Params.WEATHER[sub][rain_day][0] + total_rainfall; // CHECK DAY INDEXING 
+				total_rainfall = Params->WEATHER[sub][rain_day][0] + total_rainfall; // CHECK DAY INDEXING 
 			}
 		}
 
@@ -430,8 +430,8 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		R[sub] = y_ode[sub][m+n+2];
 		// OBs
 		V[sub] = y_ode[sub][m+n+3];
-		Vkill[sub] = y_ode[sub][m+n+4];
-		Fkill[sub] = y_ode[sub][m+n+5];
+		Params->Vkill[sub] = y_ode[sub][m+n+4];
+		Params->Fkill[sub] = y_ode[sub][m+n+5];
 	
 		if (FlagV[sub] == 1)
 		{
@@ -440,7 +440,7 @@ while (t_0 < MAX_T + h)	{ //different subs have different epi lengths
 		}
 		if (FlagR[sub] == 1)			
 		{	
-			R[sub] = INITR[sub];
+			R[sub] = Params->INITR[sub];
 			Rstartday[sub] = day;
 			FlagR[sub] = 2;
 		}

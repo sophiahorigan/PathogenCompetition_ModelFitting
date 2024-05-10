@@ -1,21 +1,13 @@
 // --------------------------------Begin ODE system of White model --------------------------------------------//
-int odes(double t, const double y[], double dydt[],void *Paramstuff)
+int odes(double t, const double y[][EPI_DIM], double dydt[][EPI_DIM],void *Paramstuff)
 {
 STRUCTURE* Params;
 Params = (STRUCTURE*) Paramstuff;
 
 //INDEXING
-int j = Params->j; //dataset
 int i;
-int num_sub = Params->numsub;
+int num_sub = Params->num_sub;
 int sub;
-
-//FIXED PARAMETERS
-double nuV 		= Params->nuV; 	//virus transmission
-double muV		= Params->muV; 	//virus decay
-double squareCVV = Params->CV*Params->CV; //heterogeneity
-double size_C	= Params->size_C;  
-double indexR = Params->indexR;
 
 //WEATHER PARAMS
 double nuR[num_sub];
@@ -59,13 +51,13 @@ if(conidia_dispersal == 1){
 	for(subout = 0; subout < num_sub; subout++){ //calculate net dispersal
 		
 		//SCALE OF MIGRATION
-		Cout[subout] = exp(-c_a[subout]*10) * y[subout][m+n+1]; //r = 10m
+		Cout[subout] = exp(-Params->c_a[subout]*10) * y[subout][m+n+1]; //r = 10m
 
 		for(subin = 0; subin < num_sub; subin++){
 
 			if(subout != subin){
 
-				Cin[subin] += Cout[subout] * exp(-c_a[subout]*Params->DISTANCE[j][subout][subin]); //UPDATE DISTANCE
+				Cin[subin] += Cout[subout] * exp(-Params->c_a[subout]*Params->DISTANCE_MAT[subout][subin]); //UPDATE DISTANCE
 
 			}
 		} 
@@ -99,10 +91,10 @@ for (sub = 0; sub < num_sub; sub++)
 
 	}
 	//--------- Conidia ----------
-	dydt[sub][m+n+1] = m * lambdaF * y[sub][m] * size_C[sub] - muF[sub] * y[sub][m+n+1] + netC[sub];
+	dydt[sub][m+n+1] = m * lambdaF * y[sub][m] * Params->size_C[sub] - muF[sub] * y[sub][m+n+1] + netC[sub];
 
 	//---------- Resting Spores --------
-	dydt[sub][m+n+2] = indexR[sub] * m * lambdaF * y[sub][m];
+	dydt[sub][m+n+2] = Params->indexR[sub] * m * lambdaF * y[sub][m];
 
 	//------------ OBs-----------
 	dydt[sub][m+n+3] = n * lambdaV * y[sub][m+n] - muV * y[sub][m+n+3]; 
@@ -119,7 +111,7 @@ return GSL_SUCCESS;
 
 
 // ------------------------------------------  ODE Solver  ----------------------------------------------- //
-double ODE_Solver(double t_ode, double t_end, void *Paramstuff, double *y_ode) // MAKE Y_ODE GLOBAL? THEN YOU CAN PASS EACH ROW BUT IT WILL HAVE ACCESS TO ALL ROWS?
+double ODE_Solver(double t_ode, double t_end, void *Paramstuff, double **y_ode) // MAKE Y_ODE GLOBAL? THEN YOU CAN PASS EACH ROW BUT IT WILL HAVE ACCESS TO ALL ROWS?
 {
 
 	STRUCTURE* Params;
@@ -128,9 +120,9 @@ double ODE_Solver(double t_ode, double t_end, void *Paramstuff, double *y_ode) /
 	int i; int sub;
 	int status_ode;
 	double h_init = 1.0e-5;
-	int num_sub = Params->numsub;
+	int num_sub = Params->num_sub;
 
-	int (*p)[EPI_DIM];
+	double (*p)[EPI_DIM];
 
 	const gsl_odeiv_step_type *solver_ode	= gsl_odeiv_step_rkf45; // Runge-Kutta Fehlberg (4, 5)
 

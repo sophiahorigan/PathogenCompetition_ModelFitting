@@ -33,7 +33,7 @@ double rand_nuR[MAXT3];
 double rand_nuF[MAXT3];
 
 double temp_now;  //CIK// used simplify decay functions
-double total_rainfall=0.0;  //used to sum up rainfall
+double total_rainfall = 0.0;  //used to sum up rainfall
 int rain_day;  //used to sum up rainfall
 
 double DDtemp_now;  //CIK// used simplify decay functions
@@ -41,12 +41,12 @@ double DDtemp_now;  //CIK// used simplify decay functions
 double nuF2;
 double nuR2;
 
-double DD10=0;    //accumulated degree days about 10 degrees C
+double DD10 = 0;    //accumulated degree days about 10 degrees C
 double R_seed = 0.05;
 
 
 // --------------------------------------- STOCHASTICITY -------------------------------------------- //
-for (i=0;i<=MAXT3;i++)	{
+for (i=0;i<MAXT3;i++)	{
 	rand_nuR[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i],Params->R_stoch);
 	rand_nuF[i]=gsl_cdf_gaussian_Pinv(RandNumsPass[i+MAXT3],Params->F_stoch);
 }
